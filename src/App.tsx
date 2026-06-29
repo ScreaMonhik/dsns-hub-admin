@@ -6,6 +6,7 @@ import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { ukUA } from '@mui/material/locale';
 import { AdminLayout } from './components/layout/AdminLayout';
 import { Users } from './pages/Users';
+import { News } from './pages/News';
 import { useThemeStore } from './store/themeStore';
 
 const DashboardPlaceholder = () => (
@@ -42,7 +43,7 @@ function App() {
             <Route element={<AdminLayout />}>
               <Route path="/" element={<DashboardPlaceholder />} />
               <Route path="/users" element={<Users />} />
-              <Route path="/news" element={<h2>Модуль "Новини" (В розробці)</h2>} />
+              <Route path="/news" element={<News />} />
               <Route path="/documents" element={<h2>Модуль "Документи" (В розробці)</h2>} />
               <Route path="/projects" element={<h2>Модуль "Проєкти" (В розробці)</h2>} />
               <Route path="/polls" element={<h2>Модуль "Опитування" (В розробці)</h2>} />
