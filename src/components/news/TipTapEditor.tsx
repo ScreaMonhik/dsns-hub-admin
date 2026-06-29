@@ -1,4 +1,4 @@
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, ReactNodeViewRenderer, NodeViewWrapper } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Underline from '@tiptap/extension-underline';
@@ -23,7 +23,27 @@ import ImageIcon from '@mui/icons-material/Image';
 import TitleIcon from '@mui/icons-material/Title';
 import { useState, useRef, useEffect } from 'react';
 import { newsApi } from '../../api/newsApi';
-import { getFullUrl } from '../../utils/url';
+import { SecureImage } from '../common/SecureImage';
+
+// Кастомний вузол для TipTap: рендерить наш SecureImage замість звичайного <img src="...">
+const TipTapSecureImage = (props: any) => {
+  return (
+    <NodeViewWrapper as="div" style={{ display: 'flex', justifyContent: 'center', width: '100%', padding: '16px 0' }}>
+      <SecureImage
+        src={props.node.attrs.src}
+        alt={props.node.attrs.alt || 'Зображення новини'}
+        style={{ maxWidth: '100%', height: 'auto', borderRadius: '4px' }}
+      />
+    </NodeViewWrapper>
+  );
+};
+
+// Створюємо розширення на базі стандартного Image
+const SecureImageExtension = Image.extend({
+  addNodeView() {
+    return ReactNodeViewRenderer(TipTapSecureImage);
+  },
+});
 
 interface TipTapEditorProps {
   value: string;
@@ -38,11 +58,10 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        heading: {
-          levels: [2, 3],
-        },
+        heading: { levels: [2, 3] },
       }),
-      Image,
+      // Замінили стандартний Image на наш SecureImageExtension
+      SecureImageExtension,
       Underline,
       Link.configure({
         openOnClick: false,
@@ -60,17 +79,15 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
       try {
         return value ? JSON.parse(value) : '';
       } catch {
-        return value; // Резервний варіант, якщо в базі зашився старий чистий HTML
+        return value;
       }
     })(),
     onUpdate: ({ editor }) => {
-      // Експортуємо контент як валідний JSON рядок для збереження в TEXT поле бази даних
       const jsonString = JSON.stringify(editor.getJSON());
       onChange(jsonString);
     },
   });
 
-  // Забезпечуємо синхронізацію при завантаженні існуючої новини з сервера
   useEffect(() => {
     if (editor) {
       const currentHTML = editor.getHTML();
@@ -95,7 +112,9 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
     try {
       setIsUploading(true);
       const res = await newsApi.uploadMedia(file);
-      editor.chain().focus().setImage({ src: getFullUrl(res.url) }).run();
+      // ВАЖЛИВО: Передаємо відносний шлях (res.url), щоб SecureImage зрозумів, 
+      // що це внутрішній ресурс і завантажив його через apiClient з JWT.
+      editor.chain().focus().setImage({ src: res.url }).run();
     } catch (err) {
       console.error('Failed to upload image:', err);
       alert('Помилка завантаження зображення');
@@ -128,7 +147,6 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
       bgcolor: 'background.paper'
     }}>
       <Toolbar variant="dense" sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.default', gap: 0.5, flexWrap: 'wrap', py: 0.5 }}>
-        {/* Заголовки */}
         <Tooltip title="Заголовок H2">
           <IconButton size="small" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} color={editor.isActive('heading', { level: 2 }) ? 'primary' : 'default'}>
             <TitleIcon fontSize="small" />
@@ -144,7 +162,6 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
 
         <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
 
-        {/* Форматування тексту */}
         <Tooltip title="Жирний">
           <IconButton size="small" onClick={() => editor.chain().focus().toggleBold().run()} color={editor.isActive('bold') ? 'primary' : 'default'}>
             <FormatBoldIcon fontSize="small" />
@@ -168,7 +185,6 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
 
         <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
 
-        {/* Вирівнювання тексту */}
         <Tooltip title="Вирівняти ліворуч">
           <IconButton size="small" onClick={() => editor.chain().focus().setTextAlign('left').run()} color={editor.isActive({ textAlign: 'left' }) ? 'primary' : 'default'}>
             <FormatAlignLeftIcon fontSize="small" />
@@ -192,7 +208,6 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
 
         <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
 
-        {/* Списки та цитати */}
         <Tooltip title="Маркований список">
           <IconButton size="small" onClick={() => editor.chain().focus().toggleBulletList().run()} color={editor.isActive('bulletList') ? 'primary' : 'default'}>
             <FormatListBulletedIcon fontSize="small" />
@@ -211,7 +226,6 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
 
         <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
 
-        {/* Посилання та Медіа */}
         <Tooltip title="Додати посилання">
           <IconButton size="small" onClick={setLink} color={editor.isActive('link') ? 'primary' : 'default'}>
             <LinkIcon fontSize="small" />
@@ -251,13 +265,6 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
           color: 'text.disabled',
           pointerEvents: 'none',
           height: 0,
-        },
-        '& img': { 
-          maxWidth: '100%', 
-          height: 'auto', 
-          borderRadius: 1, 
-          display: 'block', 
-          my: 2 
         },
         '& blockquote': {
           borderLeft: '4px solid',
