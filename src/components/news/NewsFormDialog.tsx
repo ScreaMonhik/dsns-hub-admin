@@ -20,7 +20,7 @@ const newsSchema = z.object({
   title: z.string().min(3, 'Мінімум 3 символи'),
   content: z.string().min(10, 'Контент занадто короткий'),
   categoryId: z.string().nullable(),
-  status: z.enum(['DRAFT', 'PUBLISHED']),
+  status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
   imageUrl: z.string().nullable(),
 });
 

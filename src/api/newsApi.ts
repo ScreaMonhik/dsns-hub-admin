@@ -1,6 +1,6 @@
 import { apiClient } from './apiClient';
 
-export type NewsStatus = 'DRAFT' | 'PUBLISHED';
+export type NewsStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 
 export interface NewsCategory {
   id: string;
