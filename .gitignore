@@ -1,24 +1,76 @@
-# Logs
+# ========================
+# Залежності
+# ========================
+/node_modules
+/.pnp
+.pnp.js
+
+# ========================
+# Збірка (Білди)
+# ========================
+/dist
+/build
+/out-tsc
+
+# ========================
+# Середовище та Секрети
+# ========================
+.env
+.env.test
+.env.production
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+
+# ========================
+# Логи
+# ========================
 logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# ========================
+# Кеш та Тимчасові файли
+# ========================
+/.cache
+.eslintcache
+.stylelintcache
+/coverage
+/.nyc_output
+.tsbuildinfo
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# ========================
+# Тестові артефакти
+# ========================
+# (Сюди ж додаємо твої згенеровані pdf з папки test)
+/test/documents/*.pdf
+/uploads
+
+# ========================
+# Налаштування редакторів та ОС
+# ========================
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# ========================
+# AI помічники та тули
+# ========================
+# (Краще ігнорувати глобально, щоб ніхто випадково не залив у main)
+.claude-dev-helper/
+.cline/
