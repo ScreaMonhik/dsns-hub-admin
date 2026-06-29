@@ -169,7 +169,12 @@ export const News = () => {
               </TableHead>
               <TableBody>
                 {data?.data.map((item) => (
-                  <TableRow key={item.id} hover>
+                  <TableRow 
+                    key={item.id} 
+                    hover
+                    onDoubleClick={() => activeTab === 0 && openEdit(item)}
+                    sx={{ cursor: activeTab === 0 ? 'pointer' : 'default' }}
+                  >
                     <TableCell sx={{ maxWidth: 300, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {item.title}
                     </TableCell>
@@ -250,7 +255,20 @@ export const News = () => {
         ) : (
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 2 }}>
             {data?.data.map((item) => (
-              <Card key={item.id} sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Card 
+                key={item.id} 
+                onDoubleClick={() => activeTab === 0 && openEdit(item)}
+                sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: 6,
+                    cursor: activeTab === 0 ? 'pointer' : 'default'
+                  }
+                }}
+              >
                 <SecureImage
                   src={item.imageUrl ?? undefined}
                   alt={item.title}

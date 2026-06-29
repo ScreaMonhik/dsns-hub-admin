@@ -60,7 +60,6 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
       StarterKit.configure({
         heading: { levels: [2, 3] },
       }),
-      // Замінили стандартний Image на наш SecureImageExtension
       SecureImageExtension,
       Underline,
       Link.configure({
@@ -76,29 +75,50 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
       }),
     ],
     content: (() => {
+      if (!value) return '';
       try {
-        return value ? JSON.parse(value) : '';
+        return typeof value === 'string' ? JSON.parse(value) : value;
       } catch {
         return value;
       }
     })(),
     onUpdate: ({ editor }) => {
-      const jsonString = JSON.stringify(editor.getJSON());
-      onChange(jsonString);
+      // Повертаємо строгий JSON для зручного парсингу в мобільному додатку
+      onChange(JSON.stringify(editor.getJSON()));
     },
   });
 
   useEffect(() => {
-    if (editor) {
-      const currentHTML = editor.getHTML();
-      const currentJSON = JSON.stringify(editor.getJSON());
-      
-      if (value !== currentHTML && value !== currentJSON) {
+    if (!editor || value === undefined) return;
+
+    let isJson = false;
+    let parsedValue: any = value;
+
+    if (typeof value === 'string') {
+      try {
+        parsedValue = JSON.parse(value);
+        isJson = true;
+      } catch {
+        isJson = false;
+      }
+    } else if (typeof value === 'object') {
+      isJson = true;
+      parsedValue = value;
+    }
+
+    const currentJSON = JSON.stringify(editor.getJSON());
+    const compareValue = isJson ? JSON.stringify(parsedValue) : value;
+
+    // Оновлюємо контент лише якщо він дійсно змінився, запобігаючи падінню в нескінченний цикл
+    if (compareValue !== currentJSON && value !== editor.getHTML()) {
+      if (isJson) {
         try {
-          editor.commands.setContent(JSON.parse(value));
-        } catch {
-          editor.commands.setContent(value);
+          editor.commands.setContent(parsedValue);
+        } catch (error) {
+          console.error('Failed to set JSON content in TipTap:', error);
         }
+      } else {
+        editor.commands.setContent(value || '');
       }
     }
   }, [value, editor]);
