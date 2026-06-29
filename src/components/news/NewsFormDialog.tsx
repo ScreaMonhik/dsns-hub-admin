@@ -12,7 +12,9 @@ import AddIcon from '@mui/icons-material/Add';
 import { newsApi, type News, type NewsCategory } from '../../api/newsApi';
 import { TipTapEditor } from './TipTapEditor';
 import { CreateCategoryDialog } from './CreateCategoryDialog';
+import { ManageCategoriesDialog } from './ManageCategoriesDialog';
 import { SecureImage } from '../common/SecureImage';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 const newsSchema = z.object({
   title: z.string().min(3, 'Мінімум 3 символи'),
@@ -37,6 +39,7 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
   const [apiError, setApiError] = useState<string | null>(null);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isCreateCategoryOpen, setIsCreateCategoryOpen] = useState(false);
+  const [isManageCategoriesOpen, setIsManageCategoriesOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { control, handleSubmit, reset, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormInputs>({
@@ -45,9 +48,11 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
   });
 
   const coverUrl = watch('imageUrl');
+  const wasOpen = useRef(false);
 
   useEffect(() => {
-    if (open) {
+    // Форма скидається або ініціалізується даними ТІЛЬКИ коли вікно переходить зі стану закритого у відкрите
+    if (open && !wasOpen.current) {
       if (news) {
         reset({
           title: news.title,
@@ -60,6 +65,7 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
         reset({ title: '', content: '', categoryId: categories[0]?.id || null, status: 'DRAFT', imageUrl: null });
       }
     }
+    wasOpen.current = open;
   }, [news, open, reset, categories]);
 
   const handleCoverUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,16 +109,29 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
           )}/>
 
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-            <Box sx={{ display: 'flex', gap: 1, flex: 1, alignItems: 'flex-start' }}>
+            <Box sx={{ display: 'flex', gap: 0.5, flex: 1, alignItems: 'flex-start' }}>
               <Controller name="categoryId" control={control} render={({ field }) => (
-                <TextField {...field} select label="Категорія" fullWidth error={!!errors.categoryId} helperText={errors.categoryId?.message} value={field.value || ''}>
+                <TextField 
+                  {...field} 
+                  select 
+                  label="Категорія" 
+                  fullWidth 
+                  error={!!errors.categoryId} 
+                  helperText={errors.categoryId?.message} 
+                  value={categories.some(c => c.id === field.value) ? field.value : ''}
+                >
                   <MenuItem value=""><em>Без категорії</em></MenuItem>
                   {categories.map((cat) => <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>)}
                 </TextField>
               )}/>
               <Tooltip title="Додати нову категорію">
-                <IconButton color="primary" onClick={() => setIsCreateCategoryOpen(true)} sx={{ mt: 0.5 }}>
+                <IconButton onClick={() => setIsCreateCategoryOpen(true)} sx={{ mt: 0.5, color: 'action.active' }}>
                   <AddIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Управління категоріями">
+                <IconButton onClick={() => setIsManageCategoriesOpen(true)} sx={{ mt: 0.5, color: 'action.active' }}>
+                  <SettingsIcon />
                 </IconButton>
               </Tooltip>
             </Box>
@@ -177,6 +196,17 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
             onRefreshCategories();
           }
           setValue('categoryId', newId);
+        }}
+      />
+
+      <ManageCategoriesDialog
+        open={isManageCategoriesOpen}
+        categories={categories}
+        onClose={() => setIsManageCategoriesOpen(false)}
+        onRefresh={() => {
+          if (onRefreshCategories) {
+            onRefreshCategories();
+          }
         }}
       />
     </Dialog>

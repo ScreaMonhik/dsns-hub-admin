@@ -74,6 +74,21 @@ export const newsApi = {
     return response.data;
   },
 
+  deleteCategory: async (id: string) => {
+    const response = await apiClient.delete(`/news/categories/${id}`);
+    return response.data;
+  },
+
+  updateCategory: async (id: string, name: string) => {
+    const response = await apiClient.patch<NewsCategory>(`/news/categories/${id}`, { name });
+    return response.data;
+  },
+
+  reorderCategories: async (categoryIds: string[]) => {
+    const response = await apiClient.patch(`/news/categories/reorder`, { categoryIds });
+    return response.data;
+  },
+
   createNews: async (payload: NewsPayload) => {
     const response = await apiClient.post<News>('/news', payload);
     return response.data;
