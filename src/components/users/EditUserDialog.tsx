@@ -3,75 +3,66 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, 
-  Button, TextField, MenuItem, Box, Alert 
+  Button, TextField, MenuItem, Box, Alert, FormControlLabel, Switch 
 } from '@mui/material';
-import { useState } from 'react';
-import { usersApi, type CreateUserPayload } from '../../api/usersApi';
+import { useState, useEffect } from 'react';
+import { usersApi, type UpdateUserPayload } from '../../api/usersApi';
+import type { User } from '../../store/authStore';
 
-const createUserSchema = z.object({
-  email: z.string().email('Некоректна адреса').endsWith('@dsns.gov.ua', 'Дозволено тільки домен @dsns.gov.ua'),
-  password: z.string().min(6, 'Мінімум 6 символів'),
+const editUserSchema = z.object({
   firstName: z.string().min(2, "Обов'язкове поле"),
   lastName: z.string().min(2, "Обов'язкове поле"),
   role: z.enum(['ADMIN', 'USER']),
   isActive: z.boolean(),
 });
 
-type FormInputs = z.infer<typeof createUserSchema>;
+type FormInputs = z.infer<typeof editUserSchema>;
 
 interface Props {
   open: boolean;
+  user: User | null;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export const CreateUserDialog = ({ open, onClose, onSuccess }: Props) => {
+export const EditUserDialog = ({ open, user, onClose, onSuccess }: Props) => {
   const [apiError, setApiError] = useState<string | null>(null);
 
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormInputs>({
-    resolver: zodResolver(createUserSchema),
-    defaultValues: { email: '', password: '', firstName: '', lastName: '', role: 'USER', isActive: true },
+    resolver: zodResolver(editUserSchema),
+    defaultValues: { firstName: '', lastName: '', role: 'USER', isActive: true },
   });
 
+  useEffect(() => {
+    if (user) {
+      reset({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        isActive: user.isActive,
+      });
+    }
+  }, [user, reset]);
+
   const onSubmit = async (data: FormInputs) => {
+    if (!user) return;
     try {
       setApiError(null);
-      await usersApi.createUser(data);
-      reset();
+      await usersApi.updateUser(user.id, data);
       onSuccess();
       onClose();
     } catch (error: any) {
-      setApiError(error.response?.data?.message || 'Не вдалося створити користувача');
+      setApiError(error.response?.data?.message || 'Не вдалося оновити дані користувача');
     }
   };
 
-  const handleClose = () => {
-    reset();
-    setApiError(null);
-    onClose();
-  };
-
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Додати нового співробітника</DialogTitle>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>Редагувати співробітника: {user?.email}</DialogTitle>
       <Box component="form" onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
           {apiError && <Alert severity="error" sx={{ mb: 2 }}>{apiError}</Alert>}
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Controller
-              name="email"
-              control={control}
-              render={({ field }) => (
-                <TextField {...field} label="Електронна пошта" error={!!errors.email} helperText={errors.email?.message} fullWidth />
-              )}
-            />
-            <Controller
-              name="password"
-              control={control}
-              render={({ field }) => (
-                <TextField {...field} type="password" label="Пароль" error={!!errors.password} helperText={errors.password?.message} fullWidth />
-              )}
-            />
             <Box sx={{ display: 'flex', gap: 2 }}>
               <Controller
                 name="firstName"
@@ -98,12 +89,22 @@ export const CreateUserDialog = ({ open, onClose, onSuccess }: Props) => {
                 </TextField>
               )}
             />
+            <Controller
+              name="isActive"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={<Switch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
+                  label={field.value ? "Обліковий запис активний" : "Обліковий запис заблокований"}
+                />
+              )}
+            />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} disabled={isSubmitting}>Скасувати</Button>
+          <Button onClick={onClose} disabled={isSubmitting}>Скасувати</Button>
           <Button type="submit" variant="contained" disabled={isSubmitting}>
-            {isSubmitting ? 'Створення...' : 'Створити'}
+            {isSubmitting ? 'Збереження...' : 'Зберегти зміни'}
           </Button>
         </DialogActions>
       </Box>

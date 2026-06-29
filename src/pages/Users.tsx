@@ -1,22 +1,46 @@
 import { useEffect, useState, useCallback } from 'react';
 import { 
   Box, Typography, Button, Paper, Table, TableBody, TableCell, 
-  TableContainer, TableHead, TableRow, Pagination, CircularProgress 
+  TableContainer, TableHead, TableRow, Pagination, CircularProgress,
+  OutlinedInput, InputAdornment, IconButton, Tooltip, Chip
 } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import EditIcon from '@mui/icons-material/Edit';
+import LockResetIcon from '@mui/icons-material/LockReset';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
 import { usersApi, type UsersResponse } from '../api/usersApi';
 import { CreateUserDialog } from '../components/users/CreateUserDialog';
+import { EditUserDialog } from '../components/users/EditUserDialog';
+import { ResetPasswordDialog } from '../components/users/ResetPasswordDialog';
+import { DeleteUserDialog } from '../components/users/DeleteUserDialog';
+import type { User } from '../store/authStore';
 
 export const Users = () => {
   const [data, setData] = useState<UsersResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  
+  // Dialog States
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [editUser, setEditUser] = useState<User | null>(null);
+  const [resetPassUser, setResetPassUser] = useState<User | null>(null);
+  const [deleteUser, setDeleteUser] = useState<User | null>(null);
 
-  const fetchUsers = useCallback(async (currentPage: number) => {
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  const fetchUsers = useCallback(async (currentPage: number, search: string) => {
     try {
       setLoading(true);
-      const result = await usersApi.getUsers(currentPage);
+      const result = await usersApi.getUsers(currentPage, 10, search);
       setData(result);
     } catch (error) {
       console.error('Failed to fetch users', error);
@@ -26,37 +50,53 @@ export const Users = () => {
   }, []);
 
   useEffect(() => {
-    fetchUsers(page);
-  }, [page, fetchUsers]);
+    fetchUsers(page, debouncedSearch);
+  }, [page, debouncedSearch, fetchUsers]);
 
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">Users Management</Typography>
+        <Typography variant="h4">Управління користувачами</Typography>
         <Button 
           variant="contained" 
           startIcon={<PersonAddIcon />}
-          onClick={() => setIsDialogOpen(true)}
+          onClick={() => setIsCreateOpen(true)}
         >
-          Add User
+          Додати користувача
         </Button>
       </Box>
 
-      <Paper sx={{ width: '100%', mb: 2 }}>
+      <Paper sx={{ width: '100%', mb: 2, p: 2 }}>
+        <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+          <OutlinedInput
+            size="small"
+            placeholder="Шукати за ім'ям або поштою..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            startAdornment={
+              <InputAdornment position="start">
+                <SearchIcon color="action" />
+              </InputAdornment>
+            }
+            sx={{ width: 300 }}
+          />
+        </Box>
+
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Role</TableCell>
-                <TableCell>Registration Date</TableCell>
+                <TableCell>Ім'я та Прізвище</TableCell>
+                <TableCell>Електронна пошта</TableCell>
+                <TableCell>Роль</TableCell>
+                <TableCell>Статус</TableCell>
+                <TableCell align="right">Дії</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
+                  <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
                     <CircularProgress />
                   </TableCell>
                 </TableRow>
@@ -64,13 +104,36 @@ export const Users = () => {
                 <TableRow key={user.id} hover>
                   <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
                   <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                  <TableCell>{user.role === 'ADMIN' ? 'Адміністратор' : 'Користувач'}</TableCell>
+                  <TableCell>
+                    <Chip 
+                      label={user.isActive ? 'Активний' : 'Заблокований'} 
+                      color={user.isActive ? 'success' : 'error'} 
+                      size="small" 
+                    />
+                  </TableCell>
+                  <TableCell align="right">
+                    <Tooltip title="Редагувати / Блокувати">
+                      <IconButton color="primary" onClick={() => setEditUser(user)}>
+                        <EditIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Скинути пароль">
+                      <IconButton color="warning" onClick={() => setResetPassUser(user)}>
+                        <LockResetIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Видалити">
+                      <IconButton color="error" onClick={() => setDeleteUser(user)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
                 </TableRow>
               ))}
               {!loading && data?.data.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} align="center">No users found</TableCell>
+                  <TableCell colSpan={5} align="center">Користувачів не знайдено</TableCell>
                 </TableRow>
               )}
             </TableBody>
@@ -78,7 +141,7 @@ export const Users = () => {
         </TableContainer>
         
         {data && data.meta.lastPage > 1 && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 2, pt: 3 }}>
             <Pagination 
               count={data.meta.lastPage} 
               page={page} 
@@ -90,9 +153,30 @@ export const Users = () => {
       </Paper>
 
       <CreateUserDialog 
-        open={isDialogOpen} 
-        onClose={() => setIsDialogOpen(false)} 
-        onSuccess={() => fetchUsers(page)} 
+        open={isCreateOpen} 
+        onClose={() => setIsCreateOpen(false)} 
+        onSuccess={() => fetchUsers(page, debouncedSearch)} 
+      />
+
+      <EditUserDialog 
+        open={!!editUser} 
+        user={editUser}
+        onClose={() => setEditUser(null)} 
+        onSuccess={() => fetchUsers(page, debouncedSearch)} 
+      />
+
+      <ResetPasswordDialog 
+        open={!!resetPassUser} 
+        user={resetPassUser}
+        onClose={() => setResetPassUser(null)} 
+        onSuccess={() => fetchUsers(page, debouncedSearch)}
+      />
+
+      <DeleteUserDialog
+        open={!!deleteUser}
+        user={deleteUser}
+        onClose={() => setDeleteUser(null)}
+        onSuccess={() => fetchUsers(page, debouncedSearch)}
       />
     </Box>
   );
