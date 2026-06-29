@@ -10,7 +10,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
-import { getFullUrl } from '../utils/url';
+import { SecureImage } from '../components/common/SecureImage';
 import { newsApi, type NewsStatus, type News as NewsType, type NewsCategory, type NewsListResponse } from '../api/newsApi';
 import { NewsFormDialog } from '../components/news/NewsFormDialog';
 import { DeleteNewsDialog } from '../components/news/DeleteNewsDialog';
@@ -165,17 +165,22 @@ export const News = () => {
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 2 }}>
             {data?.data.map((item) => (
               <Card key={item.id} sx={{ display: 'flex', flexDirection: 'column' }}>
-                <CardMedia
-                  component="img"
-                  height="160"
-                  image={item.imageUrl ? getFullUrl(item.imageUrl) : 'https://placehold.co/600x400?text=Немає+обкладинки'}
-                  alt={item.title}
-                  sx={{ objectFit: 'cover' }}
-                />
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography variant="h6" component="div" sx={{ mb: 1, fontSize: '1.1rem', lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    {item.title}
-                  </Typography>
+  
+  {/* Використовуємо SecureImage напряму замість CardMedia */}
+  <SecureImage
+    src={item.imageUrl ?? undefined}
+    alt={item.title}
+    style={{ 
+      width: '100%', 
+      height: '160px', 
+      objectFit: 'cover' 
+    }}
+  />
+
+  <CardContent sx={{ flexGrow: 1 }}>
+    <Typography variant="h6" component="div" sx={{ mb: 1, fontSize: '1.1rem', lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+      {item.title}
+    </Typography>
                   <Box sx={{ display: 'flex', gap: 1, mb: 1, flexWrap: 'wrap' }}>
                     <Chip size="small" label={item.category?.name || 'Без категорії'} variant="outlined" />
                     <Chip size="small" label={item.status === 'PUBLISHED' ? 'Опубліковано' : 'Чернетка'} color={item.status === 'PUBLISHED' ? 'success' : 'default'} />

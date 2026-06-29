@@ -12,7 +12,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { newsApi, type News, type NewsCategory } from '../../api/newsApi';
 import { TipTapEditor } from './TipTapEditor';
 import { CreateCategoryDialog } from './CreateCategoryDialog';
-import { getFullUrl } from '../../utils/url';
+import { SecureImage } from '../common/SecureImage';
 
 const newsSchema = z.object({
   title: z.string().min(3, 'Мінімум 3 символи'),
@@ -134,13 +134,22 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
                 <input type="file" hidden accept="image/jpeg, image/png" onChange={handleCoverUpload} ref={fileInputRef} />
               </Button>
               {coverUrl && (
-                <Box sx={{ position: 'relative', width: 100, height: 60 }}>
-                  <img src={getFullUrl(coverUrl)} alt="Cover" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4 }} />
-                  <IconButton size="small" color="error" sx={{ position: 'absolute', top: -10, right: -10, bgcolor: 'background.paper' }} onClick={() => setValue('imageUrl', null)}>
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </Box>
-              )}
+  <Box sx={{ position: 'relative', width: 100, height: 60 }}>
+    <SecureImage 
+      src={coverUrl} 
+      alt="Cover" 
+      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4 }} 
+    />
+    <IconButton 
+      size="small" 
+      color="error" 
+      sx={{ position: 'absolute', top: -10, right: -10, bgcolor: 'background.paper' }} 
+      onClick={() => setValue('imageUrl', null)}
+    >
+      <DeleteIcon fontSize="small" />
+    </IconButton>
+  </Box>
+)}
             </Box>
           </Box>
 
