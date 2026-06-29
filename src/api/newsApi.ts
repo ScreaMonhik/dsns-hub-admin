@@ -25,6 +25,20 @@ export interface News {
   };
   _count?: {
     comments: number;
+    likes: number;
+    dislikes: number;
+  };
+}
+
+export interface NewsComment {
+  id: string;
+  content: string;
+  createdAt: string;
+  author: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatarUrl: string | null;
   };
 }
 
@@ -110,6 +124,16 @@ export const newsApi = {
     const response = await apiClient.post<{ url: string }>('/news/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
+    return response.data;
+  },
+
+  getNewsComments: async (newsId: string) => {
+    const response = await apiClient.get<NewsComment[]>(`/news/${newsId}/comments`);
+    return response.data;
+  },
+
+  deleteNewsComment: async (newsId: string, commentId: string) => {
+    const response = await apiClient.delete(`/news/${newsId}/comments/${commentId}`);
     return response.data;
   },
 };

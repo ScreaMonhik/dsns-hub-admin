@@ -12,12 +12,16 @@ import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import CommentIcon from '@mui/icons-material/Comment';
 import { SecureImage } from '../components/common/SecureImage';
 import { newsApi, type NewsStatus, type News as NewsType, type NewsCategory, type NewsListResponse } from '../api/newsApi';
 import { NewsFormDialog } from '../components/news/NewsFormDialog';
 import { DeleteNewsDialog } from '../components/news/DeleteNewsDialog';
 import { ArchiveNewsDialog } from '../components/news/ArchiveNewsDialog';
 import { RestoreNewsDialog } from '../components/news/RestoreNewsDialog';
+import { NewsCommentsDialog } from '../components/news/NewsCommentsDialog';
 import { format } from 'date-fns';
 
 export const News = () => {
@@ -31,7 +35,7 @@ export const News = () => {
   const [filterStatus, setFilterStatus] = useState<NewsStatus | ''>('');
   const [sortBy, setSortBy] = useState<string>('createdAt');
   const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
-  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid');
   
   // Dialog States
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -39,6 +43,7 @@ export const News = () => {
   const [deleteNewsItem, setDeleteNewsItem] = useState<NewsType | null>(null);
   const [archiveNewsItem, setArchiveNewsItem] = useState<NewsType | null>(null);
   const [restoreNewsItem, setRestoreNewsItem] = useState<NewsType | null>(null);
+  const [commentsNewsItem, setCommentsNewsItem] = useState<NewsType | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -138,8 +143,8 @@ export const News = () => {
             onChange={(_, newMode) => { if (newMode) setViewMode(newMode); }}
             size="small"
           >
-            <ToggleButton value="table" aria-label="table view"><ViewListIcon /></ToggleButton>
             <ToggleButton value="grid" aria-label="grid view"><GridViewIcon /></ToggleButton>
+            <ToggleButton value="table" aria-label="table view"><ViewListIcon /></ToggleButton>
           </ToggleButtonGroup>
         </Box>
 
@@ -155,6 +160,7 @@ export const News = () => {
                   <TableCell sx={{ fontWeight: 'bold' }}>Статус</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Автор</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Дата створення</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', minWidth: 140 }}>Статистика</TableCell>
                   <TableCell align="right" sx={{ fontWeight: 'bold' }}>Дії</TableCell>
                 </TableRow>
               </TableHead>
@@ -174,7 +180,34 @@ export const News = () => {
                     </TableCell>
                     <TableCell>{`${item.author.firstName} ${item.author.lastName}`}</TableCell>
                     <TableCell>{format(new Date(item.createdAt), 'dd.MM.yyyy HH:mm')}</TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                        <Tooltip title="Лайки">
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'success.main' }}>
+                            <ThumbUpIcon sx={{ fontSize: 16 }} />
+                            <Typography variant="body2">{item._count?.likes || 0}</Typography>
+                          </Box>
+                        </Tooltip>
+                        <Tooltip title="Дизлайки">
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'error.main' }}>
+                            <ThumbDownIcon sx={{ fontSize: 16 }} />
+                            <Typography variant="body2">{item._count?.dislikes || 0}</Typography>
+                          </Box>
+                        </Tooltip>
+                        <Tooltip title="Коментарі">
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'info.main' }}>
+                            <CommentIcon sx={{ fontSize: 16 }} />
+                            <Typography variant="body2">{item._count?.comments || 0}</Typography>
+                          </Box>
+                        </Tooltip>
+                      </Box>
+                    </TableCell>
                     <TableCell align="right">
+                      <Tooltip title="Переглянути коментарі">
+                        <IconButton color="info" onClick={() => setCommentsNewsItem(item)}>
+                          <CommentIcon />
+                        </IconButton>
+                      </Tooltip>
                       {activeTab === 0 ? (
                         <>
                           <Tooltip title="Редагувати">
@@ -235,8 +268,25 @@ export const News = () => {
                   <Typography variant="body2" color="text.secondary">
                     {format(new Date(item.createdAt), 'dd.MM.yyyy HH:mm')}
                   </Typography>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mt: 1.5, pt: 1.5, borderTop: '1px dashed', borderColor: 'divider' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'success.main' }}>
+                      <ThumbUpIcon sx={{ fontSize: 16 }} />
+                      <Typography variant="caption">{item._count?.likes || 0}</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'error.main' }}>
+                      <ThumbDownIcon sx={{ fontSize: 16 }} />
+                      <Typography variant="caption">{item._count?.dislikes || 0}</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'info.main' }}>
+                      <CommentIcon sx={{ fontSize: 16 }} />
+                      <Typography variant="caption">{item._count?.comments || 0}</Typography>
+                    </Box>
+                  </Box>
                 </CardContent>
                 <CardActions sx={{ justifyContent: 'flex-end', borderTop: 1, borderColor: 'divider' }}>
+                  <Tooltip title="Переглянути коментарі">
+                    <IconButton size="small" color="info" onClick={() => setCommentsNewsItem(item)}><CommentIcon fontSize="small" /></IconButton>
+                  </Tooltip>
                   {activeTab === 0 ? (
                     <>
                       <Tooltip title="Редагувати">
@@ -300,6 +350,13 @@ export const News = () => {
         news={restoreNewsItem}
         onClose={() => setRestoreNewsItem(null)}
         onSuccess={fetchData}
+      />
+
+      <NewsCommentsDialog
+        open={!!commentsNewsItem}
+        news={commentsNewsItem}
+        onClose={() => setCommentsNewsItem(null)}
+        onRefreshNews={fetchData}
       />
     </Box>
   );
