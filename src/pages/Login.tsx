@@ -8,8 +8,8 @@ import { useAuthStore, type User } from '../store/authStore';
 import { apiClient } from '../api/apiClient';
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email address').endsWith('@dsns.gov.ua', 'Must be a @dsns.gov.ua domain'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  email: z.string().email('Некоректна електронна пошта').endsWith('@dsns.gov.ua', 'Дозволено тільки домен @dsns.gov.ua'),
+  password: z.string().min(6, 'Пароль має містити щонайменше 6 символів'),
 });
 
 type LoginFormInputs = z.infer<typeof loginSchema>;
@@ -40,14 +40,14 @@ export const Login = () => {
       const { accessToken, user } = response.data;
       
       if (user.role !== 'ADMIN') {
-        setErrorMsg('Access denied. Administrator privileges required.');
+        setErrorMsg('Доступ заборонено. Потрібні права адміністратора.');
         return;
       }
 
       setAuth(user, accessToken);
       navigate('/', { replace: true });
     } catch (error: any) {
-      setErrorMsg(error.response?.data?.message || 'Failed to authenticate');
+      setErrorMsg(error.response?.data?.message || 'Помилка авторизації');
     }
   };
 
@@ -62,7 +62,7 @@ export const Login = () => {
         }}
       >
         <Typography component="h1" variant="h5">
-          DSNS Hub Admin Panel
+          Адмін-панель DSNS Hub
         </Typography>
         <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 1 }}>
           {errorMsg && <Alert severity="error" sx={{ mb: 2 }}>{errorMsg}</Alert>}
@@ -70,7 +70,7 @@ export const Login = () => {
             margin="normal"
             fullWidth
             id="email"
-            label="Email Address"
+            label="Електронна пошта"
             autoComplete="email"
             autoFocus
             {...register('email')}
@@ -80,7 +80,7 @@ export const Login = () => {
           <TextField
             margin="normal"
             fullWidth
-            label="Password"
+            label="Пароль"
             type="password"
             id="password"
             autoComplete="current-password"
@@ -95,7 +95,7 @@ export const Login = () => {
             sx={{ mt: 3, mb: 2 }}
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Signing in...' : 'Sign In'}
+            {isSubmitting ? 'Вхід...' : 'Увійти'}
           </Button>
         </Box>
       </Box>

@@ -10,12 +10,12 @@ import ChatIcon from '@mui/icons-material/Chat';
 const DRAWER_WIDTH = 240;
 
 const menuItems = [
-  { text: 'Users', path: '/users', icon: <PeopleIcon /> },
-  { text: 'News', path: '/news', icon: <ArticleIcon /> },
-  { text: 'Documents', path: '/documents', icon: <DescriptionIcon /> },
-  { text: 'Projects', path: '/projects', icon: <AssignmentIcon /> },
-  { text: 'Polls', path: '/polls', icon: <HowToVoteIcon /> },
-  { text: 'Chats', path: '/chats', icon: <ChatIcon /> },
+  { text: 'Користувачі', path: '/users', icon: <PeopleIcon /> },
+  { text: 'Новини', path: '/news', icon: <ArticleIcon /> },
+  { text: 'Документи', path: '/documents', icon: <DescriptionIcon /> },
+  { text: 'Проєкти', path: '/projects', icon: <AssignmentIcon /> },
+  { text: 'Опитування', path: '/polls', icon: <HowToVoteIcon /> },
+  { text: 'Чати', path: '/chats', icon: <ChatIcon /> },
 ];
 
 export const Sidebar = () => {
