@@ -9,15 +9,13 @@ import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import ImageIcon from '@mui/icons-material/Image';
 import { useState, useRef, useEffect } from 'react';
 import { newsApi } from '../../api/newsApi';
+import { getFullUrl } from '../../utils/url';
 
 interface TipTapEditorProps {
   value: string;
   onChange: (content: string) => void;
   error?: boolean;
 }
-
-const getFullUrl = (path: string) => 
-  path.startsWith('http') ? path : `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}${path}`;
 
 export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
   const [isUploading, setIsUploading] = useState(false);

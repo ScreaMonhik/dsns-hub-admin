@@ -46,10 +46,19 @@ export type NewsPayload = {
 };
 
 export const newsApi = {
-  getNews: async (page: number = 1, limit: number = 10, categoryId?: string, status?: NewsStatus) => {
+  getNews: async (
+    page: number = 1, 
+    limit: number = 10, 
+    categoryId?: string, 
+    status?: NewsStatus,
+    sortBy?: string,
+    sortOrder?: 'ASC' | 'DESC'
+  ) => {
     const params: Record<string, any> = { page, limit };
     if (categoryId) params.categoryId = categoryId;
     if (status) params.status = status;
+    if (sortBy) params.sortBy = sortBy;
+    if (sortOrder) params.sortOrder = sortOrder;
     
     const response = await apiClient.get<NewsListResponse>('/news', { params });
     return response.data;

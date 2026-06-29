@@ -5,11 +5,14 @@ import { z } from 'zod';
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, 
   Button, TextField, MenuItem, Box, Alert, Typography,
-  CircularProgress, IconButton
+  CircularProgress, IconButton, Tooltip
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { newsApi, type NewsStatus, type News, type NewsCategory } from '../../api/newsApi';
+import AddIcon from '@mui/icons-material/Add';
+import { newsApi, type News, type NewsCategory } from '../../api/newsApi';
 import { TipTapEditor } from './TipTapEditor';
+import { CreateCategoryDialog } from './CreateCategoryDialog';
+import { getFullUrl } from '../../utils/url';
 
 const newsSchema = z.object({
   title: z.string().min(3, 'Мінімум 3 символи'),
@@ -27,14 +30,13 @@ interface Props {
   categories: NewsCategory[];
   onClose: () => void;
   onSuccess: () => void;
+  onRefreshCategories?: () => void;
 }
 
-const getFullUrl = (path: string) => 
-  path.startsWith('http') ? path : `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}${path}`;
-
-export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess }: Props) => {
+export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onRefreshCategories }: Props) => {
   const [apiError, setApiError] = useState<string | null>(null);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [isCreateCategoryOpen, setIsCreateCategoryOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { control, handleSubmit, reset, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormInputs>({
@@ -100,19 +102,28 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess }: P
             <TextField {...field} label="Заголовок" error={!!errors.title} helperText={errors.title?.message} fullWidth />
           )}/>
 
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Controller name="categoryId" control={control} render={({ field }) => (
-              <TextField {...field} select label="Категорія" fullWidth error={!!errors.categoryId} helperText={errors.categoryId?.message} value={field.value || ''}>
-                <MenuItem value=""><em>Без категорії</em></MenuItem>
-                {categories.map((cat) => <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>)}
-              </TextField>
-            )}/>
-            <Controller name="status" control={control} render={({ field }) => (
-              <TextField {...field} select label="Статус" fullWidth error={!!errors.status} helperText={errors.status?.message}>
-                <MenuItem value="DRAFT">Чернетка (DRAFT)</MenuItem>
-                <MenuItem value="PUBLISHED">Опубліковано (PUBLISHED)</MenuItem>
-              </TextField>
-            )}/>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+            <Box sx={{ display: 'flex', gap: 1, flex: 1, alignItems: 'flex-start' }}>
+              <Controller name="categoryId" control={control} render={({ field }) => (
+                <TextField {...field} select label="Категорія" fullWidth error={!!errors.categoryId} helperText={errors.categoryId?.message} value={field.value || ''}>
+                  <MenuItem value=""><em>Без категорії</em></MenuItem>
+                  {categories.map((cat) => <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>)}
+                </TextField>
+              )}/>
+              <Tooltip title="Додати нову категорію">
+                <IconButton color="primary" onClick={() => setIsCreateCategoryOpen(true)} sx={{ mt: 0.5 }}>
+                  <AddIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Controller name="status" control={control} render={({ field }) => (
+                <TextField {...field} select label="Статус" fullWidth error={!!errors.status} helperText={errors.status?.message}>
+                  <MenuItem value="DRAFT">Чернетка (DRAFT)</MenuItem>
+                  <MenuItem value="PUBLISHED">Опубліковано (PUBLISHED)</MenuItem>
+                </TextField>
+              )}/>
+            </Box>
           </Box>
 
           <Box>
@@ -148,6 +159,17 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess }: P
           </Button>
         </DialogActions>
       </Box>
+
+      <CreateCategoryDialog
+        open={isCreateCategoryOpen}
+        onClose={() => setIsCreateCategoryOpen(false)}
+        onSuccess={(newId) => {
+          if (onRefreshCategories) {
+            onRefreshCategories();
+          }
+          setValue('categoryId', newId);
+        }}
+      />
     </Dialog>
   );
 };
