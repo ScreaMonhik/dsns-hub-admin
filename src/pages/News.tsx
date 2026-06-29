@@ -131,6 +131,9 @@ export const News = () => {
             <TextField select size="small" label="Сортувати за" value={sortBy} onChange={(e) => { setSortBy(e.target.value); setPage(1); }} sx={{ minWidth: 160 }}>
               <MenuItem value="createdAt">Датою створення</MenuItem>
               <MenuItem value="authorId">Автором</MenuItem>
+              <MenuItem value="likes">Кількістю лайків</MenuItem>
+              <MenuItem value="dislikes">Кількістю дизлайків</MenuItem>
+              <MenuItem value="comments">Кількістю коментарів</MenuItem>
             </TextField>
             <TextField select size="small" label="Порядок" value={sortOrder} onChange={(e) => { setSortOrder(e.target.value as 'ASC' | 'DESC'); setPage(1); }} sx={{ minWidth: 160 }}>
               <MenuItem value="DESC">За спаданням</MenuItem>
