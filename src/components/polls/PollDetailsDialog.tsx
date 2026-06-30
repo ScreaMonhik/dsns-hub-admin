@@ -31,6 +31,14 @@ export const PollDetailsDialog = ({ open, poll, onClose }: Props) => {
             {poll.author && (
               <Chip label={`Автор: ${poll.author.firstName} ${poll.author.lastName}`} size="small" variant="outlined" />
             )}
+            {poll.expiresAt && (
+              <Chip 
+                label={`Завершується: ${format(new Date(poll.expiresAt), 'dd.MM.yyyy HH:mm')}`} 
+                size="small" 
+                color={new Date(poll.expiresAt) < new Date() ? 'error' : 'info'} 
+                variant={new Date(poll.expiresAt) < new Date() ? 'filled' : 'outlined'} 
+              />
+            )}
           </Box>
         </Box>
 

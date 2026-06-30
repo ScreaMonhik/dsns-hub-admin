@@ -37,6 +37,7 @@ export interface Poll {
   status: PollStatus;
   createdAt: string;
   updatedAt: string;
+  expiresAt?: string | null; // Дата завершення опитування
   author?: PollAuthor | null;
   departments: PollDepartment[];
   options: PollOption[];
@@ -57,6 +58,7 @@ export interface CreatePollDto {
   title: string;
   description?: string;
   status?: PollStatus;
+  expiresAt?: string | null; // Дата завершення
   departmentIds?: string[];
   options: string[];
 }

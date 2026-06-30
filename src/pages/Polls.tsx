@@ -221,6 +221,16 @@ export const Polls = () => {
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     Охоплення: {item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Загальнонаціональне'}
                   </Typography>
+                  {item.expiresAt && (
+                    <Typography 
+                      variant="body2" 
+                      color={new Date(item.expiresAt) < new Date() ? 'error.main' : 'info.main'} 
+                      sx={{ mb: 1, fontWeight: 500 }}
+                    >
+                      {new Date(item.expiresAt) < new Date() ? 'Час вичерпано: ' : 'Активне до: '}
+                      {format(new Date(item.expiresAt), 'dd.MM.yyyy HH:mm')}
+                    </Typography>
+                  )}
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'primary.main', mb: 1 }}>
                     <HowToVoteIcon fontSize="small" /> <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Всього голосів: {item.totalVotes || 0}</Typography>
                   </Box>

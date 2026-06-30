@@ -31,6 +31,7 @@ import { CSS } from '@dnd-kit/utilities';
 const pollSchema = z.object({
   title: z.string().min(3, 'Мінімум 3 символи'),
   description: z.string().optional(),
+  expiresAt: z.string().optional().nullable(),
   departmentIds: z.array(z.string()),
   options: z.array(
     z.object({ text: z.string().min(1, "Обов'язкове поле") })
@@ -118,7 +119,7 @@ export const PollFormDialog = ({ open, poll, departments, onClose, onSuccess, is
 
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormInputs>({
     resolver: zodResolver(pollSchema),
-    defaultValues: { title: '', description: '', departmentIds: [], options: [{ text: '' }, { text: '' }] },
+    defaultValues: { title: '', description: '', expiresAt: '', departmentIds: [], options: [{ text: '' }, { text: '' }] },
   });
 
   const { fields, append, remove, move } = useFieldArray({ control, name: "options" });
@@ -145,11 +146,12 @@ export const PollFormDialog = ({ open, poll, departments, onClose, onSuccess, is
         reset({
           title: isDuplicate ? `${poll.title} (Копія)` : poll.title,
           description: poll.description || '',
+          expiresAt: poll.expiresAt ? new Date(poll.expiresAt).toISOString().slice(0, 16) : '',
           departmentIds: poll.departments?.map(d => d.id) || [],
           options: poll.options?.map(o => ({ text: o.text })) || [{ text: '' }, { text: '' }],
         });
       } else {
-        reset({ title: '', description: '', departmentIds: [], options: [{ text: '' }, { text: '' }] });
+        reset({ title: '', description: '', expiresAt: '', departmentIds: [], options: [{ text: '' }, { text: '' }] });
       }
     }
   }, [open, poll, reset, isDuplicate]);
@@ -160,6 +162,7 @@ export const PollFormDialog = ({ open, poll, departments, onClose, onSuccess, is
       const payload = {
         title: data.title,
         description: data.description,
+        expiresAt: data.expiresAt ? new Date(data.expiresAt).toISOString() : null,
         departmentIds: data.departmentIds,
         options: data.options.map(o => o.text),
         status: PollStatus.DRAFT, 
@@ -202,6 +205,18 @@ export const PollFormDialog = ({ open, poll, departments, onClose, onSuccess, is
 
           <Controller name="description" control={control} render={({ field }) => (
             <TextField {...field} label="Опис (необов'язково)" multiline rows={2} fullWidth />
+          )}/>
+
+          <Controller name="expiresAt" control={control} render={({ field }) => (
+            <TextField 
+              {...field} 
+              type="datetime-local" 
+              label="Дата та час завершення (необов'язково)" 
+              slotProps={{ inputLabel: { shrink: true } }}
+              fullWidth 
+              error={!!errors.expiresAt}
+              helperText={errors.expiresAt?.message || 'Якщо вказано, опитування автоматично завершиться в цей час'}
+            />
           )}/>
 
           <Box>
