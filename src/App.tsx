@@ -7,6 +7,7 @@ import { ukUA } from '@mui/material/locale';
 import { AdminLayout } from './components/layout/AdminLayout';
 import { Users } from './pages/Users';
 import { News } from './pages/News';
+import { Polls } from './pages/Polls';
 import { useThemeStore } from './store/themeStore';
 
 const DashboardPlaceholder = () => (
@@ -46,7 +47,7 @@ function App() {
               <Route path="/news" element={<News />} />
               <Route path="/documents" element={<h2>Модуль "Документи" (В розробці)</h2>} />
               <Route path="/projects" element={<h2>Модуль "Проєкти" (В розробці)</h2>} />
-              <Route path="/polls" element={<h2>Модуль "Опитування" (В розробці)</h2>} />
+              <Route path="/polls" element={<Polls />} />
               <Route path="/chats" element={<h2>Модуль "Чати" (В розробці)</h2>} />
             </Route>
           </Route>
