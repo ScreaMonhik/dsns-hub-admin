@@ -34,6 +34,14 @@ export const PollStatusDialog = ({ open, poll, targetStatus, onClose, onSuccess 
       case PollStatus.PUBLISHED:
         return { title: 'Опублікувати опитування?', text: 'Воно стане доступним для голосування у вибраних підрозділах.', color: 'success' as const, btnText: 'Опублікувати' };
       case PollStatus.DRAFT:
+        if (poll && (poll.totalVotes || 0) > 0) {
+          return { 
+            title: 'Увага: Опитування вже має голоси!', 
+            text: 'Це опитування вже зібрало статистику. Якщо ви відредагуєте варіанти відповідей, цілісність даних буде повністю порушена. Рекомендуємо замість цього перенести його в архів і створити нове.', 
+            color: 'error' as const, 
+            btnText: 'Я розумію, в чернетки' 
+          };
+        }
         return { title: 'Перенести в чернетки?', text: 'Опитування буде приховано. Ви зможете його відредагувати.', color: 'primary' as const, btnText: 'В чернетки' };
       case PollStatus.ARCHIVED:
         return { title: 'Архівувати опитування?', text: 'Опитування буде закрито і перенесено в архів.', color: 'warning' as const, btnText: 'В архів' };

@@ -15,10 +15,12 @@ import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import PublicIcon from '@mui/icons-material/Public';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'; // Імпортуємо іконку для копіювання
 import { pollsApi, PollStatus, type Poll, type PollDepartment, type PaginatedPollsResponse } from '../api/pollsApi';
 import { PollFormDialog } from '../components/polls/PollFormDialog';
 import { DeletePollDialog } from '../components/polls/DeletePollDialog';
 import { PollStatusDialog } from '../components/polls/PollStatusDialog';
+import { PollDetailsDialog } from '../components/polls/PollDetailsDialog';
 import { format } from 'date-fns';
 
 export const Polls = () => {
@@ -39,6 +41,8 @@ export const Polls = () => {
   const [deletePollItem, setDeletePollItem] = useState<Poll | null>(null);
   
   const [statusDialogItem, setStatusDialogItem] = useState<{ poll: Poll, targetStatus: PollStatus } | null>(null);
+  const [viewPollDetails, setViewPollDetails] = useState<Poll | null>(null);
+  const [isDuplicate, setIsDuplicate] = useState(false); // Стан для відслідковування режиму форми
 
   const fetchData = useCallback(async () => {
     try {
@@ -83,11 +87,20 @@ export const Polls = () => {
     }
   };
 
+  const handlePollDoubleClick = (item: Poll) => {
+    if (item.status === PollStatus.DRAFT) {
+      setEditPoll(item);
+      setIsFormOpen(true);
+    } else {
+      setViewPollDetails(item);
+    }
+  };
+
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4">Управління опитуваннями</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => { setEditPoll(null); setIsFormOpen(true); }}>
+        <Button variant="contained" startIcon={<AddIcon />} onClick={() => { setEditPoll(null); setIsDuplicate(false); setIsFormOpen(true); }}>
           Створити опитування
         </Button>
       </Box>
@@ -145,17 +158,27 @@ export const Polls = () => {
               </TableHead>
               <TableBody>
                 {pollsList.map((item) => (
-                  <TableRow key={item.id} hover>
+                  <TableRow 
+                    key={item.id} 
+                    hover 
+                    onDoubleClick={() => handlePollDoubleClick(item)}
+                    sx={{ cursor: 'pointer' }}
+                  >
                     <TableCell sx={{ maxWidth: 250 }}>{item.title}</TableCell>
                     <TableCell>{item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Всі підрозділи'}</TableCell>
                     <TableCell>{getStatusChip(item.status)}</TableCell>
                     <TableCell>{item.totalVotes || 0}</TableCell>
                     <TableCell>{item.createdAt ? format(new Date(item.createdAt), 'dd.MM.yyyy') : '—'}</TableCell>
                     <TableCell align="right">
+                      <Tooltip title="Дублювати як чернетку">
+                        <IconButton color="info" onClick={() => { setEditPoll(item); setIsDuplicate(true); setIsFormOpen(true); }}>
+                          <ContentCopyIcon />
+                        </IconButton>
+                      </Tooltip>
                       {item.status === PollStatus.DRAFT && (
                         <>
                           <Tooltip title="Опублікувати"><IconButton color="success" onClick={() => setStatusDialogItem({ poll: item, targetStatus: PollStatus.PUBLISHED })}><PublicIcon /></IconButton></Tooltip>
-                          <Tooltip title="Редагувати"><IconButton color="primary" onClick={() => { setEditPoll(item); setIsFormOpen(true); }}><EditIcon /></IconButton></Tooltip>
+                          <Tooltip title="Редагувати"><IconButton color="primary" onClick={() => { setEditPoll(item); setIsDuplicate(false); setIsFormOpen(true); }}><EditIcon /></IconButton></Tooltip>
                         </>
                       )}
                       {item.status === PollStatus.PUBLISHED && (
@@ -178,7 +201,20 @@ export const Polls = () => {
         ) : (
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 2 }}>
             {pollsList.map((item) => (
-              <Card key={item.id} sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Card 
+                key={item.id} 
+                onDoubleClick={() => handlePollDoubleClick(item)}
+                sx={{
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: 6,
+                    cursor: 'pointer'
+                  }
+                }}
+              >
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Typography variant="h6" sx={{ fontSize: '1.1rem', mb: 1 }}>{item.title}</Typography>
                   <Box sx={{ mb: 2, display: 'flex', gap: 1 }}>{getStatusChip(item.status)}</Box>
@@ -198,10 +234,15 @@ export const Polls = () => {
                   </Box>
                 </CardContent>
                 <CardActions sx={{ justifyContent: 'flex-end', borderTop: 1, borderColor: 'divider' }}>
+                  <Tooltip title="Дублювати як чернетку">
+                    <IconButton size="small" color="info" onClick={() => { setEditPoll(item); setIsDuplicate(true); setIsFormOpen(true); }}>
+                      <ContentCopyIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                   {item.status === PollStatus.DRAFT && (
                     <>
                       <Tooltip title="Опублікувати"><IconButton size="small" color="success" onClick={() => setStatusDialogItem({ poll: item, targetStatus: PollStatus.PUBLISHED })}><PublicIcon fontSize="small" /></IconButton></Tooltip>
-                      <Tooltip title="Редагувати"><IconButton size="small" color="primary" onClick={() => { setEditPoll(item); setIsFormOpen(true); }}><EditIcon fontSize="small" /></IconButton></Tooltip>
+                      <Tooltip title="Редагувати"><IconButton size="small" color="primary" onClick={() => { setEditPoll(item); setIsDuplicate(false); setIsFormOpen(true); }}><EditIcon fontSize="small" /></IconButton></Tooltip>
                     </>
                   )}
                   {item.status === PollStatus.PUBLISHED && (
@@ -228,7 +269,14 @@ export const Polls = () => {
         )}
       </Paper>
 
-      <PollFormDialog open={isFormOpen} poll={editPoll} departments={departments} onClose={() => setIsFormOpen(false)} onSuccess={fetchData} />
+      <PollFormDialog 
+        open={isFormOpen} 
+        poll={editPoll} 
+        departments={departments} 
+        onClose={() => setIsFormOpen(false)} 
+        onSuccess={fetchData} 
+        isDuplicate={isDuplicate} // Прокидаємо стан у форму
+      />
       <DeletePollDialog open={!!deletePollItem} poll={deletePollItem} onClose={() => setDeletePollItem(null)} onSuccess={fetchData} />
       <PollStatusDialog 
         open={!!statusDialogItem} 
@@ -236,6 +284,12 @@ export const Polls = () => {
         targetStatus={statusDialogItem?.targetStatus || PollStatus.DRAFT} 
         onClose={() => setStatusDialogItem(null)} 
         onSuccess={fetchData} 
+      />
+
+      <PollDetailsDialog
+        open={!!viewPollDetails}
+        poll={viewPollDetails}
+        onClose={() => setViewPollDetails(null)}
       />
     </Box>
   );
