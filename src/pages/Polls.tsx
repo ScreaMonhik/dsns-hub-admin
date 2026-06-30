@@ -47,20 +47,27 @@ export const Polls = () => {
       
       const res = await pollsApi.getPolls(page, 10, filterDepartment || undefined, targetStatus, sortBy, sortOrder);
       setData(res);
-
-      try {
-        const deps = await pollsApi.getDepartments();
-        setDepartments(deps);
-      } catch (e) {
-        // Fallback if endpoint does not exist yet
-        setDepartments([]);
-      }
     } catch (error) {
       console.error('Failed to fetch polls data', error);
+      setData(null);
     } finally {
       setLoading(false);
     }
   }, [page, filterDepartment, filterStatus, sortBy, sortOrder, activeTab]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Завантажуємо підрозділи лише один раз при монтуванні, щоб не блокувати таблицю
+  useEffect(() => {
+    pollsApi.getDepartments()
+      .then(setDepartments)
+      .catch(() => setDepartments([]));
+  }, []);
+
+  // Безпечний масив опитувань, навіть якщо бекенд повернув помилкову структуру
+  const pollsList: Poll[] = Array.isArray(data?.data) ? data.data : [];
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
@@ -137,13 +144,13 @@ export const Polls = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data?.data.map((item) => (
+                {pollsList.map((item) => (
                   <TableRow key={item.id} hover>
                     <TableCell sx={{ maxWidth: 250 }}>{item.title}</TableCell>
-                    <TableCell>{item.departments.length ? item.departments.map(d => d.name).join(', ') : 'Всі підрозділи'}</TableCell>
+                    <TableCell>{item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Всі підрозділи'}</TableCell>
                     <TableCell>{getStatusChip(item.status)}</TableCell>
-                    <TableCell>{item.totalVotes}</TableCell>
-                    <TableCell>{format(new Date(item.createdAt), 'dd.MM.yyyy')}</TableCell>
+                    <TableCell>{item.totalVotes || 0}</TableCell>
+                    <TableCell>{item.createdAt ? format(new Date(item.createdAt), 'dd.MM.yyyy') : '—'}</TableCell>
                     <TableCell align="right">
                       {item.status === PollStatus.DRAFT && (
                         <>
@@ -164,30 +171,30 @@ export const Polls = () => {
                     </TableCell>
                   </TableRow>
                 ))}
-                {data?.data.length === 0 && <TableRow><TableCell colSpan={6} align="center">Опитувань не знайдено</TableCell></TableRow>}
+                {pollsList.length === 0 && <TableRow><TableCell colSpan={6} align="center">Опитувань не знайдено</TableCell></TableRow>}
               </TableBody>
             </Table>
           </TableContainer>
         ) : (
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 2 }}>
-            {data?.data.map((item) => (
+            {pollsList.map((item) => (
               <Card key={item.id} sx={{ display: 'flex', flexDirection: 'column' }}>
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Typography variant="h6" sx={{ fontSize: '1.1rem', mb: 1 }}>{item.title}</Typography>
                   <Box sx={{ mb: 2, display: 'flex', gap: 1 }}>{getStatusChip(item.status)}</Box>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    Охоплення: {item.departments.length ? item.departments.map(d => d.name).join(', ') : 'Загальнонаціональне'}
+                    Охоплення: {item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Загальнонаціональне'}
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'primary.main', mb: 1 }}>
-                    <HowToVoteIcon fontSize="small" /> <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Всього голосів: {item.totalVotes}</Typography>
+                    <HowToVoteIcon fontSize="small" /> <Typography variant="body2" sx={{ fontWeight: 'bold' }}>Всього голосів: {item.totalVotes || 0}</Typography>
                   </Box>
                   <Box sx={{ mt: 2, pl: 2, borderLeft: '3px solid', borderColor: 'divider' }}>
-                    {item.options.slice(0, 3).map(opt => (
+                    {item.options?.slice(0, 3).map(opt => (
                       <Typography key={opt.id} variant="caption" sx={{ display: 'block' }} color="text.secondary">
-                        • {opt.text} ({opt._count.votes})
+                        • {opt.text} ({opt._count?.votes || 0})
                       </Typography>
                     ))}
-                    {item.options.length > 3 && <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }} color="text.disabled">...та ще {item.options.length - 3}</Typography>}
+                    {(item.options?.length || 0) > 3 && <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }} color="text.disabled">...та ще {(item.options?.length || 0) - 3}</Typography>}
                   </Box>
                 </CardContent>
                 <CardActions sx={{ justifyContent: 'flex-end', borderTop: 1, borderColor: 'divider' }}>
@@ -210,11 +217,11 @@ export const Polls = () => {
                 </CardActions>
               </Card>
             ))}
-            {data?.data.length === 0 && <Typography sx={{ gridColumn: '1 / -1', textAlign: 'center', py: 4 }}>Опитувань не знайдено</Typography>}
+            {pollsList.length === 0 && <Typography sx={{ gridColumn: '1 / -1', textAlign: 'center', py: 4 }}>Опитувань не знайдено</Typography>}
           </Box>
         )}
         
-        {data && data.meta.lastPage > 1 && (
+        {data && (data.meta?.lastPage || 0) > 1 && (
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 2, pt: 3 }}>
             <Pagination count={data.meta.lastPage} page={page} onChange={(_, val) => setPage(val)} color="primary" />
           </Box>
