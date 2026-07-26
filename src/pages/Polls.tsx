@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { 
   Box, Typography, Button, Paper, Table, TableBody, TableCell, 
   TableContainer, TableHead, TableRow, Pagination, CircularProgress,
@@ -87,7 +87,23 @@ export const Polls = () => {
     }
   };
 
-  const handlePollDoubleClick = (item: Poll) => {
+  const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleSingleClick = (item: Poll) => {
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+    }
+    clickTimeoutRef.current = setTimeout(() => {
+      setViewPollDetails(item);
+      clickTimeoutRef.current = null;
+    }, 250);
+  };
+
+  const handleDoubleClick = (item: Poll) => {
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+    }
     if (item.status === PollStatus.DRAFT) {
       setEditPoll(item);
       setIsFormOpen(true);
@@ -161,7 +177,8 @@ export const Polls = () => {
                   <TableRow 
                     key={item.id} 
                     hover 
-                    onDoubleClick={() => handlePollDoubleClick(item)}
+                    onClick={() => handleSingleClick(item)}
+                    onDoubleClick={() => handleDoubleClick(item)}
                     sx={{ cursor: 'pointer' }}
                   >
                     <TableCell sx={{ maxWidth: 250 }}>{item.title}</TableCell>
@@ -169,7 +186,7 @@ export const Polls = () => {
                     <TableCell>{getStatusChip(item.status)}</TableCell>
                     <TableCell>{item.totalVotes || 0}</TableCell>
                     <TableCell>{item.createdAt ? format(new Date(item.createdAt), 'dd.MM.yyyy') : '—'}</TableCell>
-                    <TableCell align="right">
+                    <TableCell align="right" onClick={(e) => e.stopPropagation()}>
                       <Tooltip title="Дублювати як чернетку">
                         <IconButton color="info" onClick={() => { setEditPoll(item); setIsDuplicate(true); setIsFormOpen(true); }}>
                           <ContentCopyIcon />
@@ -203,7 +220,8 @@ export const Polls = () => {
             {pollsList.map((item) => (
               <Card 
                 key={item.id} 
-                onDoubleClick={() => handlePollDoubleClick(item)}
+                onClick={() => handleSingleClick(item)}
+                onDoubleClick={() => handleDoubleClick(item)}
                 sx={{
                   display: 'flex', 
                   flexDirection: 'column',
@@ -243,7 +261,7 @@ export const Polls = () => {
                     {(item.options?.length || 0) > 3 && <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }} color="text.disabled">...та ще {(item.options?.length || 0) - 3}</Typography>}
                   </Box>
                 </CardContent>
-                <CardActions sx={{ justifyContent: 'flex-end', borderTop: 1, borderColor: 'divider' }}>
+                <CardActions sx={{ justifyContent: 'flex-end', borderTop: 1, borderColor: 'divider' }} onClick={(e) => e.stopPropagation()}>
                   <Tooltip title="Дублювати як чернетку">
                     <IconButton size="small" color="info" onClick={() => { setEditPoll(item); setIsDuplicate(true); setIsFormOpen(true); }}>
                       <ContentCopyIcon fontSize="small" />
