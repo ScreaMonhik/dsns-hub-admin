@@ -64,15 +64,32 @@ export const PollDetailsDialog = ({ open, poll, onClose }: Props) => {
             {poll.options?.map((opt) => {
               const percentage = poll.totalVotes > 0 ? Math.round(((opt._count?.votes || 0) / poll.totalVotes) * 100) : 0;
               return (
-                <Box key={opt.id} sx={{ p: 1.5, bgcolor: 'background.default', borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>{opt.text}</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                <Box key={opt.id} sx={{ 
+                  p: 2, 
+                  bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#f8fafc', 
+                  borderRadius: 2, 
+                  border: '1px solid', 
+                  borderColor: 'divider' 
+                }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{opt.text}</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main' }}>
                       {opt._count?.votes || 0} ({percentage}%)
                     </Typography>
                   </Box>
-                  <Box sx={{ width: '100%', height: 6, bgcolor: 'action.hover', borderRadius: 3, overflow: 'hidden' }}>
-                    <Box sx={{ width: `${percentage}%`, height: '100%', bgcolor: 'primary.main', transition: 'width 0.5s ease' }} />
+                  <Box sx={{ 
+                    width: '100%', 
+                    height: 8, 
+                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)', 
+                    borderRadius: 4, 
+                    overflow: 'hidden' 
+                  }}>
+                    <Box sx={{ 
+                      width: `${percentage}%`, 
+                      height: '100%', 
+                      bgcolor: 'primary.main', 
+                      transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' 
+                    }} />
                   </Box>
                 </Box>
               );
