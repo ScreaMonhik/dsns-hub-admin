@@ -1,9 +1,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { 
   Box, Typography, Button, Paper, List, ListItem, ListItemAvatar, 
-  ListItemText, Avatar, CircularProgress, Divider 
+  ListItemText, Avatar, CircularProgress, Divider, TextField, InputAdornment 
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
 import { chatsApi, type ChatGroup } from '../api/chatsApi';
 import { CreateChatDialog } from '../components/chats/CreateChatDialog';
 import { ChatWindow } from '../components/chats/ChatWindow';
@@ -14,6 +15,7 @@ export const Chats = () => {
   const [loading, setLoading] = useState(true);
   const [selectedChat, setSelectedChat] = useState<ChatGroup | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchChats = useCallback(async () => {
     try {
@@ -31,22 +33,44 @@ export const Chats = () => {
     fetchChats();
   }, [fetchChats]);
 
+  const filteredChats = chats.filter(chat => 
+    chat.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <Box sx={{ display: 'flex', height: 'calc(100vh - 100px)', gap: 2 }}>
       {/* Ліва панель зі списком чатів */}
       <Paper sx={{ width: 350, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 1, borderColor: 'divider' }}>
-          <Typography variant="h6">Усі чати</Typography>
-          <Button size="small" variant="contained" onClick={() => setIsCreateOpen(true)}>
-            <AddIcon />
-          </Button>
+        <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2, borderBottom: 1, borderColor: 'divider' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h6">Усі чати</Typography>
+            <Button size="small" variant="contained" onClick={() => setIsCreateOpen(true)}>
+              <AddIcon />
+            </Button>
+          </Box>
+          <TextField
+            size="small"
+            fullWidth
+            placeholder="Пошук за назвою..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" />
+                  </InputAdornment>
+                ),
+              }
+            }}
+          />
         </Box>
         
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>
         ) : (
           <List sx={{ flexGrow: 1, overflowY: 'auto', p: 0 }}>
-            {chats.map((chat) => (
+            {filteredChats.map((chat) => (
               <Box key={chat.id}>
                 <ListItem 
                   component="div"
@@ -74,9 +98,9 @@ export const Chats = () => {
                 <Divider />
               </Box>
             ))}
-            {chats.length === 0 && (
+            {filteredChats.length === 0 && (
               <Typography sx={{ p: 3, textAlign: 'center', color: 'text.secondary' }}>
-                Чатів ще не створено
+                {chats.length === 0 ? 'Чатів ще не створено' : 'Чатів не знайдено'}
               </Typography>
             )}
           </List>
