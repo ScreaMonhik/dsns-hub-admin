@@ -9,7 +9,9 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { pollsApi, PollStatus, type Poll, type PollDepartment } from '../../api/pollsApi';
+import { pollsApi, PollStatus, type Poll } from '../../api/pollsApi';
+import { DepartmentAutocomplete } from '../common/DepartmentAutocomplete';
+import type { Department } from '../../api/departmentsApi';
 
 import {
   DndContext,
@@ -108,14 +110,14 @@ const SortableOptionItem = ({
 interface Props {
   open: boolean;
   poll: Poll | null;
-  departments: PollDepartment[];
   onClose: () => void;
   onSuccess: () => void;
-  isDuplicate?: boolean; // Новий необов'язковий проп для режиму клонування
+  isDuplicate?: boolean;
 }
 
-export const PollFormDialog = ({ open, poll, departments, onClose, onSuccess, isDuplicate }: Props) => {
+export const PollFormDialog = ({ open, poll, onClose, onSuccess, isDuplicate }: Props) => {
   const [apiError, setApiError] = useState<string | null>(null);
+  const [selectedDepartments, setSelectedDepartments] = useState<Department[]>([]);
 
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormInputs>({
     resolver: zodResolver(pollSchema),
@@ -143,6 +145,7 @@ export const PollFormDialog = ({ open, poll, departments, onClose, onSuccess, is
   useEffect(() => {
     if (open) {
       if (poll) {
+        setSelectedDepartments(poll.departments || []);
         reset({
           title: isDuplicate ? `${poll.title} (Копія)` : poll.title,
           description: poll.description || '',
@@ -151,6 +154,7 @@ export const PollFormDialog = ({ open, poll, departments, onClose, onSuccess, is
           options: poll.options?.map(o => ({ text: o.text })) || [{ text: '' }, { text: '' }],
         });
       } else {
+        setSelectedDepartments([]);
         reset({ title: '', description: '', expiresAt: '', departmentIds: [], options: [{ text: '' }, { text: '' }] });
       }
     }
@@ -222,26 +226,16 @@ export const PollFormDialog = ({ open, poll, departments, onClose, onSuccess, is
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>Прив'язка до підрозділів</Typography>
             <Controller name="departmentIds" control={control} render={({ field }) => (
-              <Select
-                {...field}
+              <DepartmentAutocomplete
                 multiple
-                fullWidth
-                displayEmpty
-                renderValue={(selected) => {
-                  if (selected.length === 0) return <em>Всі підрозділи (Загальнонаціональне)</em>;
-                  return (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((val) => (
-                        <Chip key={val} label={departments.find(d => d.id === val)?.name || val} size="small" />
-                      ))}
-                    </Box>
-                  );
+                value={selectedDepartments}
+                onChange={(_, newValue) => {
+                  const values = newValue as Department[];
+                  setSelectedDepartments(values);
+                  field.onChange(values.map(d => d.id));
                 }}
-              >
-                {departments.map((d) => (
-                  <MenuItem key={d.id} value={d.id}>{d.name}</MenuItem>
-                ))}
-              </Select>
+                placeholder={selectedDepartments.length === 0 ? "Всі підрозділи (Загальнонаціональне)" : ""}
+              />
             )}/>
           </Box>
 

@@ -16,6 +16,8 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import CommentIcon from '@mui/icons-material/Comment';
 import { SecureImage } from '../components/common/SecureImage';
+import { DepartmentAutocomplete } from '../components/common/DepartmentAutocomplete';
+import type { Department } from '../api/departmentsApi';
 import { newsApi, type NewsStatus, type News as NewsType, type NewsCategory, type NewsListResponse } from '../api/newsApi';
 import { NewsFormDialog } from '../components/news/NewsFormDialog';
 import { DeleteNewsDialog } from '../components/news/DeleteNewsDialog';
@@ -32,6 +34,7 @@ export const News = () => {
   const [activeTab, setActiveTab] = useState(0); // 0 = Активні, 1 = Архів
   const [page, setPage] = useState(1);
   const [filterCategory, setFilterCategory] = useState<string>('');
+  const [filterDepartment, setFilterDepartment] = useState<Department | null>(null);
   const [filterStatus, setFilterStatus] = useState<NewsStatus | ''>('');
   const [sortBy, setSortBy] = useState<string>('createdAt');
   const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
@@ -52,7 +55,7 @@ export const News = () => {
       const targetStatus = activeTab === 1 ? 'ARCHIVED' : (filterStatus || undefined);
       
       const [newsRes, catsRes] = await Promise.all([
-        newsApi.getNews(page, 10, filterCategory || undefined, targetStatus, sortBy, sortOrder),
+        newsApi.getNews(page, 10, filterCategory || undefined, filterDepartment?.id || undefined, targetStatus, sortBy, sortOrder),
         newsApi.getCategories()
       ]);
       setData(newsRes);
@@ -62,7 +65,7 @@ export const News = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, filterCategory, filterStatus, sortBy, sortOrder, activeTab]);
+  }, [page, filterCategory, filterDepartment, filterStatus, sortBy, sortOrder, activeTab]);
 
   useEffect(() => {
     fetchData();
@@ -114,6 +117,16 @@ export const News = () => {
 
         <Box sx={{ mb: 3, display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+            <Box sx={{ minWidth: 200 }}>
+              <DepartmentAutocomplete
+                size="small"
+                label="Підрозділ"
+                value={filterDepartment}
+                onChange={(_, val) => { setFilterDepartment(val as Department | null); setPage(1); }}
+                placeholder="Всі підрозділи"
+              />
+            </Box>
+
             <TextField select size="small" label="Категорія" value={filterCategory} onChange={(e) => { setFilterCategory(e.target.value); setPage(1); }} sx={{ minWidth: 160 }}>
               <MenuItem value="">Всі категорії</MenuItem>
               {categories.map(c => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
@@ -159,6 +172,7 @@ export const News = () => {
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 'bold' }}>Заголовок</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Охоплення</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Категорія</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Статус</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Автор</TableCell>
@@ -178,10 +192,11 @@ export const News = () => {
                     <TableCell sx={{ maxWidth: 300, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {item.title}
                     </TableCell>
+                    <TableCell>{item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Всі підрозділи'}</TableCell>
                     <TableCell>{item.category?.name || '—'}</TableCell>
                     <TableCell>
-                      <Chip 
-                        label={item.status === 'PUBLISHED' ? 'Опубліковано' : item.status === 'ARCHIVED' ? 'В архіві' : 'Чернетка'} 
+                      <Chip
+                        label={item.status === 'PUBLISHED' ? 'Опубліковано' : item.status === 'ARCHIVED' ? 'В архіві' : 'Чернетка'}
                         color={item.status === 'PUBLISHED' ? 'success' : item.status === 'ARCHIVED' ? 'warning' : 'default'} 
                         size="small" 
                       />
@@ -283,6 +298,9 @@ export const News = () => {
                     <Chip size="small" label={item.category?.name || 'Без категорії'} variant="outlined" />
                     <Chip size="small" label={item.status === 'PUBLISHED' ? 'Опубліковано' : item.status === 'ARCHIVED' ? 'В архіві' : 'Чернетка'} color={item.status === 'PUBLISHED' ? 'success' : item.status === 'ARCHIVED' ? 'warning' : 'default'} />
                   </Box>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    Охоплення: {item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Загальнонаціональне'}
+                  </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Автор: {item.author.firstName} {item.author.lastName}
                   </Typography>

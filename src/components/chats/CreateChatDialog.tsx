@@ -4,11 +4,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, 
-  Button, TextField, Box, Alert, MenuItem, Select, Chip, Typography
+  Button, TextField, Box, Alert, Typography, Autocomplete, CircularProgress
 } from '@mui/material';
 import { chatsApi } from '../../api/chatsApi';
 import { usersApi } from '../../api/usersApi';
-import { pollsApi, type PollDepartment } from '../../api/pollsApi';
+import { DepartmentAutocomplete } from '../common/DepartmentAutocomplete';
+import type { Department } from '../../api/departmentsApi';
 import type { User } from '../../store/authStore';
 
 const createChatSchema = z.object({
@@ -27,8 +28,12 @@ interface Props {
 
 export const CreateChatDialog = ({ open, onClose, onSuccess }: Props) => {
   const [apiError, setApiError] = useState<string | null>(null);
-  const [departments, setDepartments] = useState<PollDepartment[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+  const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
+
+  const [options, setOptions] = useState<User[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loadingOptions, setLoadingOptions] = useState(false);
+  const [selectedAdmins, setSelectedAdmins] = useState<User[]>([]);
 
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormInputs>({
     resolver: zodResolver(createChatSchema),
@@ -37,13 +42,37 @@ export const CreateChatDialog = ({ open, onClose, onSuccess }: Props) => {
 
   useEffect(() => {
     if (open) {
-      pollsApi.getDepartments().then(setDepartments).catch(console.error);
-      // Завантажуємо першу сторінку користувачів для вибору адмінів
-      usersApi.getUsers(1, 100).then(res => setUsers(res.data)).catch(console.error);
       reset({ name: '', departmentId: null, adminIds: [] });
+      setSelectedAdmins([]);
+      setSelectedDepartment(null);
+      setSearchQuery('');
       setApiError(null);
+    } else {
+      setOptions([]);
     }
   }, [open, reset]);
+
+  // Пошук адміністраторів (виконується тільки при наявності тексту)
+  useEffect(() => {
+    if (!open) return;
+    const handler = setTimeout(async () => {
+      if (!searchQuery.trim()) {
+        setOptions([]);
+        return;
+      }
+      setLoadingOptions(true);
+      try {
+        const response = await usersApi.getUsers(1, 20, searchQuery);
+        setOptions(response.data);
+      } catch (error) {
+        console.error('Помилка пошуку користувачів', error);
+      } finally {
+        setLoadingOptions(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [searchQuery, open]);
 
   const onSubmit = async (data: FormInputs) => {
     try {
@@ -74,45 +103,57 @@ export const CreateChatDialog = ({ open, onClose, onSuccess }: Props) => {
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>Підрозділ (опціонально)</Typography>
             <Controller name="departmentId" control={control} render={({ field }) => (
-              <TextField 
-                {...field} 
-                select 
-                fullWidth 
-                value={field.value || ''}
-              >
-                <MenuItem value=""><em>Загальний (без підрозділу)</em></MenuItem>
-                {departments.map(d => <MenuItem key={d.id} value={d.id}>{d.name}</MenuItem>)}
-              </TextField>
+              <DepartmentAutocomplete
+                value={selectedDepartment}
+                onChange={(_, newValue) => {
+                  const val = newValue as Department | null;
+                  setSelectedDepartment(val);
+                  field.onChange(val ? val.id : null);
+                }}
+                placeholder={!selectedDepartment ? "Загальнонаціональний (всі підрозділи)" : ""}
+              />
             )}/>
           </Box>
 
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>Призначити адміністраторів (обов'язково)</Typography>
             <Controller name="adminIds" control={control} render={({ field }) => (
-              <Select
-                {...field}
+              <Autocomplete
                 multiple
-                fullWidth
-                error={!!errors.adminIds}
-                displayEmpty
-                renderValue={(selected) => {
-                  if (selected.length === 0) return <Typography color="text.secondary">Оберіть співробітників...</Typography>;
-                  return (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((val) => {
-                        const user = users.find(u => u.id === val);
-                        return <Chip key={val} label={user ? `${user.firstName} ${user.lastName}` : val} size="small" />;
-                      })}
-                    </Box>
-                  );
+                options={options}
+                loading={loadingOptions}
+                getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.email})`}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                value={selectedAdmins}
+                onChange={(_, newValue) => {
+                  setSelectedAdmins(newValue);
+                  field.onChange(newValue.map(u => u.id));
                 }}
-              >
-                {users.map(u => (
-                  <MenuItem key={u.id} value={u.id}>{u.firstName} {u.lastName} ({u.email})</MenuItem>
-                ))}
-              </Select>
+                inputValue={searchQuery}
+                onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
+                noOptionsText={searchQuery.trim() ? "Не знайдено" : "Почніть вводити пошту або ім'я..."}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder={selectedAdmins.length === 0 ? "Пошук співробітників..." : ""}
+                    error={!!errors.adminIds}
+                    helperText={errors.adminIds?.message}
+                    slotProps={{
+                      ...params.slotProps,
+                      input: {
+                        ...((params as any).InputProps || params.slotProps?.input),
+                        endAdornment: (
+                          <>
+                            {loadingOptions ? <CircularProgress color="inherit" size={20} /> : null}
+                            {params.slotProps?.input?.endAdornment || (params as any).InputProps?.endAdornment}
+                          </>
+                        ),
+                      },
+                    }}
+                  />
+                )}
+              />
             )}/>
-            {errors.adminIds && <Typography color="error" variant="caption" sx={{ mt: 0.5, display: 'block' }}>{errors.adminIds.message}</Typography>}
           </Box>
         </DialogContent>
         <DialogActions>

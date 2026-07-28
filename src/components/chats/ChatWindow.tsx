@@ -45,7 +45,13 @@ export const ChatWindow = ({ chat, onChatUpdate }: Props) => {
       setLoadingHistory(true);
       try {
         const history = await chatsApi.getMessages(chat.id, 1, 100);
-        if (isMounted) setMessages(history.data.reverse()); // Старі повідомлення зверху
+        if (isMounted) {
+          // Завжди жорстко сортуємо за датою (від найстаріших до найновіших)
+          const sortedMessages = history.data.sort(
+            (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          );
+          setMessages(sortedMessages);
+        }
       } catch (error) {
         console.error('Failed to load history', error);
       } finally {
@@ -148,30 +154,42 @@ export const ChatWindow = ({ chat, onChatUpdate }: Props) => {
         
         {!loadingHistory && messages.map((msg) => {
           const isMe = msg.senderId === user?.id;
+          const senderAvatar = isMe ? user?.avatarUrl : msg.sender?.avatarUrl;
+          const senderFirstName = isMe ? user?.firstName : msg.sender?.firstName;
+          const senderLastName = isMe ? user?.lastName : msg.sender?.lastName;
+
           return (
-            <Box key={msg.id} sx={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start' }}>
-              {!isMe && msg.sender && (
-                <Typography variant="caption" color="text.secondary" sx={{ ml: 1, mb: 0.5 }}>
-                  {msg.sender.firstName} {msg.sender.lastName}
+            <Box key={msg.id} sx={{ display: 'flex', flexDirection: isMe ? 'row-reverse' : 'row', alignItems: 'flex-end', gap: 1, mb: 1 }}>
+              <Avatar sx={{ width: 32, height: 32, bgcolor: isMe ? 'primary.main' : 'grey.400' }}>
+                {senderAvatar ? (
+                  <SecureImage src={senderAvatar} alt={senderFirstName || 'User'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  (senderFirstName?.charAt(0) || '?').toUpperCase()
+                )}
+              </Avatar>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start', maxWidth: '75%' }}>
+                {!isMe && senderFirstName && (
+                  <Typography variant="caption" color="text.secondary" sx={{ ml: 1, mb: 0.5 }}>
+                    {senderFirstName} {senderLastName}
+                  </Typography>
+                )}
+                <Paper 
+                  elevation={1} 
+                  sx={{ 
+                    p: 1.5, 
+                    bgcolor: isMe ? 'primary.main' : 'background.paper',
+                    color: isMe ? 'primary.contrastText' : 'text.primary',
+                    borderRadius: 2,
+                    borderBottomRightRadius: isMe ? 0 : 8,
+                    borderBottomLeftRadius: isMe ? 8 : 0,
+                  }}
+                >
+                  <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>{msg.content}</Typography>
+                </Paper>
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, mx: 1 }}>
+                  {format(new Date(msg.createdAt), 'HH:mm')}
                 </Typography>
-              )}
-              <Paper 
-                elevation={1} 
-                sx={{ 
-                  p: 1.5, 
-                  maxWidth: '70%', 
-                  bgcolor: isMe ? 'primary.main' : 'background.paper',
-                  color: isMe ? 'primary.contrastText' : 'text.primary',
-                  borderRadius: 2,
-                  borderBottomRightRadius: isMe ? 0 : 8,
-                  borderBottomLeftRadius: isMe ? 8 : 0,
-                }}
-              >
-                <Typography variant="body2">{msg.content}</Typography>
-              </Paper>
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, mx: 1 }}>
-                {format(new Date(msg.createdAt), 'HH:mm')}
-              </Typography>
+              </Box>
             </Box>
           );
         })}

@@ -16,7 +16,8 @@ import PublicIcon from '@mui/icons-material/Public';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'; // Імпортуємо іконку для копіювання
-import { pollsApi, PollStatus, type Poll, type PollDepartment, type PaginatedPollsResponse } from '../api/pollsApi';
+import { pollsApi, PollStatus, type Poll, type PaginatedPollsResponse } from '../api/pollsApi';
+import { departmentsApi, type Department } from '../api/departmentsApi';
 import { PollFormDialog } from '../components/polls/PollFormDialog';
 import { DeletePollDialog } from '../components/polls/DeletePollDialog';
 import { PollStatusDialog } from '../components/polls/PollStatusDialog';
@@ -25,7 +26,7 @@ import { format } from 'date-fns';
 
 export const Polls = () => {
   const [data, setData] = useState<PaginatedPollsResponse | null>(null);
-  const [departments, setDepartments] = useState<PollDepartment[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [activeTab, setActiveTab] = useState(0); 
@@ -65,7 +66,7 @@ export const Polls = () => {
 
   // Завантажуємо підрозділи лише один раз при монтуванні, щоб не блокувати таблицю
   useEffect(() => {
-    pollsApi.getDepartments()
+    departmentsApi.getDepartments()
       .then(setDepartments)
       .catch(() => setDepartments([]));
   }, []);
@@ -300,10 +301,9 @@ export const Polls = () => {
       <PollFormDialog 
         open={isFormOpen} 
         poll={editPoll} 
-        departments={departments} 
         onClose={() => setIsFormOpen(false)} 
         onSuccess={fetchData} 
-        isDuplicate={isDuplicate} // Прокидаємо стан у форму
+        isDuplicate={isDuplicate}
       />
       <DeletePollDialog open={!!deletePollItem} poll={deletePollItem} onClose={() => setDeletePollItem(null)} onSuccess={fetchData} />
       <PollStatusDialog 

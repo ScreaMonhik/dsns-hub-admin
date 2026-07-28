@@ -14,12 +14,15 @@ import { TipTapEditor } from './TipTapEditor';
 import { CreateCategoryDialog } from './CreateCategoryDialog';
 import { ManageCategoriesDialog } from './ManageCategoriesDialog';
 import { SecureImage } from '../common/SecureImage';
+import { DepartmentAutocomplete } from '../common/DepartmentAutocomplete';
+import type { Department } from '../../api/departmentsApi';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 const newsSchema = z.object({
   title: z.string().min(3, 'Мінімум 3 символи'),
   content: z.string().min(10, 'Контент занадто короткий'),
   categoryId: z.string().nullable(),
+  departmentIds: z.array(z.string()).optional(),
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
   imageUrl: z.string().nullable(),
 });
@@ -40,29 +43,32 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isCreateCategoryOpen, setIsCreateCategoryOpen] = useState(false);
   const [isManageCategoriesOpen, setIsManageCategoriesOpen] = useState(false);
+  const [selectedDepartments, setSelectedDepartments] = useState<Department[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { control, handleSubmit, reset, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormInputs>({
     resolver: zodResolver(newsSchema),
-    defaultValues: { title: '', content: '', categoryId: null, status: 'DRAFT', imageUrl: null },
+    defaultValues: { title: '', content: '', categoryId: null, departmentIds: [], status: 'DRAFT', imageUrl: null },
   });
 
   const coverUrl = watch('imageUrl');
   const wasOpen = useRef(false);
 
   useEffect(() => {
-    // Форма скидається або ініціалізується даними ТІЛЬКИ коли вікно переходить зі стану закритого у відкрите
     if (open && !wasOpen.current) {
       if (news) {
+        setSelectedDepartments(news.departments || []);
         reset({
           title: news.title,
           content: news.content,
           categoryId: news.categoryId,
+          departmentIds: news.departments?.map(d => d.id) || [],
           status: news.status,
           imageUrl: news.imageUrl,
         });
       } else {
-        reset({ title: '', content: '', categoryId: categories[0]?.id || null, status: 'DRAFT', imageUrl: null });
+        setSelectedDepartments([]);
+        reset({ title: '', content: '', categoryId: categories[0]?.id || null, departmentIds: [], status: 'DRAFT', imageUrl: null });
       }
     }
     wasOpen.current = open;
@@ -135,6 +141,7 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
                 </IconButton>
               </Tooltip>
             </Box>
+
             <Box sx={{ flex: 1 }}>
               <Controller name="status" control={control} render={({ field }) => (
                 <TextField {...field} select label="Статус" fullWidth error={!!errors.status} helperText={errors.status?.message}>
@@ -143,6 +150,22 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
                 </TextField>
               )}/>
             </Box>
+          </Box>
+
+          <Box>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>Охоплення підрозділів (опціонально)</Typography>
+            <Controller name="departmentIds" control={control} render={({ field }) => (
+              <DepartmentAutocomplete
+                multiple
+                value={selectedDepartments}
+                onChange={(_, newValue) => {
+                  const values = newValue as Department[];
+                  setSelectedDepartments(values);
+                  field.onChange(values.map(d => d.id));
+                }}
+                placeholder={selectedDepartments.length === 0 ? "Всі підрозділи (Загальнонаціональна новина)" : ""}
+              />
+            )}/>
           </Box>
 
           <Box>

@@ -15,6 +15,7 @@ export interface News {
   status: NewsStatus;
   categoryId: string | null;
   category: NewsCategory | null;
+  departments?: { id: string; name: string }[];
   createdAt: string;
   authorId: string;
   author: {
@@ -57,6 +58,7 @@ export type NewsPayload = {
   imageUrl: string | null;
   status: NewsStatus;
   categoryId: string | null;
+  departmentIds?: string[];
 };
 
 export const newsApi = {
@@ -64,12 +66,14 @@ export const newsApi = {
     page: number = 1, 
     limit: number = 10, 
     categoryId?: string, 
+    departmentId?: string,
     status?: NewsStatus,
     sortBy?: string,
     sortOrder?: 'ASC' | 'DESC'
   ) => {
     const params: Record<string, any> = { page, limit };
     if (categoryId) params.categoryId = categoryId;
+    if (departmentId) params.departmentId = departmentId;
     if (status) params.status = status;
     if (sortBy) params.sortBy = sortBy;
     if (sortOrder) params.sortOrder = sortOrder;

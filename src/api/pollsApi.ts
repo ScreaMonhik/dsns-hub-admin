@@ -1,4 +1,5 @@
 import { apiClient } from './apiClient';
+import type { Department } from './departmentsApi';
 
 export const PollStatus = {
   DRAFT: 'DRAFT',
@@ -14,11 +15,6 @@ export interface PollAuthor {
   lastName: string;
   email: string;
   avatarUrl?: string | null;
-}
-
-export interface PollDepartment {
-  id: string;
-  name: string;
 }
 
 export interface PollOption {
@@ -37,9 +33,9 @@ export interface Poll {
   status: PollStatus;
   createdAt: string;
   updatedAt: string;
-  expiresAt?: string | null; // Дата завершення опитування
+  expiresAt?: string | null;
   author?: PollAuthor | null;
-  departments: PollDepartment[];
+  departments: Department[];
   options: PollOption[];
   totalVotes: number;
 }
@@ -81,12 +77,6 @@ export const pollsApi = {
     if (sortOrder) params.sortOrder = sortOrder;
 
     const response = await apiClient.get<PaginatedPollsResponse>('/polls', { params });
-    return response.data;
-  },
-
-  getDepartments: async () => {
-    // Basic endpoint for departments
-    const response = await apiClient.get<PollDepartment[]>('/departments');
     return response.data;
   },
 
