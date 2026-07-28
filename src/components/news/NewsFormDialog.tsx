@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, 
   Button, TextField, MenuItem, Box, Alert, Typography,
-  CircularProgress, IconButton, Tooltip
+  CircularProgress, IconButton, Tooltip, Autocomplete
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -68,7 +68,7 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
         });
       } else {
         setSelectedDepartments([]);
-        reset({ title: '', content: '', categoryId: categories[0]?.id || null, departmentIds: [], status: 'DRAFT', imageUrl: null });
+        reset({ title: '', content: '', categoryId: null, departmentIds: [], status: 'DRAFT', imageUrl: null });
       }
     }
     wasOpen.current = open;
@@ -117,18 +117,25 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
             <Box sx={{ display: 'flex', gap: 0.5, flex: 1, alignItems: 'flex-start' }}>
               <Controller name="categoryId" control={control} render={({ field }) => (
-                <TextField 
-                  {...field} 
-                  select 
-                  label="Категорія" 
-                  fullWidth 
-                  error={!!errors.categoryId} 
-                  helperText={errors.categoryId?.message} 
-                  value={categories.some(c => c.id === field.value) ? field.value : ''}
-                >
-                  <MenuItem value=""><em>Без категорії</em></MenuItem>
-                  {categories.map((cat) => <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>)}
-                </TextField>
+                <Autocomplete
+                  options={categories}
+                  getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(option, value) => option.id === value?.id}
+                  value={categories.find(c => c.id === field.value) || null}
+                  onChange={(_, newValue) => {
+                    field.onChange(newValue ? newValue.id : null);
+                  }}
+                  renderInput={(params) => (
+                    <TextField 
+                      {...params}
+                      label="Категорія" 
+                      error={!!errors.categoryId} 
+                      helperText={errors.categoryId?.message}
+                      placeholder="Без категорії"
+                    />
+                  )}
+                  fullWidth
+                />
               )}/>
               <Tooltip title="Додати нову категорію">
                 <IconButton onClick={() => setIsCreateCategoryOpen(true)} sx={{ mt: 0.5, color: 'action.active' }}>
