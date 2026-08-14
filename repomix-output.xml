@@ -61,6 +61,7 @@ src/
       CreateChatDialog.tsx
       ManageMembersDialog.tsx
     common/
+      DepartmentAutocomplete.tsx
       SecureImage.tsx
     layout/
       AdminLayout.tsx
@@ -115,24 +116,6 @@ vite.config.ts
 
 <files>
 This section contains the contents of the repository's files.
-
-<file path="src/api/departmentsApi.ts">
-import { apiClient } from './apiClient';
-
-export interface Department {
-  id: string;
-  name: string;
-}
-
-export const departmentsApi = {
-  getDepartments: async (search?: string) => {
-    const response = await apiClient.get<Department[]>('/departments', {
-      params: search ? { search } : undefined,
-    });
-    return response.data;
-  },
-};
-</file>
 
 <file path="public/favicon.svg">
 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="46" fill="none" viewBox="0 0 48 46"><path fill="#863bff" d="M25.946 44.938c-.664.845-2.021.375-2.021-.698V33.937a2.26 2.26 0 0 0-2.262-2.262H10.287c-.92 0-1.456-1.04-.92-1.788l7.48-10.471c1.07-1.497 0-3.578-1.842-3.578H1.237c-.92 0-1.456-1.04-.92-1.788L10.013.474c.214-.297.556-.474.92-.474h28.894c.92 0 1.456 1.04.92 1.788l-7.48 10.471c-1.07 1.498 0 3.579 1.842 3.579h11.377c.943 0 1.473 1.088.89 1.83L25.947 44.94z" style="fill:#863bff;fill:color(display-p3 .5252 .23 1);fill-opacity:1"/><mask id="a" width="48" height="46" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:alpha"><path fill="#000" d="M25.842 44.938c-.664.844-2.021.375-2.021-.698V33.937a2.26 2.26 0 0 0-2.262-2.262H10.183c-.92 0-1.456-1.04-.92-1.788l7.48-10.471c1.07-1.498 0-3.579-1.842-3.579H1.133c-.92 0-1.456-1.04-.92-1.787L9.91.473c.214-.297.556-.474.92-.474h28.894c.92 0 1.456 1.04.92 1.788l-7.48 10.471c-1.07 1.498 0 3.578 1.842 3.578h11.377c.943 0 1.473 1.088.89 1.832L25.843 44.94z" style="fill:#000;fill-opacity:1"/></mask><g mask="url(#a)"><g filter="url(#b)"><ellipse cx="5.508" cy="14.704" fill="#ede6ff" rx="5.508" ry="14.704" style="fill:#ede6ff;fill:color(display-p3 .9275 .9033 1);fill-opacity:1" transform="matrix(.00324 1 1 -.00324 -4.47 31.516)"/></g><g filter="url(#c)"><ellipse cx="10.399" cy="29.851" fill="#ede6ff" rx="10.399" ry="29.851" style="fill:#ede6ff;fill:color(display-p3 .9275 .9033 1);fill-opacity:1" transform="matrix(.00324 1 1 -.00324 -39.328 7.883)"/></g><g filter="url(#d)"><ellipse cx="5.508" cy="30.487" fill="#7e14ff" rx="5.508" ry="30.487" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(89.814 -25.913 -14.639)scale(1 -1)"/></g><g filter="url(#e)"><ellipse cx="5.508" cy="30.599" fill="#7e14ff" rx="5.508" ry="30.599" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(89.814 -32.644 -3.334)scale(1 -1)"/></g><g filter="url(#f)"><ellipse cx="5.508" cy="30.599" fill="#7e14ff" rx="5.508" ry="30.599" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="matrix(.00324 1 1 -.00324 -34.34 30.47)"/></g><g filter="url(#g)"><ellipse cx="14.072" cy="22.078" fill="#ede6ff" rx="14.072" ry="22.078" style="fill:#ede6ff;fill:color(display-p3 .9275 .9033 1);fill-opacity:1" transform="rotate(93.35 24.506 48.493)scale(-1 1)"/></g><g filter="url(#h)"><ellipse cx="3.47" cy="21.501" fill="#7e14ff" rx="3.47" ry="21.501" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(89.009 28.708 47.59)scale(-1 1)"/></g><g filter="url(#i)"><ellipse cx="3.47" cy="21.501" fill="#7e14ff" rx="3.47" ry="21.501" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(89.009 28.708 47.59)scale(-1 1)"/></g><g filter="url(#j)"><ellipse cx=".387" cy="8.972" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(39.51 .387 8.972)"/></g><g filter="url(#k)"><ellipse cx="47.523" cy="-6.092" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(37.892 47.523 -6.092)"/></g><g filter="url(#l)"><ellipse cx="41.412" cy="6.333" fill="#47bfff" rx="5.971" ry="9.665" style="fill:#47bfff;fill:color(display-p3 .2799 .748 1);fill-opacity:1" transform="rotate(37.892 41.412 6.333)"/></g><g filter="url(#m)"><ellipse cx="-1.879" cy="38.332" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(37.892 -1.88 38.332)"/></g><g filter="url(#n)"><ellipse cx="-1.879" cy="38.332" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(37.892 -1.88 38.332)"/></g><g filter="url(#o)"><ellipse cx="35.651" cy="29.907" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(37.892 35.651 29.907)"/></g><g filter="url(#p)"><ellipse cx="38.418" cy="32.4" fill="#47bfff" rx="5.971" ry="15.297" style="fill:#47bfff;fill:color(display-p3 .2799 .748 1);fill-opacity:1" transform="rotate(37.892 38.418 32.4)"/></g></g><defs><filter id="b" width="60.045" height="41.654" x="-19.77" y="16.149" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="7.659"/></filter><filter id="c" width="90.34" height="51.437" x="-54.613" y="-7.533" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="7.659"/></filter><filter id="d" width="79.355" height="29.4" x="-49.64" y="2.03" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="e" width="79.579" height="29.4" x="-45.045" y="20.029" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="f" width="79.579" height="29.4" x="-43.513" y="21.178" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="g" width="74.749" height="58.852" x="15.756" y="-17.901" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="7.659"/></filter><filter id="h" width="61.377" height="25.362" x="23.548" y="2.284" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="i" width="61.377" height="25.362" x="23.548" y="2.284" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="j" width="56.045" height="63.649" x="-27.636" y="-22.853" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="k" width="54.814" height="64.646" x="20.116" y="-38.415" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="l" width="33.541" height="35.313" x="24.641" y="-11.323" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="m" width="54.814" height="64.646" x="-29.286" y="6.009" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="n" width="54.814" height="64.646" x="-29.286" y="6.009" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="o" width="54.814" height="64.646" x="8.244" y="-2.416" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="p" width="39.409" height="43.623" x="18.713" y="10.588" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter></defs></svg>
@@ -286,6 +269,24 @@ export const chatsApi = {
 };
 </file>
 
+<file path="src/api/departmentsApi.ts">
+import { apiClient } from './apiClient';
+
+export interface Department {
+  id: string;
+  name: string;
+}
+
+export const departmentsApi = {
+  getDepartments: async (search?: string) => {
+    const response = await apiClient.get<Department[]>('/departments', {
+      params: search ? { search } : undefined,
+    });
+    return response.data;
+  },
+};
+</file>
+
 <file path="src/assets/react.svg">
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="35.93" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 228"><path fill="#00D8FF" d="M210.483 73.824a171.49 171.49 0 0 0-8.24-2.597c.465-1.9.893-3.777 1.273-5.621c6.238-30.281 2.16-54.676-11.769-62.708c-13.355-7.7-35.196.329-57.254 19.526a171.23 171.23 0 0 0-6.375 5.848a155.866 155.866 0 0 0-4.241-3.917C100.759 3.829 77.587-4.822 63.673 3.233C50.33 10.957 46.379 33.89 51.995 62.588a170.974 170.974 0 0 0 1.892 8.48c-3.28.932-6.445 1.924-9.474 2.98C17.309 83.498 0 98.307 0 113.668c0 15.865 18.582 31.778 46.812 41.427a145.52 145.52 0 0 0 6.921 2.165a167.467 167.467 0 0 0-2.01 9.138c-5.354 28.2-1.173 50.591 12.134 58.266c13.744 7.926 36.812-.22 59.273-19.855a145.567 145.567 0 0 0 5.342-4.923a168.064 168.064 0 0 0 6.92 6.314c21.758 18.722 43.246 26.282 56.54 18.586c13.731-7.949 18.194-32.003 12.4-61.268a145.016 145.016 0 0 0-1.535-6.842c1.62-.48 3.21-.974 4.76-1.488c29.348-9.723 48.443-25.443 48.443-41.52c0-15.417-17.868-30.326-45.517-39.844Zm-6.365 70.984c-1.4.463-2.836.91-4.3 1.345c-3.24-10.257-7.612-21.163-12.963-32.432c5.106-11 9.31-21.767 12.459-31.957c2.619.758 5.16 1.557 7.61 2.4c23.69 8.156 38.14 20.213 38.14 29.504c0 9.896-15.606 22.743-40.946 31.14Zm-10.514 20.834c2.562 12.94 2.927 24.64 1.23 33.787c-1.524 8.219-4.59 13.698-8.382 15.893c-8.067 4.67-25.32-1.4-43.927-17.412a156.726 156.726 0 0 1-6.437-5.87c7.214-7.889 14.423-17.06 21.459-27.246c12.376-1.098 24.068-2.894 34.671-5.345a134.17 134.17 0 0 1 1.386 6.193ZM87.276 214.515c-7.882 2.783-14.16 2.863-17.955.675c-8.075-4.657-11.432-22.636-6.853-46.752a156.923 156.923 0 0 1 1.869-8.499c10.486 2.32 22.093 3.988 34.498 4.994c7.084 9.967 14.501 19.128 21.976 27.15a134.668 134.668 0 0 1-4.877 4.492c-9.933 8.682-19.886 14.842-28.658 17.94ZM50.35 144.747c-12.483-4.267-22.792-9.812-29.858-15.863c-6.35-5.437-9.555-10.836-9.555-15.216c0-9.322 13.897-21.212 37.076-29.293c2.813-.98 5.757-1.905 8.812-2.773c3.204 10.42 7.406 21.315 12.477 32.332c-5.137 11.18-9.399 22.249-12.634 32.792a134.718 134.718 0 0 1-6.318-1.979Zm12.378-84.26c-4.811-24.587-1.616-43.134 6.425-47.789c8.564-4.958 27.502 2.111 47.463 19.835a144.318 144.318 0 0 1 3.841 3.545c-7.438 7.987-14.787 17.08-21.808 26.988c-12.04 1.116-23.565 2.908-34.161 5.309a160.342 160.342 0 0 1-1.76-7.887Zm110.427 27.268a347.8 347.8 0 0 0-7.785-12.803c8.168 1.033 15.994 2.404 23.343 4.08c-2.206 7.072-4.956 14.465-8.193 22.045a381.151 381.151 0 0 0-7.365-13.322Zm-45.032-43.861c5.044 5.465 10.096 11.566 15.065 18.186a322.04 322.04 0 0 0-30.257-.006c4.974-6.559 10.069-12.652 15.192-18.18ZM82.802 87.83a323.167 323.167 0 0 0-7.227 13.238c-3.184-7.553-5.909-14.98-8.134-22.152c7.304-1.634 15.093-2.97 23.209-3.984a321.524 321.524 0 0 0-7.848 12.897Zm8.081 65.352c-8.385-.936-16.291-2.203-23.593-3.793c2.26-7.3 5.045-14.885 8.298-22.6a321.187 321.187 0 0 0 7.257 13.246c2.594 4.48 5.28 8.868 8.038 13.147Zm37.542 31.03c-5.184-5.592-10.354-11.779-15.403-18.433c4.902.192 9.899.29 14.978.29c5.218 0 10.376-.117 15.453-.343c-4.985 6.774-10.018 12.97-15.028 18.486Zm52.198-57.817c3.422 7.8 6.306 15.345 8.596 22.52c-7.422 1.694-15.436 3.058-23.88 4.071a382.417 382.417 0 0 0 7.859-13.026a347.403 347.403 0 0 0 7.425-13.565Zm-16.898 8.101a358.557 358.557 0 0 1-12.281 19.815a329.4 329.4 0 0 1-23.444.823c-7.967 0-15.716-.248-23.178-.732a310.202 310.202 0 0 1-12.513-19.846h.001a307.41 307.41 0 0 1-10.923-20.627a310.278 310.278 0 0 1 10.89-20.637l-.001.001a307.318 307.318 0 0 1 12.413-19.761c7.613-.576 15.42-.876 23.31-.876H128c7.926 0 15.743.303 23.354.883a329.357 329.357 0 0 1 12.335 19.695a358.489 358.489 0 0 1 11.036 20.54a329.472 329.472 0 0 1-11 20.722Zm22.56-122.124c8.572 4.944 11.906 24.881 6.52 51.026c-.344 1.668-.73 3.367-1.15 5.09c-10.622-2.452-22.155-4.275-34.23-5.408c-7.034-10.017-14.323-19.124-21.64-27.008a160.789 160.789 0 0 1 5.888-5.4c18.9-16.447 36.564-22.941 44.612-18.3ZM128 90.808c12.625 0 22.86 10.235 22.86 22.86s-10.235 22.86-22.86 22.86s-22.86-10.235-22.86-22.86s10.235-22.86 22.86-22.86Z"></path></svg>
 </file>
@@ -294,742 +295,89 @@ export const chatsApi = {
 <svg xmlns="http://www.w3.org/2000/svg" width="77" height="47" fill="none" aria-labelledby="vite-logo-title" viewBox="0 0 77 47"><title id="vite-logo-title">Vite</title><style>.parenthesis{fill:#000}@media (prefers-color-scheme:dark){.parenthesis{fill:#fff}}</style><path fill="#9135ff" d="M40.151 45.71c-.663.844-2.02.374-2.02-.699V34.708a2.26 2.26 0 0 0-2.262-2.262H24.493c-.92 0-1.457-1.04-.92-1.788l7.479-10.471c1.07-1.498 0-3.578-1.842-3.578H15.443c-.92 0-1.456-1.04-.92-1.788l9.696-13.576c.213-.297.556-.474.92-.474h28.894c.92 0 1.456 1.04.92 1.788l-7.48 10.472c-1.07 1.497 0 3.578 1.842 3.578h11.376c.944 0 1.474 1.087.89 1.83L40.153 45.712z"/><mask id="a" width="48" height="47" x="14" y="0" maskUnits="userSpaceOnUse" style="mask-type:alpha"><path fill="#000" d="M40.047 45.71c-.663.843-2.02.374-2.02-.699V34.708a2.26 2.26 0 0 0-2.262-2.262H24.389c-.92 0-1.457-1.04-.92-1.788l7.479-10.472c1.07-1.497 0-3.578-1.842-3.578H15.34c-.92 0-1.456-1.04-.92-1.788l9.696-13.575c.213-.297.556-.474.92-.474H53.93c.92 0 1.456 1.04.92 1.788L47.37 13.03c-1.07 1.498 0 3.578 1.842 3.578h11.376c.944 0 1.474 1.088.89 1.831L40.049 45.712z"/></mask><g mask="url(#a)"><g filter="url(#b)"><ellipse cx="5.508" cy="14.704" fill="#eee6ff" rx="5.508" ry="14.704" transform="rotate(269.814 20.96 11.29)scale(-1 1)"/></g><g filter="url(#c)"><ellipse cx="10.399" cy="29.851" fill="#eee6ff" rx="10.399" ry="29.851" transform="rotate(89.814 -16.902 -8.275)scale(1 -1)"/></g><g filter="url(#d)"><ellipse cx="5.508" cy="30.487" fill="#8900ff" rx="5.508" ry="30.487" transform="rotate(89.814 -19.197 -7.127)scale(1 -1)"/></g><g filter="url(#e)"><ellipse cx="5.508" cy="30.599" fill="#8900ff" rx="5.508" ry="30.599" transform="rotate(89.814 -25.928 4.177)scale(1 -1)"/></g><g filter="url(#f)"><ellipse cx="5.508" cy="30.599" fill="#8900ff" rx="5.508" ry="30.599" transform="rotate(89.814 -25.738 5.52)scale(1 -1)"/></g><g filter="url(#g)"><ellipse cx="14.072" cy="22.078" fill="#eee6ff" rx="14.072" ry="22.078" transform="rotate(93.35 31.245 55.578)scale(-1 1)"/></g><g filter="url(#h)"><ellipse cx="3.47" cy="21.501" fill="#8900ff" rx="3.47" ry="21.501" transform="rotate(89.009 35.419 55.202)scale(-1 1)"/></g><g filter="url(#i)"><ellipse cx="3.47" cy="21.501" fill="#8900ff" rx="3.47" ry="21.501" transform="rotate(89.009 35.419 55.202)scale(-1 1)"/></g><g filter="url(#j)"><ellipse cx="14.592" cy="9.743" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(39.51 14.592 9.743)"/></g><g filter="url(#k)"><ellipse cx="61.728" cy="-5.321" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 61.728 -5.32)"/></g><g filter="url(#l)"><ellipse cx="55.618" cy="7.104" fill="#00c2ff" rx="5.971" ry="9.665" transform="rotate(37.892 55.618 7.104)"/></g><g filter="url(#m)"><ellipse cx="12.326" cy="39.103" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 12.326 39.103)"/></g><g filter="url(#n)"><ellipse cx="12.326" cy="39.103" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 12.326 39.103)"/></g><g filter="url(#o)"><ellipse cx="49.857" cy="30.678" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 49.857 30.678)"/></g><g filter="url(#p)"><ellipse cx="52.623" cy="33.171" fill="#00c2ff" rx="5.971" ry="15.297" transform="rotate(37.892 52.623 33.17)"/></g></g><path d="M6.919 0c-9.198 13.166-9.252 33.575 0 46.789h6.215c-9.25-13.214-9.196-33.623 0-46.789zm62.424 0h-6.215c9.198 13.166 9.252 33.575 0 46.789h6.215c9.25-13.214 9.196-33.623 0-46.789" class="parenthesis"/><defs><filter id="b" width="60.045" height="41.654" x="-5.564" y="16.92" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="7.659"/></filter><filter id="c" width="90.34" height="51.437" x="-40.407" y="-6.762" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="7.659"/></filter><filter id="d" width="79.355" height="29.4" x="-35.435" y="2.801" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="e" width="79.579" height="29.4" x="-30.84" y="20.8" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="f" width="79.579" height="29.4" x="-29.307" y="21.949" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="g" width="74.749" height="58.852" x="29.961" y="-17.13" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="7.659"/></filter><filter id="h" width="61.377" height="25.362" x="37.754" y="3.055" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="i" width="61.377" height="25.362" x="37.754" y="3.055" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="j" width="56.045" height="63.649" x="-13.43" y="-22.082" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="k" width="54.814" height="64.646" x="34.321" y="-37.644" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="l" width="33.541" height="35.313" x="38.847" y="-10.552" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="m" width="54.814" height="64.646" x="-15.081" y="6.78" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="n" width="54.814" height="64.646" x="-15.081" y="6.78" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="o" width="54.814" height="64.646" x="22.45" y="-1.645" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="p" width="39.409" height="43.623" x="32.919" y="11.36" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter></defs></svg>
 </file>
 
-<file path="src/components/chats/ChatWindow.tsx">
-import { useEffect, useState, useRef } from 'react';
-import { io, Socket } from 'socket.io-client';
-import { 
-  Box, Typography, TextField, IconButton, Avatar, 
-  CircularProgress, Paper, Tooltip 
-} from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import PeopleIcon from '@mui/icons-material/People';
-import { chatsApi, type ChatGroup, type ChatMessage } from '../../api/chatsApi';
-import { useAuthStore } from '../../store/authStore';
-import { SecureImage } from '../common/SecureImage';
-import { ManageMembersDialog } from './ManageMembersDialog';
-import { format } from 'date-fns';
-
-interface Props {
-  chat: ChatGroup;
-  onChatUpdate: () => void;
-}
-
-export const ChatWindow = ({ chat, onChatUpdate }: Props) => {
-  const { user } = useAuthStore();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [loadingHistory, setLoadingHistory] = useState(false);
-  const [messageText, setMessageText] = useState('');
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [isManageMembersOpen, setIsManageMembersOpen] = useState(false);
-  const socketRef = useRef<Socket | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  // Завантаження історії та підключення до WebSockets
-  useEffect(() => {
-    let isMounted = true;
-
-    const initChat = async () => {
-      setLoadingHistory(true);
-      try {
-        const history = await chatsApi.getMessages(chat.id, 1, 100);
-        if (isMounted) {
-          // Завжди жорстко сортуємо за датою (від найстаріших до найновіших)
-          const sortedMessages = history.data.sort(
-            (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-          );
-          setMessages(sortedMessages);
-        }
-      } catch (error) {
-        console.error('Failed to load history', error);
-      } finally {
-        if (isMounted) setLoadingHistory(false);
-      }
-    };
-
-    initChat();
-
-    const token = localStorage.getItem('jwt_token');
-    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-    
-    socketRef.current = io(`${baseUrl}/chat`, {
-      auth: { token },
-      transports: ['websocket']
-    });
-
-    socketRef.current.on('connect', () => {
-      socketRef.current?.emit('joinRoom', { groupId: chat.id });
-    });
-
-    socketRef.current.on('newMessage', (msg: ChatMessage) => {
-      if (isMounted && msg.groupId === chat.id) {
-        setMessages((prev) => [...prev, msg]);
-      }
-    });
-
-    return () => {
-      isMounted = false;
-      socketRef.current?.disconnect();
-    };
-  }, [chat.id]);
-
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!messageText.trim() || !socketRef.current) return;
-
-    socketRef.current.emit('sendMessage', {
-      groupId: chat.id,
-      content: messageText.trim()
-    });
-    
-    setMessageText('');
-  };
-
-  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      setUploadingAvatar(true);
-      await chatsApi.uploadAvatar(chat.id, file);
-      onChatUpdate(); // Оновлюємо список чатів зліва
-    } catch (error) {
-      console.error('Upload failed', error);
-    } finally {
-      setUploadingAvatar(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
-  };
-
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* Заголовок чату */}
-      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
-        <Box sx={{ position: 'relative' }}>
-          <Avatar sx={{ width: 48, height: 48, bgcolor: 'primary.main' }}>
-            {chat.avatarUrl ? (
-              <SecureImage src={chat.avatarUrl} alt={chat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              chat.name.charAt(0)
-            )}
-          </Avatar>
-          <IconButton 
-            size="small" 
-            sx={{ position: 'absolute', bottom: -8, right: -8, bgcolor: 'background.paper' }}
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploadingAvatar}
-          >
-            {uploadingAvatar ? <CircularProgress size={16} /> : <PhotoCameraIcon fontSize="small" />}
-          </IconButton>
-          <input type="file" hidden ref={fileInputRef} accept="image/*" onChange={handleAvatarUpload} />
-        </Box>
-        <Box sx={{ flexGrow: 1 }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{chat.name}</Typography>
-          <Typography variant="caption" color="text.secondary">
-            ID кімнати: {chat.id}
-          </Typography>
-        </Box>
-        <Tooltip title="Управління учасниками">
-          <IconButton color="primary" onClick={() => setIsManageMembersOpen(true)}>
-            <PeopleIcon />
-          </IconButton>
-        </Tooltip>
-      </Box>
-
-      {/* Зона повідомлень */}
-      <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2, bgcolor: 'background.default', display: 'flex', flexDirection: 'column', gap: 1 }}>
-        {loadingHistory && <CircularProgress sx={{ alignSelf: 'center', mt: 2 }} />}
-        
-        {!loadingHistory && messages.map((msg) => {
-          const isMe = msg.senderId === user?.id;
-          const senderAvatar = isMe ? user?.avatarUrl : msg.sender?.avatarUrl;
-          const senderFirstName = isMe ? user?.firstName : msg.sender?.firstName;
-          const senderLastName = isMe ? user?.lastName : msg.sender?.lastName;
-
-          return (
-            <Box key={msg.id} sx={{ display: 'flex', flexDirection: isMe ? 'row-reverse' : 'row', alignItems: 'flex-end', gap: 1, mb: 1 }}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: isMe ? 'primary.main' : 'grey.400' }}>
-                {senderAvatar ? (
-                  <SecureImage src={senderAvatar} alt={senderFirstName || 'User'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  (senderFirstName?.charAt(0) || '?').toUpperCase()
-                )}
-              </Avatar>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start', maxWidth: '75%' }}>
-                {!isMe && senderFirstName && (
-                  <Typography variant="caption" color="text.secondary" sx={{ ml: 1, mb: 0.5 }}>
-                    {senderFirstName} {senderLastName}
-                  </Typography>
-                )}
-                <Paper 
-                  elevation={1} 
-                  sx={{ 
-                    p: 1.5, 
-                    bgcolor: isMe ? 'primary.main' : 'background.paper',
-                    color: isMe ? 'primary.contrastText' : 'text.primary',
-                    borderRadius: 2,
-                    borderBottomRightRadius: isMe ? 0 : 8,
-                    borderBottomLeftRadius: isMe ? 8 : 0,
-                  }}
-                >
-                  <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>{msg.content}</Typography>
-                </Paper>
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, mx: 1 }}>
-                  {format(new Date(msg.createdAt), 'HH:mm')}
-                </Typography>
-              </Box>
-            </Box>
-          );
-        })}
-        <div ref={messagesEndRef} />
-      </Box>
-
-      {/* Поле вводу */}
-      <Box component="form" onSubmit={handleSendMessage} sx={{ p: 2, bgcolor: 'background.paper', borderTop: 1, borderColor: 'divider', display: 'flex', gap: 1 }}>
-        <TextField
-          fullWidth
-          size="small"
-          placeholder="Напишіть повідомлення..."
-          value={messageText}
-          onChange={(e) => setMessageText(e.target.value)}
-          autoComplete="off"
-        />
-        <IconButton type="submit" color="primary" disabled={!messageText.trim()}>
-          <SendIcon />
-        </IconButton>
-      </Box>
-
-      <ManageMembersDialog 
-        open={isManageMembersOpen}
-        groupId={chat.id}
-        chatName={chat.name}
-        onClose={() => setIsManageMembersOpen(false)}
-      />
-    </Box>
-  );
-};
-</file>
-
-<file path="src/components/chats/CreateChatDialog.tsx">
+<file path="src/components/common/DepartmentAutocomplete.tsx">
 import { useState, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { 
-  Dialog, DialogTitle, DialogContent, DialogActions, 
-  Button, TextField, Box, Alert, MenuItem, Typography, Autocomplete, CircularProgress
-} from '@mui/material';
-import { chatsApi } from '../../api/chatsApi';
-import { usersApi } from '../../api/usersApi';
-import { pollsApi, type PollDepartment } from '../../api/pollsApi';
-import type { User } from '../../store/authStore';
+import { Autocomplete, TextField, CircularProgress, type AutocompleteProps } from '@mui/material';
+import { departmentsApi, type Department } from '../../api/departmentsApi';
 
-const createChatSchema = z.object({
-  name: z.string().min(3, 'Мінімум 3 символи'),
-  departmentId: z.string().nullable(),
-  adminIds: z.array(z.string()).min(1, 'Оберіть хоча б одного адміністратора'),
-});
-
-type FormInputs = z.infer<typeof createChatSchema>;
-
-interface Props {
-  open: boolean;
-  onClose: () => void;
-  onSuccess: () => void;
+interface DepartmentAutocompleteProps<Multiple extends boolean | undefined = false> 
+  extends Omit<AutocompleteProps<Department, Multiple, false, false>, 'options' | 'renderInput' | 'loading'> {
+  label?: string;
+  placeholder?: string;
+  error?: boolean;
+  helperText?: React.ReactNode;
 }
 
-export const CreateChatDialog = ({ open, onClose, onSuccess }: Props) => {
-  const [apiError, setApiError] = useState<string | null>(null);
-  const [departmentOptions, setDepartmentOptions] = useState<PollDepartment[]>([]);
-  const [departmentSearchQuery, setDepartmentSearchQuery] = useState('');
-  const [loadingDepartments, setLoadingDepartments] = useState(false);
-  const [selectedDepartment, setSelectedDepartment] = useState<PollDepartment | null>(null);
-
-  const [options, setOptions] = useState<User[]>([]);
+export function DepartmentAutocomplete<Multiple extends boolean | undefined = false>({
+  label,
+  placeholder = "Почніть вводити назву...",
+  error,
+  helperText,
+  multiple,
+  ...props
+}: DepartmentAutocompleteProps<Multiple>) {
+  const [options, setOptions] = useState<Department[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [loadingOptions, setLoadingOptions] = useState(false);
-  const [selectedAdmins, setSelectedAdmins] = useState<User[]>([]);
-
-  const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormInputs>({
-    resolver: zodResolver(createChatSchema),
-    defaultValues: { name: '', departmentId: null, adminIds: [] },
-  });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (open) {
-      reset({ name: '', departmentId: null, adminIds: [] });
-      setSelectedAdmins([]);
-      setSelectedDepartment(null);
-      setSearchQuery('');
-      setDepartmentSearchQuery('');
-      setApiError(null);
-    } else {
-      setOptions([]);
-      setDepartmentOptions([]);
-    }
-  }, [open, reset]);
-
-  // Пошук адміністраторів (виконується тільки при наявності тексту)
-  useEffect(() => {
-    if (!open) return;
     const handler = setTimeout(async () => {
       if (!searchQuery.trim()) {
         setOptions([]);
         return;
       }
-      setLoadingOptions(true);
+      setLoading(true);
       try {
-        const response = await usersApi.getUsers(1, 20, searchQuery);
-        setOptions(response.data);
-      } catch (error) {
-        console.error('Помилка пошуку користувачів', error);
-      } finally {
-        setLoadingOptions(false);
-      }
-    }, 500);
-
-    return () => clearTimeout(handler);
-  }, [searchQuery, open]);
-
-  // Пошук підрозділів (виконується тільки при наявності тексту)
-  useEffect(() => {
-    if (!open) return;
-    const handler = setTimeout(async () => {
-      if (!departmentSearchQuery.trim()) {
-        setDepartmentOptions([]);
-        return;
-      }
-      setLoadingDepartments(true);
-      try {
-        const deps = await pollsApi.getDepartments(departmentSearchQuery);
-        setDepartmentOptions(deps);
+        const deps = await departmentsApi.getDepartments(searchQuery);
+        setOptions(deps);
       } catch (error) {
         console.error('Помилка пошуку підрозділів', error);
       } finally {
-        setLoadingDepartments(false);
+        setLoading(false);
       }
     }, 500);
 
     return () => clearTimeout(handler);
-  }, [departmentSearchQuery, open]);
-
-  const onSubmit = async (data: FormInputs) => {
-    try {
-      setApiError(null);
-      await chatsApi.createGroup({
-        name: data.name,
-        departmentId: data.departmentId,
-        adminIds: data.adminIds,
-      });
-      onSuccess();
-      onClose();
-    } catch (error: any) {
-      setApiError(error.response?.data?.message || 'Не вдалося створити чат');
-    }
-  };
+  }, [searchQuery]);
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Створити новий чат</DialogTitle>
-      <Box component="form" onSubmit={handleSubmit(onSubmit)}>
-        <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          {apiError && <Alert severity="error">{apiError}</Alert>}
-          
-          <Controller name="name" control={control} render={({ field }) => (
-            <TextField {...field} label="Назва чату" error={!!errors.name} helperText={errors.name?.message} fullWidth autoFocus />
-          )}/>
-
-          <Box>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>Підрозділ (опціонально)</Typography>
-            <Controller name="departmentId" control={control} render={({ field }) => (
-              <Autocomplete
-                options={departmentOptions}
-                loading={loadingDepartments}
-                getOptionLabel={(option) => option.name}
-                isOptionEqualToValue={(option, value) => option.id === value?.id}
-                value={selectedDepartment}
-                onChange={(_, newValue) => {
-                  setSelectedDepartment(newValue);
-                  field.onChange(newValue ? newValue.id : null);
-                }}
-                inputValue={departmentSearchQuery}
-                onInputChange={(_, newInputValue) => setDepartmentSearchQuery(newInputValue)}
-                noOptionsText={departmentSearchQuery.trim() ? "Підрозділ не знайдено" : "Почніть вводити назву підрозділу..."}
-                forcePopupIcon={false}
-                blurOnSelect
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder={!selectedDepartment ? "Загальнонаціональний (всі підрозділи)" : ""}
-                    slotProps={{
-                      ...params.slotProps,
-                      input: {
-                        ...((params as any).InputProps || params.slotProps?.input),
-                        endAdornment: (
-                          <>
-                            {loadingDepartments ? <CircularProgress color="inherit" size={20} /> : null}
-                            {params.slotProps?.input?.endAdornment || (params as any).InputProps?.endAdornment}
-                          </>
-                        ),
-                      },
-                    }}
-                  />
-                )}
-              />
-            )}/>
-          </Box>
-
-          <Box>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>Призначити адміністраторів (обов'язково)</Typography>
-            <Controller name="adminIds" control={control} render={({ field }) => (
-              <Autocomplete
-                multiple
-                options={options}
-                loading={loadingOptions}
-                getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.email})`}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                value={selectedAdmins}
-                onChange={(_, newValue) => {
-                  setSelectedAdmins(newValue);
-                  field.onChange(newValue.map(u => u.id));
-                }}
-                inputValue={searchQuery}
-                onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
-                noOptionsText={searchQuery.trim() ? "Не знайдено" : "Почніть вводити пошту або ім'я..."}
-                forcePopupIcon={false}
-                filterSelectedOptions
-                blurOnSelect
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder={selectedAdmins.length === 0 ? "Пошук співробітників..." : ""}
-                    error={!!errors.adminIds}
-                    helperText={errors.adminIds?.message}
-                    slotProps={{
-                      ...params.slotProps,
-                      input: {
-                        ...((params as any).InputProps || params.slotProps?.input),
-                        endAdornment: (
-                          <>
-                            {loadingOptions ? <CircularProgress color="inherit" size={20} /> : null}
-                            {params.slotProps?.input?.endAdornment || (params as any).InputProps?.endAdornment}
-                          </>
-                        ),
-                      },
-                    }}
-                  />
-                )}
-              />
-            )}/>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} disabled={isSubmitting}>Скасувати</Button>
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
-            {isSubmitting ? 'Створення...' : 'Створити чат'}
-          </Button>
-        </DialogActions>
-      </Box>
-    </Dialog>
+    <Autocomplete
+      multiple={multiple}
+      options={options}
+      loading={loading}
+      getOptionLabel={(option) => option.name}
+      isOptionEqualToValue={(option, value) => option.id === value.id}
+      inputValue={searchQuery}
+      onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
+      noOptionsText={searchQuery.trim() ? "Підрозділ не знайдено" : "Почніть вводити назву..."}
+      forcePopupIcon={false}
+      filterSelectedOptions
+      blurOnSelect={!multiple}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label={label}
+          placeholder={placeholder}
+          error={error}
+          helperText={helperText}
+          slotProps={{
+            ...params.slotProps,
+            input: {
+              ...((params as any).InputProps || params.slotProps?.input),
+              endAdornment: (
+                <>
+                  {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                  {params.slotProps?.input?.endAdornment || (params as any).InputProps?.endAdornment}
+                </>
+              ),
+            },
+          }}
+        />
+      )}
+      {...props}
+    />
   );
-};
-</file>
-
-<file path="src/components/chats/ManageMembersDialog.tsx">
-import { useEffect, useState } from 'react';
-import { 
-  Dialog, DialogTitle, DialogContent, DialogActions, Button, 
-  List, ListItem, ListItemAvatar, ListItemText, Avatar, IconButton, 
-  Box, Typography, CircularProgress, Tooltip, Switch, Alert,
-  Autocomplete, TextField, InputAdornment, DialogContentText
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import SearchIcon from '@mui/icons-material/Search';
-import { chatsApi, type GroupMember } from '../../api/chatsApi';
-import { usersApi } from '../../api/usersApi';
-import type { User } from '../../store/authStore';
-
-interface Props {
-  open: boolean;
-  groupId: string;
-  chatName: string;
-  onClose: () => void;
 }
-
-export const ManageMembersDialog = ({ open, groupId, chatName, onClose }: Props) => {
-  const [members, setMembers] = useState<GroupMember[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null);
-
-  // Пошук існуючих учасників
-  const [memberSearchQuery, setMemberSearchQuery] = useState('');
-
-  // Додавання нових учасників (Автокомпліт)
-  const [addSearchQuery, setAddSearchQuery] = useState('');
-  const [addOptions, setAddOptions] = useState<User[]>([]);
-  const [loadingOptions, setLoadingOptions] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [addingUser, setAddingUser] = useState(false);
-
-  // Видалення учасника (Модальне вікно)
-  const [memberToDelete, setMemberToDelete] = useState<GroupMember | null>(null);
-  const [deleting, setDeleting] = useState(false);
-
-  useEffect(() => {
-    if (open) {
-      fetchMembers();
-    } else {
-      setSelectedUser(null);
-      setAddSearchQuery('');
-      setMemberSearchQuery('');
-      setAddOptions([]);
-      setApiError(null);
-    }
-  }, [open, groupId]);
-
-  useEffect(() => {
-    if (!open) return;
-    
-    const handler = setTimeout(async () => {
-      if (!addSearchQuery.trim()) {
-        setAddOptions([]);
-        return;
-      }
-      
-      setLoadingOptions(true);
-      try {
-        const response = await usersApi.getUsers(1, 20, addSearchQuery);
-        // Відфільтровуємо користувачів, які вже є в чаті
-        const available = response.data.filter(u => !members.some(m => m.userId === u.id));
-        setAddOptions(available);
-      } catch (error) {
-        console.error('Помилка пошуку користувачів', error);
-      } finally {
-        setLoadingOptions(false);
-      }
-    }, 500);
-
-    return () => clearTimeout(handler);
-  }, [addSearchQuery, members, open]);
-
-  const fetchMembers = async () => {
-    setLoading(true);
-    try {
-      setApiError(null);
-      const membersData = await chatsApi.getMembers(groupId);
-      setMembers(membersData);
-    } catch (error: any) {
-      setApiError(error.response?.data?.message || 'Помилка завантаження даних');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAddMember = async () => {
-    if (!selectedUser) return;
-    setAddingUser(true);
-    try {
-      setApiError(null);
-      const newMember = await chatsApi.addMember(groupId, selectedUser.id);
-      
-      const memberWithUser = { ...newMember, user: newMember.user || selectedUser };
-      
-      setMembers(prev => [...prev, memberWithUser]);
-      setSelectedUser(null);
-      setAddSearchQuery('');
-    } catch (error: any) {
-      setApiError(error.response?.data?.message || 'Не вдалося додати користувача');
-    } finally {
-      setAddingUser(false);
-    }
-  };
-
-  const confirmRemoveMember = async () => {
-    if (!memberToDelete) return;
-    setDeleting(true);
-    try {
-      setApiError(null);
-      await chatsApi.removeMember(groupId, memberToDelete.userId);
-      setMembers(prev => prev.filter(m => m.userId !== memberToDelete.userId));
-      setMemberToDelete(null);
-    } catch (error: any) {
-      setApiError(error.response?.data?.message || 'Не вдалося видалити користувача');
-    } finally {
-      setDeleting(false);
-    }
-  };
-
-  const handleToggleAdmin = async (userId: string, currentStatus: boolean) => {
-    try {
-      setApiError(null);
-      const updatedMember = await chatsApi.updateMemberRole(groupId, userId, !currentStatus);
-      setMembers(prev => prev.map(m => m.userId === userId ? updatedMember : m));
-    } catch (error: any) {
-      setApiError(error.response?.data?.message || 'Не вдалося змінити роль');
-    }
-  };
-
-  const filteredMembers = members.filter(m => {
-    if (!memberSearchQuery.trim()) return true;
-    const q = memberSearchQuery.toLowerCase();
-    const fullName = `${m.user?.firstName || ''} ${m.user?.lastName || ''}`.toLowerCase();
-    const email = (m.user?.email || '').toLowerCase();
-    return fullName.includes(q) || email.includes(q);
-  });
-
-  return (
-    <>
-      <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth scroll="paper">
-        <DialogTitle>Учасники чату: {chatName}</DialogTitle>
-        <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {apiError && <Alert severity="error">{apiError}</Alert>}
-
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
-            <Autocomplete
-              fullWidth
-              size="small"
-              options={addOptions}
-              loading={loadingOptions}
-              getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.email})`}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              value={selectedUser}
-              onChange={(_, newValue) => setSelectedUser(newValue)}
-              inputValue={addSearchQuery}
-              onInputChange={(_, newInputValue) => setAddSearchQuery(newInputValue)}
-              disabled={addingUser || loading}
-              noOptionsText="Не знайдено (введіть пошту або ім'я)"
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Додати учасника (пошук за поштою/ім'ям)"
-                  slotProps={{
-                    ...params.slotProps,
-                    input: {
-                      ...((params as any).InputProps || params.slotProps?.input),
-                      endAdornment: (
-                        <>
-                          {loadingOptions ? <CircularProgress color="inherit" size={20} /> : null}
-                          {params.slotProps?.input?.endAdornment || (params as any).InputProps?.endAdornment}
-                        </>
-                      ),
-                    },
-                  }}
-                />
-              )}
-            />
-            <Button 
-              variant="contained" 
-              onClick={handleAddMember} 
-              disabled={!selectedUser || addingUser}
-              sx={{ height: 40 }}
-            >
-              {addingUser ? 'Додавання...' : 'Додати'}
-            </Button>
-          </Box>
-
-          <TextField
-            size="small"
-            fullWidth
-            placeholder="Пошук серед учасників чату..."
-            value={memberSearchQuery}
-            onChange={(e) => setMemberSearchQuery(e.target.value)}
-            disabled={loading || members.length === 0}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon fontSize="small" />
-                  </InputAdornment>
-                ),
-              }
-            }}
-          />
-
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <List sx={{ width: '100%', bgcolor: 'background.paper', p: 0 }}>
-              {filteredMembers.map((member) => (
-                <ListItem
-                  key={member.id}
-                  sx={{ borderBottom: 1, borderColor: 'divider' }}
-                  secondaryAction={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Tooltip title={member.isAdmin ? 'Забрати права адміна чату' : 'Зробити адміном чату'}>
-                        <Switch
-                          size="small"
-                          checked={member.isAdmin}
-                          onChange={() => handleToggleAdmin(member.userId, member.isAdmin)}
-                        />
-                      </Tooltip>
-                      <Tooltip title="Видалити з чату">
-                        <IconButton edge="end" color="error" size="small" onClick={() => setMemberToDelete(member)}>
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  }
-                >
-                  <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: member.isAdmin ? 'primary.main' : 'grey.400' }}>
-                      {member.user?.firstName?.charAt(0) || '?'}
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={`${member.user?.firstName || 'Невідомий'} ${member.user?.lastName || 'Користувач'}`}
-                    secondary={
-                      <Typography component="span" variant="body2" color={member.isAdmin ? 'primary.main' : 'text.secondary'}>
-                        {member.isAdmin ? 'Адміністратор чату' : 'Учасник'}
-                      </Typography>
-                    }
-                  />
-                </ListItem>
-              ))}
-              {filteredMembers.length === 0 && (
-                <Typography sx={{ textAlign: 'center', py: 2, color: 'text.secondary' }}>
-                  {members.length === 0 ? 'В чаті немає учасників' : 'Нікого не знайдено за вашим запитом'}
-                </Typography>
-              )}
-            </List>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} variant="contained">Закрити</Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Модальне вікно попередження при видаленні користувача */}
-      <Dialog open={!!memberToDelete} onClose={() => !deleting && setMemberToDelete(null)} maxWidth="xs" fullWidth>
-        <DialogTitle>Підтвердження видалення</DialogTitle>
-        <DialogContent dividers>
-          <DialogContentText>
-            Ви впевнені, що хочете видалити <strong>{memberToDelete?.user?.firstName} {memberToDelete?.user?.lastName}</strong> з чату? 
-            Цю дію не можна скасувати.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setMemberToDelete(null)} disabled={deleting}>
-            Скасувати
-          </Button>
-          <Button onClick={confirmRemoveMember} variant="contained" color="error" disabled={deleting}>
-            {deleting ? 'Видалення...' : 'Видалити'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
-  );
-};
 </file>
 
 <file path="src/components/common/SecureImage.tsx">
@@ -2105,113 +1453,6 @@ export const ResetPasswordDialog = ({ open, user, onClose, onSuccess }: Props) =
 };
 </file>
 
-<file path="src/pages/Chats.tsx">
-import { useEffect, useState, useCallback } from 'react';
-import { 
-  Box, Typography, Button, Paper, List, ListItem, ListItemAvatar, 
-  ListItemText, Avatar, CircularProgress, Divider 
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import { chatsApi, type ChatGroup } from '../api/chatsApi';
-import { CreateChatDialog } from '../components/chats/CreateChatDialog';
-import { ChatWindow } from '../components/chats/ChatWindow';
-import { SecureImage } from '../components/common/SecureImage';
-
-export const Chats = () => {
-  const [chats, setChats] = useState<ChatGroup[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedChat, setSelectedChat] = useState<ChatGroup | null>(null);
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-
-  const fetchChats = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await chatsApi.getAllGroups();
-      setChats(data);
-    } catch (error) {
-      console.error('Failed to fetch chats', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchChats();
-  }, [fetchChats]);
-
-  return (
-    <Box sx={{ display: 'flex', height: 'calc(100vh - 100px)', gap: 2 }}>
-      {/* Ліва панель зі списком чатів */}
-      <Paper sx={{ width: 350, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 1, borderColor: 'divider' }}>
-          <Typography variant="h6">Усі чати</Typography>
-          <Button size="small" variant="contained" onClick={() => setIsCreateOpen(true)}>
-            <AddIcon />
-          </Button>
-        </Box>
-        
-        {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>
-        ) : (
-          <List sx={{ flexGrow: 1, overflowY: 'auto', p: 0 }}>
-            {chats.map((chat) => (
-              <Box key={chat.id}>
-                <ListItem 
-                  component="div"
-                  onClick={() => setSelectedChat(chat)}
-                  sx={{ 
-                    cursor: 'pointer',
-                    bgcolor: selectedChat?.id === chat.id ? 'action.selected' : 'transparent',
-                    '&:hover': { bgcolor: 'action.hover' }
-                  }}
-                >
-                  <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: 'primary.main' }}>
-                      {chat.avatarUrl ? (
-                        <SecureImage src={chat.avatarUrl} alt={chat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      ) : (
-                        chat.name.charAt(0)
-                      )}
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={chat.name} 
-                    secondary={chat.createdAt ? `Створено: ${new Date(chat.createdAt).toLocaleDateString()}` : ''} 
-                  />
-                </ListItem>
-                <Divider />
-              </Box>
-            ))}
-            {chats.length === 0 && (
-              <Typography sx={{ p: 3, textAlign: 'center', color: 'text.secondary' }}>
-                Чатів ще не створено
-              </Typography>
-            )}
-          </List>
-        )}
-      </Paper>
-
-      {/* Права панель з активним чатом */}
-      <Paper sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        {selectedChat ? (
-          <ChatWindow chat={selectedChat} onChatUpdate={fetchChats} />
-        ) : (
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'text.secondary' }}>
-            <Typography variant="h6">Оберіть чат для перегляду або створіть новий</Typography>
-          </Box>
-        )}
-      </Paper>
-
-      <CreateChatDialog 
-        open={isCreateOpen} 
-        onClose={() => setIsCreateOpen(false)} 
-        onSuccess={fetchChats} 
-      />
-    </Box>
-  );
-};
-</file>
-
 <file path="src/routes/ProtectedRoute.tsx">
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
@@ -2710,106 +1951,6 @@ export default defineConfig({
 })
 </file>
 
-<file path="src/api/pollsApi.ts">
-import { apiClient } from './apiClient';
-import type { Department } from './departmentsApi';
-
-export const PollStatus = {
-  DRAFT: 'DRAFT',
-  PUBLISHED: 'PUBLISHED',
-  ARCHIVED: 'ARCHIVED',
-} as const;
-
-export type PollStatus = typeof PollStatus[keyof typeof PollStatus];
-
-export interface PollAuthor {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  avatarUrl?: string | null;
-}
-
-export interface PollOption {
-  id: string;
-  text: string;
-  pollId: string;
-  _count: {
-    votes: number;
-  };
-}
-
-export interface Poll {
-  id: string;
-  title: string;
-  description?: string | null;
-  status: PollStatus;
-  createdAt: string;
-  updatedAt: string;
-  expiresAt?: string | null;
-  author?: PollAuthor | null;
-  departments: Department[];
-  options: PollOption[];
-  totalVotes: number;
-}
-
-export interface PaginatedPollsResponse {
-  data: Poll[];
-  meta: {
-    total: number;
-    page: number;
-    lastPage: number;
-    limit: number;
-  };
-}
-
-export interface CreatePollDto {
-  title: string;
-  description?: string;
-  status?: PollStatus;
-  expiresAt?: string | null; // Дата завершення
-  departmentIds?: string[];
-  options: string[];
-}
-
-export interface UpdatePollDto extends Partial<CreatePollDto> {}
-
-export const pollsApi = {
-  getPolls: async (
-    page: number = 1,
-    limit: number = 10,
-    departmentId?: string,
-    status?: PollStatus,
-    sortBy?: string,
-    sortOrder?: 'asc' | 'desc'
-  ) => {
-    const params: Record<string, any> = { page, limit };
-    if (departmentId) params.departmentId = departmentId;
-    if (status) params.status = status;
-    if (sortBy) params.sortBy = sortBy;
-    if (sortOrder) params.sortOrder = sortOrder;
-
-    const response = await apiClient.get<PaginatedPollsResponse>('/polls', { params });
-    return response.data;
-  },
-
-  createPoll: async (payload: CreatePollDto) => {
-    const response = await apiClient.post<Poll>('/polls', payload);
-    return response.data;
-  },
-
-  updatePoll: async (id: string, payload: UpdatePollDto) => {
-    const response = await apiClient.patch<Poll>(`/polls/${id}`, payload);
-    return response.data;
-  },
-
-  deletePoll: async (id: string) => {
-    const response = await apiClient.delete(`/polls/${id}`);
-    return response.data;
-  },
-};
-</file>
-
 <file path="src/api/usersApi.ts">
 import { apiClient } from './apiClient';
 import type { User } from '../store/authStore';
@@ -2859,6 +2000,690 @@ export const usersApi = {
     const response = await apiClient.delete(`/users/${id}`);
     return response.data;
   }
+};
+</file>
+
+<file path="src/components/chats/ChatWindow.tsx">
+import { useEffect, useState, useRef } from 'react';
+import { io, Socket } from 'socket.io-client';
+import { 
+  Box, Typography, TextField, IconButton, Avatar, 
+  CircularProgress, Paper, Tooltip 
+} from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import PeopleIcon from '@mui/icons-material/People';
+import { chatsApi, type ChatGroup, type ChatMessage } from '../../api/chatsApi';
+import { useAuthStore } from '../../store/authStore';
+import { SecureImage } from '../common/SecureImage';
+import { ManageMembersDialog } from './ManageMembersDialog';
+import { format } from 'date-fns';
+
+interface Props {
+  chat: ChatGroup;
+  onChatUpdate: () => void;
+}
+
+export const ChatWindow = ({ chat, onChatUpdate }: Props) => {
+  const { user } = useAuthStore();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [messageText, setMessageText] = useState('');
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [isManageMembersOpen, setIsManageMembersOpen] = useState(false);
+  const socketRef = useRef<Socket | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Завантаження історії та підключення до WebSockets
+  useEffect(() => {
+    let isMounted = true;
+
+    const initChat = async () => {
+      setLoadingHistory(true);
+      try {
+        const history = await chatsApi.getMessages(chat.id, 1, 100);
+        if (isMounted) {
+          // Завжди жорстко сортуємо за датою (від найстаріших до найновіших)
+          const sortedMessages = history.data.sort(
+            (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          );
+          setMessages(sortedMessages);
+        }
+      } catch (error) {
+        console.error('Failed to load history', error);
+      } finally {
+        if (isMounted) setLoadingHistory(false);
+      }
+    };
+
+    initChat();
+
+    const token = localStorage.getItem('jwt_token');
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    
+    socketRef.current = io(`${baseUrl}/chat`, {
+      auth: { token },
+      transports: ['websocket']
+    });
+
+    socketRef.current.on('connect', () => {
+      socketRef.current?.emit('joinRoom', { groupId: chat.id });
+    });
+
+    socketRef.current.on('newMessage', (msg: ChatMessage) => {
+      if (isMounted && msg.groupId === chat.id) {
+        setMessages((prev) => [...prev, msg]);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      socketRef.current?.disconnect();
+    };
+  }, [chat.id]);
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!messageText.trim() || !socketRef.current) return;
+
+    socketRef.current.emit('sendMessage', {
+      groupId: chat.id,
+      content: messageText.trim()
+    });
+    
+    setMessageText('');
+  };
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingAvatar(true);
+      await chatsApi.uploadAvatar(chat.id, file);
+      onChatUpdate(); // Оновлюємо список чатів зліва
+    } catch (error) {
+      console.error('Upload failed', error);
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {/* Заголовок чату */}
+      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
+        <Box sx={{ position: 'relative' }}>
+          <Avatar sx={{ width: 48, height: 48, bgcolor: 'primary.main' }}>
+            {chat.avatarUrl ? (
+              <SecureImage src={chat.avatarUrl} alt={chat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              chat.name.charAt(0)
+            )}
+          </Avatar>
+          <IconButton 
+            size="small" 
+            sx={{ position: 'absolute', bottom: -8, right: -8, bgcolor: 'background.paper' }}
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadingAvatar}
+          >
+            {uploadingAvatar ? <CircularProgress size={16} /> : <PhotoCameraIcon fontSize="small" />}
+          </IconButton>
+          <input type="file" hidden ref={fileInputRef} accept="image/*" onChange={handleAvatarUpload} />
+        </Box>
+        <Box sx={{ flexGrow: 1 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{chat.name}</Typography>
+          <Typography variant="caption" color="text.secondary">
+            ID кімнати: {chat.id}
+          </Typography>
+        </Box>
+        <Tooltip title="Управління учасниками">
+          <IconButton color="primary" onClick={() => setIsManageMembersOpen(true)}>
+            <PeopleIcon />
+          </IconButton>
+        </Tooltip>
+      </Box>
+
+      {/* Зона повідомлень */}
+      <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2, bgcolor: 'background.default', display: 'flex', flexDirection: 'column', gap: 1 }}>
+        {loadingHistory && <CircularProgress sx={{ alignSelf: 'center', mt: 2 }} />}
+        
+        {!loadingHistory && messages.map((msg) => {
+          const isMe = msg.senderId === user?.id;
+          const senderAvatar = isMe ? user?.avatarUrl : msg.sender?.avatarUrl;
+          const senderFirstName = isMe ? user?.firstName : msg.sender?.firstName;
+          const senderLastName = isMe ? user?.lastName : msg.sender?.lastName;
+
+          return (
+            <Box key={msg.id} sx={{ display: 'flex', flexDirection: isMe ? 'row-reverse' : 'row', alignItems: 'flex-end', gap: 1, mb: 1 }}>
+              <Avatar sx={{ width: 32, height: 32, bgcolor: isMe ? 'primary.main' : 'grey.400' }}>
+                {senderAvatar ? (
+                  <SecureImage src={senderAvatar} alt={senderFirstName || 'User'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  (senderFirstName?.charAt(0) || '?').toUpperCase()
+                )}
+              </Avatar>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start', maxWidth: '75%' }}>
+                {!isMe && senderFirstName && (
+                  <Typography variant="caption" color="text.secondary" sx={{ ml: 1, mb: 0.5 }}>
+                    {senderFirstName} {senderLastName}
+                  </Typography>
+                )}
+                <Paper 
+                  elevation={1} 
+                  sx={{ 
+                    p: 1.5, 
+                    bgcolor: isMe ? 'primary.main' : 'background.paper',
+                    color: isMe ? 'primary.contrastText' : 'text.primary',
+                    borderRadius: 2,
+                    borderBottomRightRadius: isMe ? 0 : 8,
+                    borderBottomLeftRadius: isMe ? 8 : 0,
+                  }}
+                >
+                  <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>{msg.content}</Typography>
+                </Paper>
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, mx: 1 }}>
+                  {format(new Date(msg.createdAt), 'HH:mm')}
+                </Typography>
+              </Box>
+            </Box>
+          );
+        })}
+        <div ref={messagesEndRef} />
+      </Box>
+
+      {/* Поле вводу */}
+      <Box component="form" onSubmit={handleSendMessage} sx={{ p: 2, bgcolor: 'background.paper', borderTop: 1, borderColor: 'divider', display: 'flex', gap: 1 }}>
+        <TextField
+          fullWidth
+          size="small"
+          placeholder="Напишіть повідомлення..."
+          value={messageText}
+          onChange={(e) => setMessageText(e.target.value)}
+          autoComplete="off"
+        />
+        <IconButton type="submit" color="primary" disabled={!messageText.trim()}>
+          <SendIcon />
+        </IconButton>
+      </Box>
+
+      <ManageMembersDialog 
+        open={isManageMembersOpen}
+        groupId={chat.id}
+        chatName={chat.name}
+        onClose={() => setIsManageMembersOpen(false)}
+      />
+    </Box>
+  );
+};
+</file>
+
+<file path="src/components/chats/CreateChatDialog.tsx">
+import { useState, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { 
+  Dialog, DialogTitle, DialogContent, DialogActions, 
+  Button, TextField, Box, Alert, Typography, Autocomplete, CircularProgress
+} from '@mui/material';
+import { chatsApi } from '../../api/chatsApi';
+import { usersApi } from '../../api/usersApi';
+import { DepartmentAutocomplete } from '../common/DepartmentAutocomplete';
+import type { Department } from '../../api/departmentsApi';
+import type { User } from '../../store/authStore';
+
+const createChatSchema = z.object({
+  name: z.string().min(3, 'Мінімум 3 символи'),
+  departmentId: z.string().nullable(),
+  adminIds: z.array(z.string()).min(1, 'Оберіть хоча б одного адміністратора'),
+});
+
+type FormInputs = z.infer<typeof createChatSchema>;
+
+interface Props {
+  open: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+}
+
+export const CreateChatDialog = ({ open, onClose, onSuccess }: Props) => {
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
+
+  const [options, setOptions] = useState<User[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loadingOptions, setLoadingOptions] = useState(false);
+  const [selectedAdmins, setSelectedAdmins] = useState<User[]>([]);
+
+  const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormInputs>({
+    resolver: zodResolver(createChatSchema),
+    defaultValues: { name: '', departmentId: null, adminIds: [] },
+  });
+
+  useEffect(() => {
+    if (open) {
+      reset({ name: '', departmentId: null, adminIds: [] });
+      setSelectedAdmins([]);
+      setSelectedDepartment(null);
+      setSearchQuery('');
+      setApiError(null);
+    } else {
+      setOptions([]);
+    }
+  }, [open, reset]);
+
+  // Пошук адміністраторів (виконується тільки при наявності тексту)
+  useEffect(() => {
+    if (!open) return;
+    const handler = setTimeout(async () => {
+      if (!searchQuery.trim()) {
+        setOptions([]);
+        return;
+      }
+      setLoadingOptions(true);
+      try {
+        const response = await usersApi.getUsers(1, 20, searchQuery);
+        setOptions(response.data);
+      } catch (error) {
+        console.error('Помилка пошуку користувачів', error);
+      } finally {
+        setLoadingOptions(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [searchQuery, open]);
+
+  const onSubmit = async (data: FormInputs) => {
+    try {
+      setApiError(null);
+      await chatsApi.createGroup({
+        name: data.name,
+        departmentId: data.departmentId,
+        adminIds: data.adminIds,
+      });
+      onSuccess();
+      onClose();
+    } catch (error: any) {
+      setApiError(error.response?.data?.message || 'Не вдалося створити чат');
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>Створити новий чат</DialogTitle>
+      <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+        <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          {apiError && <Alert severity="error">{apiError}</Alert>}
+          
+          <Controller name="name" control={control} render={({ field }) => (
+            <TextField {...field} label="Назва чату" error={!!errors.name} helperText={errors.name?.message} fullWidth autoFocus />
+          )}/>
+
+          <Box>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>Підрозділ (опціонально)</Typography>
+            <Controller name="departmentId" control={control} render={({ field }) => (
+              <DepartmentAutocomplete
+                value={selectedDepartment}
+                onChange={(_, newValue) => {
+                  const val = newValue as Department | null;
+                  setSelectedDepartment(val);
+                  field.onChange(val ? val.id : null);
+                }}
+                placeholder={!selectedDepartment ? "Загальнонаціональний (всі підрозділи)" : ""}
+              />
+            )}/>
+          </Box>
+
+          <Box>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>Призначити адміністраторів (обов'язково)</Typography>
+            <Controller name="adminIds" control={control} render={({ field }) => (
+              <Autocomplete
+                multiple
+                options={options}
+                loading={loadingOptions}
+                getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.email})`}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                value={selectedAdmins}
+                onChange={(_, newValue) => {
+                  setSelectedAdmins(newValue);
+                  field.onChange(newValue.map(u => u.id));
+                }}
+                inputValue={searchQuery}
+                onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
+                noOptionsText={searchQuery.trim() ? "Не знайдено" : "Почніть вводити пошту або ім'я..."}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder={selectedAdmins.length === 0 ? "Пошук співробітників..." : ""}
+                    error={!!errors.adminIds}
+                    helperText={errors.adminIds?.message}
+                    slotProps={{
+                      ...params.slotProps,
+                      input: {
+                        ...((params as any).InputProps || params.slotProps?.input),
+                        endAdornment: (
+                          <>
+                            {loadingOptions ? <CircularProgress color="inherit" size={20} /> : null}
+                            {params.slotProps?.input?.endAdornment || (params as any).InputProps?.endAdornment}
+                          </>
+                        ),
+                      },
+                    }}
+                  />
+                )}
+              />
+            )}/>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose} disabled={isSubmitting}>Скасувати</Button>
+          <Button type="submit" variant="contained" disabled={isSubmitting}>
+            {isSubmitting ? 'Створення...' : 'Створити чат'}
+          </Button>
+        </DialogActions>
+      </Box>
+    </Dialog>
+  );
+};
+</file>
+
+<file path="src/components/chats/ManageMembersDialog.tsx">
+import { useEffect, useState } from 'react';
+import { 
+  Dialog, DialogTitle, DialogContent, DialogActions, Button, 
+  List, ListItem, ListItemAvatar, ListItemText, Avatar, IconButton, 
+  Box, Typography, CircularProgress, Tooltip, Switch, Alert,
+  Autocomplete, TextField, InputAdornment, DialogContentText
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
+import { chatsApi, type GroupMember } from '../../api/chatsApi';
+import { usersApi } from '../../api/usersApi';
+import type { User } from '../../store/authStore';
+
+interface Props {
+  open: boolean;
+  groupId: string;
+  chatName: string;
+  onClose: () => void;
+}
+
+export const ManageMembersDialog = ({ open, groupId, chatName, onClose }: Props) => {
+  const [members, setMembers] = useState<GroupMember[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  // Пошук існуючих учасників
+  const [memberSearchQuery, setMemberSearchQuery] = useState('');
+
+  // Додавання нових учасників (Автокомпліт)
+  const [addSearchQuery, setAddSearchQuery] = useState('');
+  const [addOptions, setAddOptions] = useState<User[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [addingUser, setAddingUser] = useState(false);
+
+  // Видалення учасника (Модальне вікно)
+  const [memberToDelete, setMemberToDelete] = useState<GroupMember | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      fetchMembers();
+    } else {
+      setSelectedUser(null);
+      setAddSearchQuery('');
+      setMemberSearchQuery('');
+      setAddOptions([]);
+      setApiError(null);
+    }
+  }, [open, groupId]);
+
+  useEffect(() => {
+    if (!open) return;
+    
+    const handler = setTimeout(async () => {
+      if (!addSearchQuery.trim()) {
+        setAddOptions([]);
+        return;
+      }
+      
+      setLoadingOptions(true);
+      try {
+        const response = await usersApi.getUsers(1, 20, addSearchQuery);
+        // Відфільтровуємо користувачів, які вже є в чаті
+        const available = response.data.filter(u => !members.some(m => m.userId === u.id));
+        setAddOptions(available);
+      } catch (error) {
+        console.error('Помилка пошуку користувачів', error);
+      } finally {
+        setLoadingOptions(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [addSearchQuery, members, open]);
+
+  const fetchMembers = async () => {
+    setLoading(true);
+    try {
+      setApiError(null);
+      const membersData = await chatsApi.getMembers(groupId);
+      setMembers(membersData);
+    } catch (error: any) {
+      setApiError(error.response?.data?.message || 'Помилка завантаження даних');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddMember = async () => {
+    if (!selectedUser) return;
+    setAddingUser(true);
+    try {
+      setApiError(null);
+      const newMember = await chatsApi.addMember(groupId, selectedUser.id);
+      
+      const memberWithUser = { ...newMember, user: newMember.user || selectedUser };
+      
+      setMembers(prev => [...prev, memberWithUser]);
+      setSelectedUser(null);
+      setAddSearchQuery('');
+    } catch (error: any) {
+      setApiError(error.response?.data?.message || 'Не вдалося додати користувача');
+    } finally {
+      setAddingUser(false);
+    }
+  };
+
+  const confirmRemoveMember = async () => {
+    if (!memberToDelete) return;
+    setDeleting(true);
+    try {
+      setApiError(null);
+      await chatsApi.removeMember(groupId, memberToDelete.userId);
+      setMembers(prev => prev.filter(m => m.userId !== memberToDelete.userId));
+      setMemberToDelete(null);
+    } catch (error: any) {
+      setApiError(error.response?.data?.message || 'Не вдалося видалити користувача');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleToggleAdmin = async (userId: string, currentStatus: boolean) => {
+    try {
+      setApiError(null);
+      const updatedMember = await chatsApi.updateMemberRole(groupId, userId, !currentStatus);
+      setMembers(prev => prev.map(m => m.userId === userId ? updatedMember : m));
+    } catch (error: any) {
+      setApiError(error.response?.data?.message || 'Не вдалося змінити роль');
+    }
+  };
+
+  const filteredMembers = members.filter(m => {
+    if (!memberSearchQuery.trim()) return true;
+    const q = memberSearchQuery.toLowerCase();
+    const fullName = `${m.user?.firstName || ''} ${m.user?.lastName || ''}`.toLowerCase();
+    const email = (m.user?.email || '').toLowerCase();
+    return fullName.includes(q) || email.includes(q);
+  });
+
+  return (
+    <>
+      <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth scroll="paper">
+        <DialogTitle>Учасники чату: {chatName}</DialogTitle>
+        <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {apiError && <Alert severity="error">{apiError}</Alert>}
+
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+            <Autocomplete
+              fullWidth
+              size="small"
+              options={addOptions}
+              loading={loadingOptions}
+              getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.email})`}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              value={selectedUser}
+              onChange={(_, newValue) => setSelectedUser(newValue)}
+              inputValue={addSearchQuery}
+              onInputChange={(_, newInputValue) => setAddSearchQuery(newInputValue)}
+              disabled={addingUser || loading}
+              noOptionsText="Не знайдено (введіть пошту або ім'я)"
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Додати учасника (пошук за поштою/ім'ям)"
+                  slotProps={{
+                    ...params.slotProps,
+                    input: {
+                      ...((params as any).InputProps || params.slotProps?.input),
+                      endAdornment: (
+                        <>
+                          {loadingOptions ? <CircularProgress color="inherit" size={20} /> : null}
+                          {params.slotProps?.input?.endAdornment || (params as any).InputProps?.endAdornment}
+                        </>
+                      ),
+                    },
+                  }}
+                />
+              )}
+            />
+            <Button 
+              variant="contained" 
+              onClick={handleAddMember} 
+              disabled={!selectedUser || addingUser}
+              sx={{ height: 40 }}
+            >
+              {addingUser ? 'Додавання...' : 'Додати'}
+            </Button>
+          </Box>
+
+          <TextField
+            size="small"
+            fullWidth
+            placeholder="Пошук серед учасників чату..."
+            value={memberSearchQuery}
+            onChange={(e) => setMemberSearchQuery(e.target.value)}
+            disabled={loading || members.length === 0}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" />
+                  </InputAdornment>
+                ),
+              }
+            }}
+          />
+
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <List sx={{ width: '100%', bgcolor: 'background.paper', p: 0 }}>
+              {filteredMembers.map((member) => (
+                <ListItem
+                  key={member.id}
+                  sx={{ borderBottom: 1, borderColor: 'divider' }}
+                  secondaryAction={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Tooltip title={member.isAdmin ? 'Забрати права адміна чату' : 'Зробити адміном чату'}>
+                        <Switch
+                          size="small"
+                          checked={member.isAdmin}
+                          onChange={() => handleToggleAdmin(member.userId, member.isAdmin)}
+                        />
+                      </Tooltip>
+                      <Tooltip title="Видалити з чату">
+                        <IconButton edge="end" color="error" size="small" onClick={() => setMemberToDelete(member)}>
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  }
+                >
+                  <ListItemAvatar>
+                    <Avatar sx={{ bgcolor: member.isAdmin ? 'primary.main' : 'grey.400' }}>
+                      {member.user?.firstName?.charAt(0) || '?'}
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={`${member.user?.firstName || 'Невідомий'} ${member.user?.lastName || 'Користувач'}`}
+                    secondary={
+                      <Typography component="span" variant="body2" color={member.isAdmin ? 'primary.main' : 'text.secondary'}>
+                        {member.isAdmin ? 'Адміністратор чату' : 'Учасник'}
+                      </Typography>
+                    }
+                  />
+                </ListItem>
+              ))}
+              {filteredMembers.length === 0 && (
+                <Typography sx={{ textAlign: 'center', py: 2, color: 'text.secondary' }}>
+                  {members.length === 0 ? 'В чаті немає учасників' : 'Нікого не знайдено за вашим запитом'}
+                </Typography>
+              )}
+            </List>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose} variant="contained">Закрити</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Модальне вікно попередження при видаленні користувача */}
+      <Dialog open={!!memberToDelete} onClose={() => !deleting && setMemberToDelete(null)} maxWidth="xs" fullWidth>
+        <DialogTitle>Підтвердження видалення</DialogTitle>
+        <DialogContent dividers>
+          <DialogContentText>
+            Ви впевнені, що хочете видалити <strong>{memberToDelete?.user?.firstName} {memberToDelete?.user?.lastName}</strong> з чату? 
+            Цю дію не можна скасувати.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setMemberToDelete(null)} disabled={deleting}>
+            Скасувати
+          </Button>
+          <Button onClick={confirmRemoveMember} variant="contained" color="error" disabled={deleting}>
+            {deleting ? 'Видалення...' : 'Видалити'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
 };
 </file>
 
@@ -2953,98 +2778,6 @@ export const Sidebar = () => {
         </List>
       </Box>
     </Drawer>
-  );
-};
-</file>
-
-<file path="src/components/polls/PollDetailsDialog.tsx">
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box, Chip, Divider } from '@mui/material';
-import { format } from 'date-fns';
-import { PollStatus, type Poll } from '../../api/pollsApi';
-
-interface Props {
-  open: boolean;
-  poll: Poll | null;
-  onClose: () => void;
-}
-
-export const PollDetailsDialog = ({ open, poll, onClose }: Props) => {
-  if (!poll) return null;
-
-  const getStatusChip = (status: PollStatus) => {
-    switch(status) {
-      case PollStatus.PUBLISHED: return <Chip label="Опубліковано" color="success" size="small" />;
-      case PollStatus.ARCHIVED: return <Chip label="В архіві" color="warning" size="small" />;
-      case PollStatus.DRAFT: return <Chip label="Чернетка" color="default" size="small" />;
-    }
-  };
-
-  return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth scroll="paper">
-      <DialogTitle>Деталі опитування</DialogTitle>
-      <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-        <Box>
-          <Typography variant="h6">{poll.title}</Typography>
-          <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
-            {getStatusChip(poll.status)}
-            <Chip label={`Створено: ${format(new Date(poll.createdAt), 'dd.MM.yyyy HH:mm')}`} size="small" variant="outlined" />
-            {poll.author && (
-              <Chip label={`Автор: ${poll.author.firstName} ${poll.author.lastName}`} size="small" variant="outlined" />
-            )}
-            {poll.expiresAt && (
-              <Chip 
-                label={`Завершується: ${format(new Date(poll.expiresAt), 'dd.MM.yyyy HH:mm')}`} 
-                size="small" 
-                color={new Date(poll.expiresAt) < new Date() ? 'error' : 'info'} 
-                variant={new Date(poll.expiresAt) < new Date() ? 'filled' : 'outlined'} 
-              />
-            )}
-          </Box>
-        </Box>
-
-        <Divider />
-
-        {poll.description && (
-          <Box>
-            <Typography variant="subtitle2" color="text.secondary" gutterBottom>Опис</Typography>
-            <Typography variant="body2">{poll.description}</Typography>
-          </Box>
-        )}
-
-        <Box>
-          <Typography variant="subtitle2" color="text.secondary" gutterBottom>Охоплення підрозділів</Typography>
-          <Typography variant="body2">
-            {poll.departments?.length ? poll.departments.map(d => d.name).join(', ') : 'Всі підрозділи (Загальнонаціональне)'}
-          </Typography>
-        </Box>
-
-        <Box>
-          <Typography variant="subtitle2" color="text.secondary" gutterBottom>Всього голосів: {poll.totalVotes || 0}</Typography>
-          <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            {poll.options?.map((opt) => {
-              const percentage = poll.totalVotes > 0 ? Math.round(((opt._count?.votes || 0) / poll.totalVotes) * 100) : 0;
-              return (
-                <Box key={opt.id} sx={{ p: 1.5, bgcolor: 'background.default', borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>{opt.text}</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                      {opt._count?.votes || 0} ({percentage}%)
-                    </Typography>
-                  </Box>
-                  <Box sx={{ width: '100%', height: 6, bgcolor: 'action.hover', borderRadius: 3, overflow: 'hidden' }}>
-                    <Box sx={{ width: `${percentage}%`, height: '100%', bgcolor: 'primary.main', transition: 'width 0.5s ease' }} />
-                  </Box>
-                </Box>
-              );
-            })}
-          </Box>
-        </Box>
-
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} variant="contained">Закрити</Button>
-      </DialogActions>
-    </Dialog>
   );
 };
 </file>
@@ -3233,6 +2966,137 @@ export const CreateUserDialog = ({ open, onClose, onSuccess }: Props) => {
         </DialogActions>
       </Box>
     </Dialog>
+  );
+};
+</file>
+
+<file path="src/pages/Chats.tsx">
+import { useEffect, useState, useCallback } from 'react';
+import { 
+  Box, Typography, Button, Paper, List, ListItem, ListItemAvatar, 
+  ListItemText, Avatar, CircularProgress, Divider, TextField, InputAdornment 
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
+import { chatsApi, type ChatGroup } from '../api/chatsApi';
+import { CreateChatDialog } from '../components/chats/CreateChatDialog';
+import { ChatWindow } from '../components/chats/ChatWindow';
+import { SecureImage } from '../components/common/SecureImage';
+
+export const Chats = () => {
+  const [chats, setChats] = useState<ChatGroup[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedChat, setSelectedChat] = useState<ChatGroup | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const fetchChats = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await chatsApi.getAllGroups();
+      setChats(data);
+    } catch (error) {
+      console.error('Failed to fetch chats', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchChats();
+  }, [fetchChats]);
+
+  const filteredChats = chats.filter(chat => 
+    chat.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <Box sx={{ display: 'flex', height: 'calc(100vh - 100px)', gap: 2 }}>
+      {/* Ліва панель зі списком чатів */}
+      <Paper sx={{ width: 350, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2, borderBottom: 1, borderColor: 'divider' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h6">Усі чати</Typography>
+            <Button size="small" variant="contained" onClick={() => setIsCreateOpen(true)}>
+              <AddIcon />
+            </Button>
+          </Box>
+          <TextField
+            size="small"
+            fullWidth
+            placeholder="Пошук за назвою..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" />
+                  </InputAdornment>
+                ),
+              }
+            }}
+          />
+        </Box>
+        
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>
+        ) : (
+          <List sx={{ flexGrow: 1, overflowY: 'auto', p: 0 }}>
+            {filteredChats.map((chat) => (
+              <Box key={chat.id}>
+                <ListItem 
+                  component="div"
+                  onClick={() => setSelectedChat(chat)}
+                  sx={{ 
+                    cursor: 'pointer',
+                    bgcolor: selectedChat?.id === chat.id ? 'action.selected' : 'transparent',
+                    '&:hover': { bgcolor: 'action.hover' }
+                  }}
+                >
+                  <ListItemAvatar>
+                    <Avatar sx={{ bgcolor: 'primary.main' }}>
+                      {chat.avatarUrl ? (
+                        <SecureImage src={chat.avatarUrl} alt={chat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        chat.name.charAt(0)
+                      )}
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={chat.name} 
+                    secondary={chat.createdAt ? `Створено: ${new Date(chat.createdAt).toLocaleDateString()}` : ''} 
+                  />
+                </ListItem>
+                <Divider />
+              </Box>
+            ))}
+            {filteredChats.length === 0 && (
+              <Typography sx={{ p: 3, textAlign: 'center', color: 'text.secondary' }}>
+                {chats.length === 0 ? 'Чатів ще не створено' : 'Чатів не знайдено'}
+              </Typography>
+            )}
+          </List>
+        )}
+      </Paper>
+
+      {/* Права панель з активним чатом */}
+      <Paper sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {selectedChat ? (
+          <ChatWindow chat={selectedChat} onChatUpdate={fetchChats} />
+        ) : (
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'text.secondary' }}>
+            <Typography variant="h6">Оберіть чат для перегляду або створіть новий</Typography>
+          </Box>
+        )}
+      </Paper>
+
+      <CreateChatDialog 
+        open={isCreateOpen} 
+        onClose={() => setIsCreateOpen(false)} 
+        onSuccess={fetchChats} 
+      />
+    </Box>
   );
 };
 </file>
@@ -3625,6 +3489,258 @@ Thumbs.db
 </html>
 </file>
 
+<file path="src/api/pollsApi.ts">
+import { apiClient } from './apiClient';
+import type { Department } from './departmentsApi';
+
+export const PollStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+  ARCHIVED: 'ARCHIVED',
+} as const;
+
+export type PollStatus = typeof PollStatus[keyof typeof PollStatus];
+
+export interface PollAuthor {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  avatarUrl?: string | null;
+}
+
+export interface PollOption {
+  id: string;
+  text: string;
+  pollId: string;
+  _count: {
+    votes: number;
+  };
+}
+
+export interface Poll {
+  id: string;
+  title: string;
+  description?: string | null;
+  status: PollStatus;
+  createdAt: string;
+  updatedAt: string;
+  expiresAt?: string | null;
+  author?: PollAuthor | null;
+  departments: Department[];
+  options: PollOption[];
+  totalVotes: number;
+}
+
+export interface PaginatedPollsResponse {
+  data: Poll[];
+  meta: {
+    total: number;
+    page: number;
+    lastPage: number;
+    limit: number;
+  };
+}
+
+export interface CreatePollDto {
+  title: string;
+  description?: string;
+  status?: PollStatus;
+  expiresAt?: string | null; // Дата завершення
+  departmentIds?: string[];
+  options: string[];
+}
+
+export interface UpdatePollDto extends Partial<CreatePollDto> {}
+
+export const pollsApi = {
+  getPolls: async (
+    page: number = 1,
+    limit: number = 10,
+    departmentId?: string,
+    status?: PollStatus,
+    sortBy?: string,
+    sortOrder?: 'asc' | 'desc'
+  ) => {
+    const params: Record<string, any> = { page, limit };
+    if (departmentId) params.departmentId = departmentId;
+    if (status) params.status = status;
+    if (sortBy) params.sortBy = sortBy;
+    if (sortOrder) params.sortOrder = sortOrder;
+
+    const response = await apiClient.get<PaginatedPollsResponse>('/polls', { params });
+    return response.data;
+  },
+
+  createPoll: async (payload: CreatePollDto) => {
+    const response = await apiClient.post<Poll>('/polls', payload);
+    return response.data;
+  },
+
+  updatePoll: async (id: string, payload: UpdatePollDto) => {
+    const response = await apiClient.patch<Poll>(`/polls/${id}`, payload);
+    return response.data;
+  },
+
+  deletePoll: async (id: string) => {
+    const response = await apiClient.delete(`/polls/${id}`);
+    return response.data;
+  },
+};
+</file>
+
+<file path="src/components/polls/PollDetailsDialog.tsx">
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box, Chip, Divider } from '@mui/material';
+import { format } from 'date-fns';
+import { PollStatus, type Poll } from '../../api/pollsApi';
+
+interface Props {
+  open: boolean;
+  poll: Poll | null;
+  onClose: () => void;
+}
+
+export const PollDetailsDialog = ({ open, poll, onClose }: Props) => {
+  if (!poll) return null;
+
+  const getStatusChip = (status: PollStatus) => {
+    switch(status) {
+      case PollStatus.PUBLISHED: return <Chip label="Опубліковано" color="success" size="small" />;
+      case PollStatus.ARCHIVED: return <Chip label="В архіві" color="warning" size="small" />;
+      case PollStatus.DRAFT: return <Chip label="Чернетка" color="default" size="small" />;
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth scroll="paper">
+      <DialogTitle>Деталі опитування</DialogTitle>
+      <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+        <Box>
+          <Typography variant="h6">{poll.title}</Typography>
+          <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
+            {getStatusChip(poll.status)}
+            <Chip label={`Створено: ${format(new Date(poll.createdAt), 'dd.MM.yyyy HH:mm')}`} size="small" variant="outlined" />
+            {poll.author && (
+              <Chip label={`Автор: ${poll.author.firstName} ${poll.author.lastName}`} size="small" variant="outlined" />
+            )}
+            {poll.expiresAt && (
+              <Chip 
+                label={`Завершується: ${format(new Date(poll.expiresAt), 'dd.MM.yyyy HH:mm')}`} 
+                size="small" 
+                color={new Date(poll.expiresAt) < new Date() ? 'error' : 'info'} 
+                variant={new Date(poll.expiresAt) < new Date() ? 'filled' : 'outlined'} 
+              />
+            )}
+          </Box>
+        </Box>
+
+        <Divider />
+
+        {poll.description && (
+          <Box>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>Опис</Typography>
+            <Typography variant="body2">{poll.description}</Typography>
+          </Box>
+        )}
+
+        <Box>
+          <Typography variant="subtitle2" color="text.secondary" gutterBottom>Охоплення підрозділів</Typography>
+          <Typography variant="body2">
+            {poll.departments?.length ? poll.departments.map(d => d.name).join(', ') : 'Всі підрозділи (Загальнонаціональне)'}
+          </Typography>
+        </Box>
+
+        <Box>
+          <Typography variant="subtitle2" color="text.secondary" gutterBottom>Всього голосів: {poll.totalVotes || 0}</Typography>
+          <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            {poll.options?.map((opt) => {
+              const percentage = poll.totalVotes > 0 ? Math.round(((opt._count?.votes || 0) / poll.totalVotes) * 100) : 0;
+              return (
+                <Box key={opt.id} sx={{ 
+                  p: 2, 
+                  bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#f8fafc', 
+                  borderRadius: 2, 
+                  border: '1px solid', 
+                  borderColor: 'divider' 
+                }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{opt.text}</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                      {opt._count?.votes || 0} ({percentage}%)
+                    </Typography>
+                  </Box>
+                  <Box sx={{ 
+                    width: '100%', 
+                    height: 8, 
+                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)', 
+                    borderRadius: 4, 
+                    overflow: 'hidden' 
+                  }}>
+                    <Box sx={{ 
+                      width: `${percentage}%`, 
+                      height: '100%', 
+                      bgcolor: 'primary.main', 
+                      transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' 
+                    }} />
+                  </Box>
+                </Box>
+              );
+            })}
+          </Box>
+        </Box>
+
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} variant="contained">Закрити</Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+</file>
+
+<file path="src/store/authStore.ts">
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: 'ADMIN' | 'USER';
+  isActive: boolean;
+  avatarUrl: string | null;
+  createdAt: string;
+}
+
+interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  setAuth: (user: User, token: string) => void;
+  logout: () => void;
+}
+
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      isAuthenticated: false,
+      setAuth: (user, token) => {
+        localStorage.setItem('jwt_token', token);
+        set({ user, isAuthenticated: true });
+      },
+      logout: () => {
+        localStorage.removeItem('jwt_token');
+        set({ user: null, isAuthenticated: false });
+      },
+    }),
+    {
+      name: 'auth_storage',
+    }
+  )
+);
+</file>
+
 <file path="src/components/polls/PollFormDialog.tsx">
 import { useEffect, useState } from 'react';
 import { useForm, Controller, useFieldArray, type Control, type FieldErrors } from 'react-hook-form';
@@ -3637,7 +3753,9 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { pollsApi, PollStatus, type Poll, type PollDepartment } from '../../api/pollsApi';
+import { pollsApi, PollStatus, type Poll } from '../../api/pollsApi';
+import { DepartmentAutocomplete } from '../common/DepartmentAutocomplete';
+import type { Department } from '../../api/departmentsApi';
 
 import {
   DndContext,
@@ -3736,14 +3854,14 @@ const SortableOptionItem = ({
 interface Props {
   open: boolean;
   poll: Poll | null;
-  departments: PollDepartment[];
   onClose: () => void;
   onSuccess: () => void;
-  isDuplicate?: boolean; // Новий необов'язковий проп для режиму клонування
+  isDuplicate?: boolean;
 }
 
-export const PollFormDialog = ({ open, poll, departments, onClose, onSuccess, isDuplicate }: Props) => {
+export const PollFormDialog = ({ open, poll, onClose, onSuccess, isDuplicate }: Props) => {
   const [apiError, setApiError] = useState<string | null>(null);
+  const [selectedDepartments, setSelectedDepartments] = useState<Department[]>([]);
 
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormInputs>({
     resolver: zodResolver(pollSchema),
@@ -3771,6 +3889,7 @@ export const PollFormDialog = ({ open, poll, departments, onClose, onSuccess, is
   useEffect(() => {
     if (open) {
       if (poll) {
+        setSelectedDepartments(poll.departments || []);
         reset({
           title: isDuplicate ? `${poll.title} (Копія)` : poll.title,
           description: poll.description || '',
@@ -3779,6 +3898,7 @@ export const PollFormDialog = ({ open, poll, departments, onClose, onSuccess, is
           options: poll.options?.map(o => ({ text: o.text })) || [{ text: '' }, { text: '' }],
         });
       } else {
+        setSelectedDepartments([]);
         reset({ title: '', description: '', expiresAt: '', departmentIds: [], options: [{ text: '' }, { text: '' }] });
       }
     }
@@ -3850,26 +3970,16 @@ export const PollFormDialog = ({ open, poll, departments, onClose, onSuccess, is
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>Прив'язка до підрозділів</Typography>
             <Controller name="departmentIds" control={control} render={({ field }) => (
-              <Select
-                {...field}
+              <DepartmentAutocomplete
                 multiple
-                fullWidth
-                displayEmpty
-                renderValue={(selected) => {
-                  if (selected.length === 0) return <em>Всі підрозділи (Загальнонаціональне)</em>;
-                  return (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((val) => (
-                        <Chip key={val} label={departments.find(d => d.id === val)?.name || val} size="small" />
-                      ))}
-                    </Box>
-                  );
+                value={selectedDepartments}
+                onChange={(_, newValue) => {
+                  const values = newValue as Department[];
+                  setSelectedDepartments(values);
+                  field.onChange(values.map(d => d.id));
                 }}
-              >
-                {departments.map((d) => (
-                  <MenuItem key={d.id} value={d.id}>{d.name}</MenuItem>
-                ))}
-              </Select>
+                placeholder={selectedDepartments.length === 0 ? "Всі підрозділи (Загальнонаціональне)" : ""}
+              />
             )}/>
           </Box>
 
@@ -3908,49 +4018,6 @@ export const PollFormDialog = ({ open, poll, departments, onClose, onSuccess, is
 };
 </file>
 
-<file path="src/store/authStore.ts">
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-
-export interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: 'ADMIN' | 'USER';
-  isActive: boolean;
-  avatarUrl: string | null;
-  createdAt: string;
-}
-
-interface AuthState {
-  user: User | null;
-  isAuthenticated: boolean;
-  setAuth: (user: User, token: string) => void;
-  logout: () => void;
-}
-
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      user: null,
-      isAuthenticated: false,
-      setAuth: (user, token) => {
-        localStorage.setItem('jwt_token', token);
-        set({ user, isAuthenticated: true });
-      },
-      logout: () => {
-        localStorage.removeItem('jwt_token');
-        set({ user: null, isAuthenticated: false });
-      },
-    }),
-    {
-      name: 'auth_storage',
-    }
-  )
-);
-</file>
-
 <file path="src/api/newsApi.ts">
 import { apiClient } from './apiClient';
 
@@ -3969,6 +4036,7 @@ export interface News {
   status: NewsStatus;
   categoryId: string | null;
   category: NewsCategory | null;
+  departments?: { id: string; name: string }[];
   createdAt: string;
   authorId: string;
   author: {
@@ -4011,6 +4079,7 @@ export type NewsPayload = {
   imageUrl: string | null;
   status: NewsStatus;
   categoryId: string | null;
+  departmentIds?: string[];
 };
 
 export const newsApi = {
@@ -4018,12 +4087,14 @@ export const newsApi = {
     page: number = 1, 
     limit: number = 10, 
     categoryId?: string, 
+    departmentId?: string,
     status?: NewsStatus,
     sortBy?: string,
     sortOrder?: 'ASC' | 'DESC'
   ) => {
     const params: Record<string, any> = { page, limit };
     if (categoryId) params.categoryId = categoryId;
+    if (departmentId) params.departmentId = departmentId;
     if (status) params.status = status;
     if (sortBy) params.sortBy = sortBy;
     if (sortOrder) params.sortOrder = sortOrder;
@@ -4093,223 +4164,6 @@ export const newsApi = {
 };
 </file>
 
-<file path="src/components/news/NewsFormDialog.tsx">
-import { useEffect, useState, useRef } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { 
-  Dialog, DialogTitle, DialogContent, DialogActions, 
-  Button, TextField, MenuItem, Box, Alert, Typography,
-  CircularProgress, IconButton, Tooltip
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
-import { newsApi, type News, type NewsCategory } from '../../api/newsApi';
-import { TipTapEditor } from './TipTapEditor';
-import { CreateCategoryDialog } from './CreateCategoryDialog';
-import { ManageCategoriesDialog } from './ManageCategoriesDialog';
-import { SecureImage } from '../common/SecureImage';
-import SettingsIcon from '@mui/icons-material/Settings';
-
-const newsSchema = z.object({
-  title: z.string().min(3, 'Мінімум 3 символи'),
-  content: z.string().min(10, 'Контент занадто короткий'),
-  categoryId: z.string().nullable(),
-  status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
-  imageUrl: z.string().nullable(),
-});
-
-type FormInputs = z.infer<typeof newsSchema>;
-
-interface Props {
-  open: boolean;
-  news: News | null;
-  categories: NewsCategory[];
-  onClose: () => void;
-  onSuccess: () => void;
-  onRefreshCategories?: () => void;
-}
-
-export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onRefreshCategories }: Props) => {
-  const [apiError, setApiError] = useState<string | null>(null);
-  const [isUploadingCover, setIsUploadingCover] = useState(false);
-  const [isCreateCategoryOpen, setIsCreateCategoryOpen] = useState(false);
-  const [isManageCategoriesOpen, setIsManageCategoriesOpen] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const { control, handleSubmit, reset, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormInputs>({
-    resolver: zodResolver(newsSchema),
-    defaultValues: { title: '', content: '', categoryId: null, status: 'DRAFT', imageUrl: null },
-  });
-
-  const coverUrl = watch('imageUrl');
-  const wasOpen = useRef(false);
-
-  useEffect(() => {
-    // Форма скидається або ініціалізується даними ТІЛЬКИ коли вікно переходить зі стану закритого у відкрите
-    if (open && !wasOpen.current) {
-      if (news) {
-        reset({
-          title: news.title,
-          content: news.content,
-          categoryId: news.categoryId,
-          status: news.status,
-          imageUrl: news.imageUrl,
-        });
-      } else {
-        reset({ title: '', content: '', categoryId: categories[0]?.id || null, status: 'DRAFT', imageUrl: null });
-      }
-    }
-    wasOpen.current = open;
-  }, [news, open, reset, categories]);
-
-  const handleCoverUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    try {
-      setIsUploadingCover(true);
-      const res = await newsApi.uploadMedia(file);
-      setValue('imageUrl', res.url);
-    } catch (err) {
-      setApiError('Помилка завантаження обкладинки');
-    } finally {
-      setIsUploadingCover(false);
-    }
-  };
-
-  const onSubmit = async (data: FormInputs) => {
-    try {
-      setApiError(null);
-      if (news) {
-        await newsApi.updateNews(news.id, data);
-      } else {
-        await newsApi.createNews(data);
-      }
-      onSuccess();
-      onClose();
-    } catch (error: any) {
-      setApiError(error.response?.data?.message || 'Не вдалося зберегти новину');
-    }
-  };
-
-  return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>{news ? 'Редагувати новину' : 'Створити новину'}</DialogTitle>
-      <Box component="form" onSubmit={handleSubmit(onSubmit)}>
-        <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          {apiError && <Alert severity="error">{apiError}</Alert>}
-          
-          <Controller name="title" control={control} render={({ field }) => (
-            <TextField {...field} label="Заголовок" error={!!errors.title} helperText={errors.title?.message} fullWidth />
-          )}/>
-
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-            <Box sx={{ display: 'flex', gap: 0.5, flex: 1, alignItems: 'flex-start' }}>
-              <Controller name="categoryId" control={control} render={({ field }) => (
-                <TextField 
-                  {...field} 
-                  select 
-                  label="Категорія" 
-                  fullWidth 
-                  error={!!errors.categoryId} 
-                  helperText={errors.categoryId?.message} 
-                  value={categories.some(c => c.id === field.value) ? field.value : ''}
-                >
-                  <MenuItem value=""><em>Без категорії</em></MenuItem>
-                  {categories.map((cat) => <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>)}
-                </TextField>
-              )}/>
-              <Tooltip title="Додати нову категорію">
-                <IconButton onClick={() => setIsCreateCategoryOpen(true)} sx={{ mt: 0.5, color: 'action.active' }}>
-                  <AddIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Управління категоріями">
-                <IconButton onClick={() => setIsManageCategoriesOpen(true)} sx={{ mt: 0.5, color: 'action.active' }}>
-                  <SettingsIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-            <Box sx={{ flex: 1 }}>
-              <Controller name="status" control={control} render={({ field }) => (
-                <TextField {...field} select label="Статус" fullWidth error={!!errors.status} helperText={errors.status?.message}>
-                  <MenuItem value="DRAFT">Чернетка (DRAFT)</MenuItem>
-                  <MenuItem value="PUBLISHED">Опубліковано (PUBLISHED)</MenuItem>
-                </TextField>
-              )}/>
-            </Box>
-          </Box>
-
-          <Box>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>Обкладинка новини</Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Button variant="outlined" component="label" disabled={isUploadingCover}>
-                {isUploadingCover ? <CircularProgress size={24} /> : 'Обрати файл'}
-                <input type="file" hidden accept="image/jpeg, image/png" onChange={handleCoverUpload} ref={fileInputRef} />
-              </Button>
-              {coverUrl && (
-  <Box sx={{ position: 'relative', width: 100, height: 60 }}>
-    <SecureImage 
-      src={coverUrl} 
-      alt="Cover" 
-      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4 }} 
-    />
-    <IconButton 
-      size="small" 
-      color="error" 
-      sx={{ position: 'absolute', top: -10, right: -10, bgcolor: 'background.paper' }} 
-      onClick={() => setValue('imageUrl', null)}
-    >
-      <DeleteIcon fontSize="small" />
-    </IconButton>
-  </Box>
-)}
-            </Box>
-          </Box>
-
-          <Box>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>Текст новини</Typography>
-            <Controller name="content" control={control} render={({ field }) => (
-              <TipTapEditor value={field.value} onChange={field.onChange} error={!!errors.content} />
-            )}/>
-            {errors.content && <Typography variant="caption" color="error">{errors.content.message}</Typography>}
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, py: 2 }}>
-          <Button onClick={onClose} disabled={isSubmitting}>Скасувати</Button>
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
-            {isSubmitting ? 'Збереження...' : (news ? 'Зберегти зміни' : 'Створити')}
-          </Button>
-        </DialogActions>
-      </Box>
-
-      <CreateCategoryDialog
-        open={isCreateCategoryOpen}
-        onClose={() => setIsCreateCategoryOpen(false)}
-        onSuccess={(newId) => {
-          if (onRefreshCategories) {
-            onRefreshCategories();
-          }
-          setValue('categoryId', newId);
-        }}
-      />
-
-      <ManageCategoriesDialog
-        open={isManageCategoriesOpen}
-        categories={categories}
-        onClose={() => setIsManageCategoriesOpen(false)}
-        onRefresh={() => {
-          if (onRefreshCategories) {
-            onRefreshCategories();
-          }
-        }}
-      />
-    </Dialog>
-  );
-};
-</file>
-
 <file path="src/components/news/TipTapEditor.tsx">
 import { useEditor, EditorContent, ReactNodeViewRenderer, NodeViewWrapper } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -4318,7 +4172,12 @@ import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import Placeholder from '@tiptap/extension-placeholder';
-import { Box, IconButton, Toolbar, Tooltip, CircularProgress, Divider } from '@mui/material';
+import Youtube from '@tiptap/extension-youtube';
+import { Node, mergeAttributes } from '@tiptap/core';
+import { 
+  Box, IconButton, Toolbar, Tooltip, CircularProgress, Divider, 
+  Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField 
+} from '@mui/material';
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
 import FormatItalicIcon from '@mui/icons-material/FormatItalic';
 import FormatUnderlinedIcon from '@mui/icons-material/FormatUnderlined';
@@ -4333,12 +4192,15 @@ import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import ImageIcon from '@mui/icons-material/Image';
+import YouTubeIcon from '@mui/icons-material/YouTube';
+import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import TitleIcon from '@mui/icons-material/Title';
 import { useState, useRef, useEffect } from 'react';
 import { newsApi } from '../../api/newsApi';
 import { SecureImage } from '../common/SecureImage';
+import { getFullUrl } from '../../utils/url';
 
-// Кастомний вузол для TipTap: рендерить наш SecureImage замість звичайного <img src="...">
+// Кастомний вузол для TipTap: рендерить наш SecureImage
 const TipTapSecureImage = (props: any) => {
   return (
     <NodeViewWrapper as="div" style={{ display: 'flex', justifyContent: 'center', width: '100%', padding: '16px 0' }}>
@@ -4351,10 +4213,39 @@ const TipTapSecureImage = (props: any) => {
   );
 };
 
-// Створюємо розширення на базі стандартного Image
 const SecureImageExtension = Image.extend({
   addNodeView() {
     return ReactNodeViewRenderer(TipTapSecureImage);
+  },
+});
+
+// Кастомний вузол для TipTap: рендерить власні відео
+const TipTapVideo = (props: any) => {
+  // Для відео формуємо повний URL. Якщо потрібен JWT, бекенд повинен роздавати відео з перевіркою cookies 
+  // або використовувати тимчасові підписані посилання, оскільки стандартний <video> тег не вміє передавати Authorization Headers.
+  const videoUrl = getFullUrl(props.node.attrs.src);
+  return (
+    <NodeViewWrapper as="div" style={{ display: 'flex', justifyContent: 'center', width: '100%', padding: '16px 0' }}>
+      <video controls src={videoUrl} style={{ maxWidth: '100%', borderRadius: '4px', maxHeight: '450px' }} />
+    </NodeViewWrapper>
+  );
+};
+
+const VideoExtension = Node.create({
+  name: 'video',
+  group: 'block',
+  atom: true,
+  addAttributes() {
+    return { src: { default: null } };
+  },
+  parseHTML() {
+    return [{ tag: 'video[src]' }];
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ['video', mergeAttributes(HTMLAttributes, { controls: 'true', style: 'max-width: 100%; border-radius: 4px;' })];
+  },
+  addNodeView() {
+    return ReactNodeViewRenderer(TipTapVideo);
   },
 });
 
@@ -4365,8 +4256,13 @@ interface TipTapEditorProps {
 }
 
 export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isImageUploading, setIsImageUploading] = useState(false);
+  const [isVideoUploading, setIsVideoUploading] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+
+  const [linkDialog, setLinkDialog] = useState({ open: false, url: '' });
+  const [youtubeDialog, setYoutubeDialog] = useState({ open: false, url: '' });
 
   const editor = useEditor({
     extensions: [
@@ -4374,11 +4270,17 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
         heading: { levels: [2, 3] },
       }),
       SecureImageExtension,
+      VideoExtension,
       Underline,
       Link.configure({
         openOnClick: false,
         autolink: true,
         defaultProtocol: 'https',
+      }),
+      Youtube.configure({
+        inline: false,
+        width: 640,
+        height: 360,
       }),
       TextAlign.configure({
         types: ['heading', 'paragraph'],
@@ -4396,7 +4298,6 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
       }
     })(),
     onUpdate: ({ editor }) => {
-      // Повертаємо строгий JSON для зручного парсингу в мобільному додатку
       onChange(JSON.stringify(editor.getJSON()));
     },
   });
@@ -4422,7 +4323,6 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
     const currentJSON = JSON.stringify(editor.getJSON());
     const compareValue = isJson ? JSON.stringify(parsedValue) : value;
 
-    // Оновлюємо контент лише якщо він дійсно змінився, запобігаючи падінню в нескінченний цикл
     if (compareValue !== currentJSON && value !== editor.getHTML()) {
       if (isJson) {
         try {
@@ -4441,181 +4341,269 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     try {
-      setIsUploading(true);
+      setIsImageUploading(true);
       const res = await newsApi.uploadMedia(file);
-      // ВАЖЛИВО: Передаємо відносний шлях (res.url), щоб SecureImage зрозумів, 
-      // що це внутрішній ресурс і завантажив його через apiClient з JWT.
       editor.chain().focus().setImage({ src: res.url }).run();
     } catch (err) {
       console.error('Failed to upload image:', err);
       alert('Помилка завантаження зображення');
     } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      setIsImageUploading(false);
+      if (imageInputRef.current) imageInputRef.current.value = '';
     }
   };
 
-  const setLink = () => {
-    const previousUrl = editor.getAttributes('link').href;
-    const url = window.prompt('Введіть URL посилання:', previousUrl);
-
-    if (url === null) return;
-
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
-      return;
+  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      setIsVideoUploading(true);
+      const res = await newsApi.uploadMedia(file);
+      editor.chain().focus().insertContent({
+        type: 'video',
+        attrs: { src: res.url }
+      }).run();
+    } catch (err) {
+      console.error('Failed to upload video:', err);
+      alert('Помилка завантаження відео. Можливо перевищено ліміт розміру файлу.');
+    } finally {
+      setIsVideoUploading(false);
+      if (videoInputRef.current) videoInputRef.current.value = '';
     }
+  };
 
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+  const openLinkDialog = () => {
+    const previousUrl = editor.getAttributes('link').href;
+    setLinkDialog({ open: true, url: previousUrl || '' });
+  };
+
+  const confirmLink = () => {
+    if (!linkDialog.url) {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    } else {
+      editor.chain().focus().extendMarkRange('link').setLink({ href: linkDialog.url }).run();
+    }
+    setLinkDialog({ open: false, url: '' });
+  };
+
+  const confirmYouTube = () => {
+    if (youtubeDialog.url) {
+      editor.chain().focus().setYoutubeVideo({ src: youtubeDialog.url }).run();
+    }
+    setYoutubeDialog({ open: false, url: '' });
   };
 
   return (
-    <Box sx={{ 
-      border: 1, 
-      borderColor: error ? 'error.main' : 'divider', 
-      borderRadius: 1,
-      overflow: 'hidden',
-      bgcolor: 'background.paper'
-    }}>
-      <Toolbar variant="dense" sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.default', gap: 0.5, flexWrap: 'wrap', py: 0.5 }}>
-        <Tooltip title="Заголовок H2">
-          <IconButton size="small" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} color={editor.isActive('heading', { level: 2 }) ? 'primary' : 'default'}>
-            <TitleIcon fontSize="small" />
-            <Box component="span" sx={{ fontSize: '10px', ml: -0.5, fontWeight: 'bold' }}>2</Box>
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Заголовок H3">
-          <IconButton size="small" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} color={editor.isActive('heading', { level: 3 }) ? 'primary' : 'default'}>
-            <TitleIcon fontSize="small" />
-            <Box component="span" sx={{ fontSize: '10px', ml: -0.5, fontWeight: 'bold' }}>3</Box>
-          </IconButton>
-        </Tooltip>
-
-        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-
-        <Tooltip title="Жирний">
-          <IconButton size="small" onClick={() => editor.chain().focus().toggleBold().run()} color={editor.isActive('bold') ? 'primary' : 'default'}>
-            <FormatBoldIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Курсив">
-          <IconButton size="small" onClick={() => editor.chain().focus().toggleItalic().run()} color={editor.isActive('italic') ? 'primary' : 'default'}>
-            <FormatItalicIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Підкреслений">
-          <IconButton size="small" onClick={() => editor.chain().focus().toggleUnderline().run()} color={editor.isActive('underline') ? 'primary' : 'default'}>
-            <FormatUnderlinedIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Закреслений">
-          <IconButton size="small" onClick={() => editor.chain().focus().toggleStrike().run()} color={editor.isActive('strike') ? 'primary' : 'default'}>
-            <FormatStrikethroughIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-
-        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-
-        <Tooltip title="Вирівняти ліворуч">
-          <IconButton size="small" onClick={() => editor.chain().focus().setTextAlign('left').run()} color={editor.isActive({ textAlign: 'left' }) ? 'primary' : 'default'}>
-            <FormatAlignLeftIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="По центру">
-          <IconButton size="small" onClick={() => editor.chain().focus().setTextAlign('center').run()} color={editor.isActive({ textAlign: 'center' }) ? 'primary' : 'default'}>
-            <FormatAlignCenterIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Вирівняти праворуч">
-          <IconButton size="small" onClick={() => editor.chain().focus().setTextAlign('right').run()} color={editor.isActive({ textAlign: 'right' }) ? 'primary' : 'default'}>
-            <FormatAlignRightIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="По ширині">
-          <IconButton size="small" onClick={() => editor.chain().focus().setTextAlign('justify').run()} color={editor.isActive({ textAlign: 'justify' }) ? 'primary' : 'default'}>
-            <FormatAlignJustifyIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-
-        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-
-        <Tooltip title="Маркований список">
-          <IconButton size="small" onClick={() => editor.chain().focus().toggleBulletList().run()} color={editor.isActive('bulletList') ? 'primary' : 'default'}>
-            <FormatListBulletedIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Нумерований список">
-          <IconButton size="small" onClick={() => editor.chain().focus().toggleOrderedList().run()} color={editor.isActive('orderedList') ? 'primary' : 'default'}>
-            <FormatListNumberedIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Блок цитати">
-          <IconButton size="small" onClick={() => editor.chain().focus().toggleBlockquote().run()} color={editor.isActive('blockquote') ? 'primary' : 'default'}>
-            <FormatQuoteIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-
-        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-
-        <Tooltip title="Додати посилання">
-          <IconButton size="small" onClick={setLink} color={editor.isActive('link') ? 'primary' : 'default'}>
-            <LinkIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Видалити посилання">
-          <IconButton size="small" onClick={() => editor.chain().focus().unsetLink().run()} disabled={!editor.isActive('link')}>
-            <LinkOffIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        
-        <Box sx={{ flexGrow: 1 }} />
-        
-        <Tooltip title="Вставити зображення">
-          <IconButton size="small" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
-            {isUploading ? <CircularProgress size={20} /> : <ImageIcon fontSize="small" />}
-          </IconButton>
-        </Tooltip>
-        <input type="file" hidden ref={fileInputRef} accept="image/jpeg, image/png" onChange={handleImageUpload} />
-      </Toolbar>
-      
+    <>
       <Box sx={{ 
-        p: 2, 
-        minHeight: '320px', 
-        maxHeight: '500px',
-        overflowY: 'auto',
-        '& .ProseMirror': { 
-          outline: 'none',
-          minHeight: '300px',
-          fontFamily: 'inherit',
-          fontSize: '1rem',
-          lineHeight: 1.5,
-        },
-        '& .ProseMirror p.is-editor-empty:first-of-type::before': {
-          content: 'attr(data-placeholder)',
-          float: 'left',
-          color: 'text.disabled',
-          pointerEvents: 'none',
-          height: 0,
-        },
-        '& blockquote': {
-          borderLeft: '4px solid',
-          borderColor: 'primary.main',
-          pl: 2,
-          mx: 0,
-          my: 2,
-          fontStyle: 'italic',
-          color: 'text.secondary',
-        },
-        '& a': {
-          color: 'primary.main',
-          textDecoration: 'underline',
-        }
+        border: 1, 
+        borderColor: error ? 'error.main' : 'divider', 
+        borderRadius: 1,
+        overflow: 'hidden',
+        bgcolor: 'background.paper'
       }}>
-        <EditorContent editor={editor} />
+        <Toolbar variant="dense" sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.default', gap: 0.5, flexWrap: 'wrap', py: 0.5 }}>
+          <Tooltip title="Заголовок H2">
+            <IconButton size="small" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} color={editor.isActive('heading', { level: 2 }) ? 'primary' : 'default'}>
+              <TitleIcon fontSize="small" />
+              <Box component="span" sx={{ fontSize: '10px', ml: -0.5, fontWeight: 'bold' }}>2</Box>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Заголовок H3">
+            <IconButton size="small" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} color={editor.isActive('heading', { level: 3 }) ? 'primary' : 'default'}>
+              <TitleIcon fontSize="small" />
+              <Box component="span" sx={{ fontSize: '10px', ml: -0.5, fontWeight: 'bold' }}>3</Box>
+            </IconButton>
+          </Tooltip>
+
+          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+          <Tooltip title="Жирний">
+            <IconButton size="small" onClick={() => editor.chain().focus().toggleBold().run()} color={editor.isActive('bold') ? 'primary' : 'default'}>
+              <FormatBoldIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Курсив">
+            <IconButton size="small" onClick={() => editor.chain().focus().toggleItalic().run()} color={editor.isActive('italic') ? 'primary' : 'default'}>
+              <FormatItalicIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Підкреслений">
+            <IconButton size="small" onClick={() => editor.chain().focus().toggleUnderline().run()} color={editor.isActive('underline') ? 'primary' : 'default'}>
+              <FormatUnderlinedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Закреслений">
+            <IconButton size="small" onClick={() => editor.chain().focus().toggleStrike().run()} color={editor.isActive('strike') ? 'primary' : 'default'}>
+              <FormatStrikethroughIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+          <Tooltip title="Вирівняти ліворуч">
+            <IconButton size="small" onClick={() => editor.chain().focus().setTextAlign('left').run()} color={editor.isActive({ textAlign: 'left' }) ? 'primary' : 'default'}>
+              <FormatAlignLeftIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="По центру">
+            <IconButton size="small" onClick={() => editor.chain().focus().setTextAlign('center').run()} color={editor.isActive({ textAlign: 'center' }) ? 'primary' : 'default'}>
+              <FormatAlignCenterIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Вирівняти праворуч">
+            <IconButton size="small" onClick={() => editor.chain().focus().setTextAlign('right').run()} color={editor.isActive({ textAlign: 'right' }) ? 'primary' : 'default'}>
+              <FormatAlignRightIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="По ширині">
+            <IconButton size="small" onClick={() => editor.chain().focus().setTextAlign('justify').run()} color={editor.isActive({ textAlign: 'justify' }) ? 'primary' : 'default'}>
+              <FormatAlignJustifyIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+          <Tooltip title="Маркований список">
+            <IconButton size="small" onClick={() => editor.chain().focus().toggleBulletList().run()} color={editor.isActive('bulletList') ? 'primary' : 'default'}>
+              <FormatListBulletedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Нумерований список">
+            <IconButton size="small" onClick={() => editor.chain().focus().toggleOrderedList().run()} color={editor.isActive('orderedList') ? 'primary' : 'default'}>
+              <FormatListNumberedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Блок цитати">
+            <IconButton size="small" onClick={() => editor.chain().focus().toggleBlockquote().run()} color={editor.isActive('blockquote') ? 'primary' : 'default'}>
+              <FormatQuoteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+          <Tooltip title="Додати посилання">
+            <IconButton size="small" onClick={openLinkDialog} color={editor.isActive('link') ? 'primary' : 'default'}>
+              <LinkIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Видалити посилання">
+            <IconButton size="small" onClick={() => editor.chain().focus().unsetLink().run()} disabled={!editor.isActive('link')}>
+              <LinkOffIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          
+          <Box sx={{ flexGrow: 1 }} />
+
+          <Tooltip title="Вставити YouTube відео">
+            <IconButton size="small" onClick={() => setYoutubeDialog({ open: true, url: '' })}>
+              <YouTubeIcon fontSize="small" color="error" />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Вставити відео з комп'ютера">
+            <IconButton size="small" onClick={() => videoInputRef.current?.click()} disabled={isVideoUploading}>
+              {isVideoUploading ? <CircularProgress size={20} /> : <OndemandVideoIcon fontSize="small" color="primary" />}
+            </IconButton>
+          </Tooltip>
+          <input type="file" hidden ref={videoInputRef} accept="video/mp4, video/webm, video/ogg" onChange={handleVideoUpload} />
+          
+          <Tooltip title="Вставити зображення">
+            <IconButton size="small" onClick={() => imageInputRef.current?.click()} disabled={isImageUploading}>
+              {isImageUploading ? <CircularProgress size={20} /> : <ImageIcon fontSize="small" color="success" />}
+            </IconButton>
+          </Tooltip>
+          <input type="file" hidden ref={imageInputRef} accept="image/jpeg, image/png, image/webp" onChange={handleImageUpload} />
+        </Toolbar>
+        
+        <Box sx={{ 
+          p: 2, 
+          minHeight: '320px', 
+          maxHeight: '500px',
+          overflowY: 'auto',
+          '& .ProseMirror': { 
+            outline: 'none',
+            minHeight: '300px',
+            fontFamily: 'inherit',
+            fontSize: '1rem',
+            lineHeight: 1.5,
+          },
+          '& .ProseMirror p.is-editor-empty:first-of-type::before': {
+            content: 'attr(data-placeholder)',
+            float: 'left',
+            color: 'text.disabled',
+            pointerEvents: 'none',
+            height: 0,
+          },
+          '& blockquote': {
+            borderLeft: '4px solid',
+            borderColor: 'primary.main',
+            pl: 2,
+            mx: 0,
+            my: 2,
+            fontStyle: 'italic',
+            color: 'text.secondary',
+          },
+          '& a': {
+            color: 'primary.main',
+            textDecoration: 'underline',
+          },
+          '& iframe': {
+            border: 'none',
+            borderRadius: '8px',
+            maxWidth: '100%',
+          }
+        }}>
+          <EditorContent editor={editor} />
+        </Box>
       </Box>
-    </Box>
+
+      {/* Діалог для посилання */}
+      <Dialog open={linkDialog.open} onClose={() => setLinkDialog({ open: false, url: '' })} maxWidth="xs" fullWidth>
+        <DialogTitle>Вставити посилання</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="URL адреса"
+            type="url"
+            fullWidth
+            variant="outlined"
+            value={linkDialog.url}
+            onChange={(e) => setLinkDialog({ ...linkDialog, url: e.target.value })}
+            onKeyDown={(e) => e.key === 'Enter' && confirmLink()}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setLinkDialog({ open: false, url: '' })}>Скасувати</Button>
+          <Button onClick={confirmLink} variant="contained">Застосувати</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Діалог для YouTube */}
+      <Dialog open={youtubeDialog.open} onClose={() => setYoutubeDialog({ open: false, url: '' })} maxWidth="xs" fullWidth>
+        <DialogTitle>Вставити відео з YouTube</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Посилання на YouTube"
+            type="url"
+            fullWidth
+            variant="outlined"
+            placeholder="https://www.youtube.com/watch?v=..."
+            value={youtubeDialog.url}
+            onChange={(e) => setYoutubeDialog({ ...youtubeDialog, url: e.target.value })}
+            onKeyDown={(e) => e.key === 'Enter' && confirmYouTube()}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setYoutubeDialog({ open: false, url: '' })}>Скасувати</Button>
+          <Button onClick={confirmYouTube} variant="contained" color="error">Вставити відео</Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 </file>
@@ -4639,7 +4627,8 @@ import PublicIcon from '@mui/icons-material/Public';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'; // Імпортуємо іконку для копіювання
-import { pollsApi, PollStatus, type Poll, type PollDepartment, type PaginatedPollsResponse } from '../api/pollsApi';
+import { pollsApi, PollStatus, type Poll, type PaginatedPollsResponse } from '../api/pollsApi';
+import { departmentsApi, type Department } from '../api/departmentsApi';
 import { PollFormDialog } from '../components/polls/PollFormDialog';
 import { DeletePollDialog } from '../components/polls/DeletePollDialog';
 import { PollStatusDialog } from '../components/polls/PollStatusDialog';
@@ -4648,7 +4637,7 @@ import { format } from 'date-fns';
 
 export const Polls = () => {
   const [data, setData] = useState<PaginatedPollsResponse | null>(null);
-  const [departments, setDepartments] = useState<PollDepartment[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [activeTab, setActiveTab] = useState(0); 
@@ -4688,7 +4677,7 @@ export const Polls = () => {
 
   // Завантажуємо підрозділи лише один раз при монтуванні, щоб не блокувати таблицю
   useEffect(() => {
-    pollsApi.getDepartments()
+    departmentsApi.getDepartments()
       .then(setDepartments)
       .catch(() => setDepartments([]));
   }, []);
@@ -4923,10 +4912,9 @@ export const Polls = () => {
       <PollFormDialog 
         open={isFormOpen} 
         poll={editPoll} 
-        departments={departments} 
         onClose={() => setIsFormOpen(false)} 
         onSuccess={fetchData} 
-        isDuplicate={isDuplicate} // Прокидаємо стан у форму
+        isDuplicate={isDuplicate}
       />
       <DeletePollDialog open={!!deletePollItem} poll={deletePollItem} onClose={() => setDeletePollItem(null)} onSuccess={fetchData} />
       <PollStatusDialog 
@@ -4943,6 +4931,253 @@ export const Polls = () => {
         onClose={() => setViewPollDetails(null)}
       />
     </Box>
+  );
+};
+</file>
+
+<file path="src/components/news/NewsFormDialog.tsx">
+import { useEffect, useState, useRef } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { 
+  Dialog, DialogTitle, DialogContent, DialogActions, 
+  Button, TextField, MenuItem, Box, Alert, Typography,
+  CircularProgress, IconButton, Tooltip, Autocomplete
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import { newsApi, type News, type NewsCategory } from '../../api/newsApi';
+import { TipTapEditor } from './TipTapEditor';
+import { CreateCategoryDialog } from './CreateCategoryDialog';
+import { ManageCategoriesDialog } from './ManageCategoriesDialog';
+import { SecureImage } from '../common/SecureImage';
+import { DepartmentAutocomplete } from '../common/DepartmentAutocomplete';
+import type { Department } from '../../api/departmentsApi';
+import SettingsIcon from '@mui/icons-material/Settings';
+
+const newsSchema = z.object({
+  title: z.string().min(3, 'Мінімум 3 символи'),
+  content: z.string().min(10, 'Контент занадто короткий'),
+  categoryId: z.string().nullable(),
+  departmentIds: z.array(z.string()).optional(),
+  status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
+  imageUrl: z.string().nullable(),
+});
+
+type FormInputs = z.infer<typeof newsSchema>;
+
+interface Props {
+  open: boolean;
+  news: News | null;
+  categories: NewsCategory[];
+  onClose: () => void;
+  onSuccess: () => void;
+  onRefreshCategories?: () => void;
+}
+
+export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onRefreshCategories }: Props) => {
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [isCreateCategoryOpen, setIsCreateCategoryOpen] = useState(false);
+  const [isManageCategoriesOpen, setIsManageCategoriesOpen] = useState(false);
+  const [selectedDepartments, setSelectedDepartments] = useState<Department[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { control, handleSubmit, reset, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormInputs>({
+    resolver: zodResolver(newsSchema),
+    defaultValues: { title: '', content: '', categoryId: null, departmentIds: [], status: 'DRAFT', imageUrl: null },
+  });
+
+  const coverUrl = watch('imageUrl');
+  const wasOpen = useRef(false);
+
+  useEffect(() => {
+    if (open && !wasOpen.current) {
+      if (news) {
+        setSelectedDepartments(news.departments || []);
+        reset({
+          title: news.title,
+          content: news.content,
+          categoryId: news.categoryId,
+          departmentIds: news.departments?.map(d => d.id) || [],
+          status: news.status,
+          imageUrl: news.imageUrl,
+        });
+      } else {
+        setSelectedDepartments([]);
+        reset({ title: '', content: '', categoryId: null, departmentIds: [], status: 'DRAFT', imageUrl: null });
+      }
+    }
+    wasOpen.current = open;
+  }, [news, open, reset, categories]);
+
+  const handleCoverUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      setIsUploadingCover(true);
+      const res = await newsApi.uploadMedia(file);
+      setValue('imageUrl', res.url);
+    } catch (err) {
+      setApiError('Помилка завантаження обкладинки');
+    } finally {
+      setIsUploadingCover(false);
+    }
+  };
+
+  const onSubmit = async (data: FormInputs) => {
+    try {
+      setApiError(null);
+      if (news) {
+        await newsApi.updateNews(news.id, data);
+      } else {
+        await newsApi.createNews(data);
+      }
+      onSuccess();
+      onClose();
+    } catch (error: any) {
+      setApiError(error.response?.data?.message || 'Не вдалося зберегти новину');
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle>{news ? 'Редагувати новину' : 'Створити новину'}</DialogTitle>
+      <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+        <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          {apiError && <Alert severity="error">{apiError}</Alert>}
+          
+          <Controller name="title" control={control} render={({ field }) => (
+            <TextField {...field} label="Заголовок" error={!!errors.title} helperText={errors.title?.message} fullWidth />
+          )}/>
+
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+            <Box sx={{ display: 'flex', gap: 0.5, flex: 1, alignItems: 'flex-start' }}>
+              <Controller name="categoryId" control={control} render={({ field }) => (
+                <Autocomplete
+                  options={categories}
+                  getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(option, value) => option.id === value?.id}
+                  value={categories.find(c => c.id === field.value) || null}
+                  onChange={(_, newValue) => {
+                    field.onChange(newValue ? newValue.id : null);
+                  }}
+                  renderInput={(params) => (
+                    <TextField 
+                      {...params}
+                      label="Категорія" 
+                      error={!!errors.categoryId} 
+                      helperText={errors.categoryId?.message}
+                      placeholder="Без категорії"
+                    />
+                  )}
+                  fullWidth
+                />
+              )}/>
+              <Tooltip title="Додати нову категорію">
+                <IconButton onClick={() => setIsCreateCategoryOpen(true)} sx={{ mt: 0.5, color: 'action.active' }}>
+                  <AddIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Управління категоріями">
+                <IconButton onClick={() => setIsManageCategoriesOpen(true)} sx={{ mt: 0.5, color: 'action.active' }}>
+                  <SettingsIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+
+            <Box sx={{ flex: 1 }}>
+              <Controller name="status" control={control} render={({ field }) => (
+                <TextField {...field} select label="Статус" fullWidth error={!!errors.status} helperText={errors.status?.message}>
+                  <MenuItem value="DRAFT">Чернетка (DRAFT)</MenuItem>
+                  <MenuItem value="PUBLISHED">Опубліковано (PUBLISHED)</MenuItem>
+                </TextField>
+              )}/>
+            </Box>
+          </Box>
+
+          <Box>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>Охоплення підрозділів (опціонально)</Typography>
+            <Controller name="departmentIds" control={control} render={({ field }) => (
+              <DepartmentAutocomplete
+                multiple
+                value={selectedDepartments}
+                onChange={(_, newValue) => {
+                  const values = newValue as Department[];
+                  setSelectedDepartments(values);
+                  field.onChange(values.map(d => d.id));
+                }}
+                placeholder={selectedDepartments.length === 0 ? "Всі підрозділи (Загальнонаціональна новина)" : ""}
+              />
+            )}/>
+          </Box>
+
+          <Box>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>Обкладинка новини</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Button variant="outlined" component="label" disabled={isUploadingCover}>
+                {isUploadingCover ? <CircularProgress size={24} /> : 'Обрати файл'}
+                <input type="file" hidden accept="image/jpeg, image/png" onChange={handleCoverUpload} ref={fileInputRef} />
+              </Button>
+              {coverUrl && (
+  <Box sx={{ position: 'relative', width: 100, height: 60 }}>
+    <SecureImage 
+      src={coverUrl} 
+      alt="Cover" 
+      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4 }} 
+    />
+    <IconButton 
+      size="small" 
+      color="error" 
+      sx={{ position: 'absolute', top: -10, right: -10, bgcolor: 'background.paper' }} 
+      onClick={() => setValue('imageUrl', null)}
+    >
+      <DeleteIcon fontSize="small" />
+    </IconButton>
+  </Box>
+)}
+            </Box>
+          </Box>
+
+          <Box>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>Текст новини</Typography>
+            <Controller name="content" control={control} render={({ field }) => (
+              <TipTapEditor value={field.value} onChange={field.onChange} error={!!errors.content} />
+            )}/>
+            {errors.content && <Typography variant="caption" color="error">{errors.content.message}</Typography>}
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button onClick={onClose} disabled={isSubmitting}>Скасувати</Button>
+          <Button type="submit" variant="contained" disabled={isSubmitting}>
+            {isSubmitting ? 'Збереження...' : (news ? 'Зберегти зміни' : 'Створити')}
+          </Button>
+        </DialogActions>
+      </Box>
+
+      <CreateCategoryDialog
+        open={isCreateCategoryOpen}
+        onClose={() => setIsCreateCategoryOpen(false)}
+        onSuccess={(newId) => {
+          if (onRefreshCategories) {
+            onRefreshCategories();
+          }
+          setValue('categoryId', newId);
+        }}
+      />
+
+      <ManageCategoriesDialog
+        open={isManageCategoriesOpen}
+        categories={categories}
+        onClose={() => setIsManageCategoriesOpen(false)}
+        onRefresh={() => {
+          if (onRefreshCategories) {
+            onRefreshCategories();
+          }
+        }}
+      />
+    </Dialog>
   );
 };
 </file>
@@ -4975,11 +5210,68 @@ function App() {
     palette: {
       mode,
       primary: {
-        main: '#1976d2',
+        main: mode === 'light' ? '#1976d2' : '#c084fc',
       },
       background: {
-        default: mode === 'light' ? '#f5f5f5' : '#121212',
-        paper: mode === 'light' ? '#ffffff' : '#1e1e1e',
+        default: mode === 'light' ? '#f8fafc' : '#0f172a',
+        paper: mode === 'light' ? '#ffffff' : '#1e293b',
+      },
+      ...(mode === 'dark' && {
+        text: {
+          primary: '#f8fafc',
+          secondary: '#94a3b8',
+        },
+      }),
+      divider: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.12)',
+    },
+    shape: {
+      borderRadius: 10,
+    },
+    typography: {
+      button: {
+        textTransform: 'none',
+        fontWeight: 600,
+      },
+    },
+    components: {
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            backgroundImage: 'none',
+            ...(mode === 'dark' && {
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)',
+            }),
+          },
+        },
+      },
+      MuiAppBar: {
+        defaultProps: {
+          elevation: 0,
+        },
+        styleOverrides: {
+          root: {
+            backgroundColor: mode === 'light' ? '#ffffff' : '#1e293b',
+            color: mode === 'light' ? '#0f172a' : '#f8fafc',
+            borderBottom: '1px solid',
+            borderTop: 'none',
+            borderLeft: 'none',
+            borderRight: 'none',
+            borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)',
+          },
+        },
+      },
+      MuiDrawer: {
+        styleOverrides: {
+          paper: {
+            backgroundColor: mode === 'light' ? '#ffffff' : '#1e293b',
+            borderRight: '1px solid',
+            borderTop: 'none',
+            borderBottom: 'none',
+            borderLeft: 'none',
+            borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)',
+          },
+        },
       },
     },
   }, ukUA), [mode]);
@@ -5040,6 +5332,7 @@ export default App;
     "@tiptap/extension-placeholder": "^3.27.1",
     "@tiptap/extension-text-align": "^3.27.1",
     "@tiptap/extension-underline": "^3.27.1",
+    "@tiptap/extension-youtube": "^3.27.1",
     "@tiptap/react": "^3.27.1",
     "@tiptap/starter-kit": "^3.27.1",
     "axios": "^1.18.1",
@@ -5083,6 +5376,8 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import CommentIcon from '@mui/icons-material/Comment';
 import { SecureImage } from '../components/common/SecureImage';
+import { DepartmentAutocomplete } from '../components/common/DepartmentAutocomplete';
+import type { Department } from '../api/departmentsApi';
 import { newsApi, type NewsStatus, type News as NewsType, type NewsCategory, type NewsListResponse } from '../api/newsApi';
 import { NewsFormDialog } from '../components/news/NewsFormDialog';
 import { DeleteNewsDialog } from '../components/news/DeleteNewsDialog';
@@ -5099,6 +5394,7 @@ export const News = () => {
   const [activeTab, setActiveTab] = useState(0); // 0 = Активні, 1 = Архів
   const [page, setPage] = useState(1);
   const [filterCategory, setFilterCategory] = useState<string>('');
+  const [filterDepartment, setFilterDepartment] = useState<Department | null>(null);
   const [filterStatus, setFilterStatus] = useState<NewsStatus | ''>('');
   const [sortBy, setSortBy] = useState<string>('createdAt');
   const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
@@ -5119,7 +5415,7 @@ export const News = () => {
       const targetStatus = activeTab === 1 ? 'ARCHIVED' : (filterStatus || undefined);
       
       const [newsRes, catsRes] = await Promise.all([
-        newsApi.getNews(page, 10, filterCategory || undefined, targetStatus, sortBy, sortOrder),
+        newsApi.getNews(page, 10, filterCategory || undefined, filterDepartment?.id || undefined, targetStatus, sortBy, sortOrder),
         newsApi.getCategories()
       ]);
       setData(newsRes);
@@ -5129,7 +5425,7 @@ export const News = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, filterCategory, filterStatus, sortBy, sortOrder, activeTab]);
+  }, [page, filterCategory, filterDepartment, filterStatus, sortBy, sortOrder, activeTab]);
 
   useEffect(() => {
     fetchData();
@@ -5181,6 +5477,16 @@ export const News = () => {
 
         <Box sx={{ mb: 3, display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+            <Box sx={{ minWidth: 200 }}>
+              <DepartmentAutocomplete
+                size="small"
+                label="Підрозділ"
+                value={filterDepartment}
+                onChange={(_, val) => { setFilterDepartment(val as Department | null); setPage(1); }}
+                placeholder="Всі підрозділи"
+              />
+            </Box>
+
             <TextField select size="small" label="Категорія" value={filterCategory} onChange={(e) => { setFilterCategory(e.target.value); setPage(1); }} sx={{ minWidth: 160 }}>
               <MenuItem value="">Всі категорії</MenuItem>
               {categories.map(c => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
@@ -5226,6 +5532,7 @@ export const News = () => {
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 'bold' }}>Заголовок</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Охоплення</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Категорія</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Статус</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Автор</TableCell>
@@ -5245,10 +5552,11 @@ export const News = () => {
                     <TableCell sx={{ maxWidth: 300, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {item.title}
                     </TableCell>
+                    <TableCell>{item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Всі підрозділи'}</TableCell>
                     <TableCell>{item.category?.name || '—'}</TableCell>
                     <TableCell>
-                      <Chip 
-                        label={item.status === 'PUBLISHED' ? 'Опубліковано' : item.status === 'ARCHIVED' ? 'В архіві' : 'Чернетка'} 
+                      <Chip
+                        label={item.status === 'PUBLISHED' ? 'Опубліковано' : item.status === 'ARCHIVED' ? 'В архіві' : 'Чернетка'}
                         color={item.status === 'PUBLISHED' ? 'success' : item.status === 'ARCHIVED' ? 'warning' : 'default'} 
                         size="small" 
                       />
@@ -5350,6 +5658,9 @@ export const News = () => {
                     <Chip size="small" label={item.category?.name || 'Без категорії'} variant="outlined" />
                     <Chip size="small" label={item.status === 'PUBLISHED' ? 'Опубліковано' : item.status === 'ARCHIVED' ? 'В архіві' : 'Чернетка'} color={item.status === 'PUBLISHED' ? 'success' : item.status === 'ARCHIVED' ? 'warning' : 'default'} />
                   </Box>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    Охоплення: {item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Загальнонаціональне'}
+                  </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Автор: {item.author.firstName} {item.author.lastName}
                   </Typography>

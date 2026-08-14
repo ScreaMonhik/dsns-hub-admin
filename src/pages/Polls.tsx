@@ -3,7 +3,7 @@ import {
   Box, Typography, Button, Paper, Table, TableBody, TableCell, 
   TableContainer, TableHead, TableRow, Pagination, CircularProgress,
   IconButton, Tooltip, Chip, MenuItem, TextField,
-  ToggleButton, ToggleButtonGroup, Card, CardContent, CardActions, Tabs, Tab
+  ToggleButton, ToggleButtonGroup, Card, CardContent, CardActions, Tabs, Tab, Avatar
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -17,21 +17,22 @@ import DraftsIcon from '@mui/icons-material/Drafts';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'; // Імпортуємо іконку для копіювання
 import { pollsApi, PollStatus, type Poll, type PaginatedPollsResponse } from '../api/pollsApi';
-import { departmentsApi, type Department } from '../api/departmentsApi';
+import type { Department } from '../api/departmentsApi';
+import { DepartmentAutocomplete } from '../components/common/DepartmentAutocomplete';
 import { PollFormDialog } from '../components/polls/PollFormDialog';
 import { DeletePollDialog } from '../components/polls/DeletePollDialog';
 import { PollStatusDialog } from '../components/polls/PollStatusDialog';
 import { PollDetailsDialog } from '../components/polls/PollDetailsDialog';
 import { format } from 'date-fns';
+import { SecureImage } from '../components/common/SecureImage';
 
 export const Polls = () => {
   const [data, setData] = useState<PaginatedPollsResponse | null>(null);
-  const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [activeTab, setActiveTab] = useState(0); 
   const [page, setPage] = useState(1);
-  const [filterDepartment, setFilterDepartment] = useState<string>('');
+  const [filterDepartment, setFilterDepartment] = useState<Department | null>(null);
   const [filterStatus, setFilterStatus] = useState<PollStatus | ''>('');
   const [sortBy, setSortBy] = useState<string>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -50,7 +51,7 @@ export const Polls = () => {
       setLoading(true);
       const targetStatus = activeTab === 1 ? PollStatus.ARCHIVED : (filterStatus || undefined);
       
-      const res = await pollsApi.getPolls(page, 10, filterDepartment || undefined, targetStatus, sortBy, sortOrder);
+      const res = await pollsApi.getPolls(page, 10, filterDepartment?.id || undefined, targetStatus, sortBy, sortOrder);
       setData(res);
     } catch (error) {
       console.error('Failed to fetch polls data', error);
@@ -63,13 +64,6 @@ export const Polls = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  // Завантажуємо підрозділи лише один раз при монтуванні, щоб не блокувати таблицю
-  useEffect(() => {
-    departmentsApi.getDepartments()
-      .then(setDepartments)
-      .catch(() => setDepartments([]));
-  }, []);
 
   // Безпечний масив опитувань, навіть якщо бекенд повернув помилкову структуру
   const pollsList: Poll[] = Array.isArray(data?.data) ? data.data : [];
@@ -130,10 +124,15 @@ export const Polls = () => {
 
         <Box sx={{ mb: 3, display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-            <TextField select size="small" label="Підрозділ" value={filterDepartment} onChange={(e) => { setFilterDepartment(e.target.value); setPage(1); }} sx={{ minWidth: 160 }}>
-              <MenuItem value="">Всі (Загальнонаціональні)</MenuItem>
-              {departments.map(d => <MenuItem key={d.id} value={d.id}>{d.name}</MenuItem>)}
-            </TextField>
+            <Box sx={{ minWidth: 200 }}>
+              <DepartmentAutocomplete
+                size="small"
+                label="Підрозділ"
+                value={filterDepartment}
+                onChange={(_, val) => { setFilterDepartment(val as Department | null); setPage(1); }}
+                placeholder="Всі підрозділи"
+              />
+            </Box>
             
             {activeTab === 0 && (
               <TextField select size="small" label="Статус" value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value as PollStatus | ''); setPage(1); }} sx={{ minWidth: 160 }}>
@@ -168,6 +167,7 @@ export const Polls = () => {
                   <TableCell sx={{ fontWeight: 'bold' }}>Заголовок</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Охоплення</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Статус</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Автор</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Голосів</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Створено</TableCell>
                   <TableCell align="right" sx={{ fontWeight: 'bold' }}>Дії</TableCell>
@@ -185,6 +185,14 @@ export const Polls = () => {
                     <TableCell sx={{ maxWidth: 250 }}>{item.title}</TableCell>
                     <TableCell>{item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Всі підрозділи'}</TableCell>
                     <TableCell>{getStatusChip(item.status)}</TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Avatar sx={{ width: 24, height: 24 }}>
+                          {item.author?.avatarUrl ? <SecureImage src={item.author.avatarUrl} alt="A" /> : item.author?.firstName?.charAt(0) || '?'}
+                        </Avatar>
+                        {item.author ? `${item.author.firstName} ${item.author.lastName}` : '—'}
+                      </Box>
+                    </TableCell>
                     <TableCell>{item.totalVotes || 0}</TableCell>
                     <TableCell>{item.createdAt ? format(new Date(item.createdAt), 'dd.MM.yyyy') : '—'}</TableCell>
                     <TableCell align="right" onClick={(e) => e.stopPropagation()}>
@@ -240,6 +248,14 @@ export const Polls = () => {
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     Охоплення: {item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Загальнонаціональне'}
                   </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <Avatar sx={{ width: 24, height: 24 }}>
+                      {item.author?.avatarUrl ? <SecureImage src={item.author.avatarUrl} alt="A" /> : item.author?.firstName?.charAt(0) || '?'}
+                    </Avatar>
+                    <Typography variant="body2" color="text.secondary">
+                      {item.author ? `${item.author.firstName} ${item.author.lastName}` : 'Невідомий автор'}
+                    </Typography>
+                  </Box>
                   {item.expiresAt && (
                     <Typography 
                       variant="body2" 

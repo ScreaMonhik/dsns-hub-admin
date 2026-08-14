@@ -231,7 +231,7 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
     <>
       <Box sx={{ 
         border: 1, 
-        borderColor: error ? 'error.main' : 'divider', 
+        borderColor: error ? 'error.main' : 'divider',
         borderRadius: 1,
         overflow: 'hidden',
         bgcolor: 'background.paper'
@@ -437,5 +437,62 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
         </DialogActions>
       </Dialog>
     </>
+  );
+};
+
+// Компонент для безпечного відображення контенту (Read-Only)
+export const TipTapViewer = ({ value }: { value: string }) => {
+  const editor = useEditor({
+    editable: false,
+    extensions: [
+      StarterKit.configure({ heading: { levels: [2, 3] } }),
+      SecureImageExtension,
+      VideoExtension,
+      Underline,
+      Link.configure({ openOnClick: true, autolink: true, defaultProtocol: 'https' }),
+      Youtube.configure({ inline: false, width: 640, height: 360 }),
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+    ],
+    content: (() => {
+      if (!value) return '';
+      try {
+        return typeof value === 'string' ? JSON.parse(value) : value;
+      } catch {
+        return value;
+      }
+    })(),
+  });
+
+  if (!editor) return null;
+
+  return (
+    <Box sx={{ 
+      '& .ProseMirror': { 
+        outline: 'none',
+        fontFamily: 'inherit',
+        fontSize: '1rem',
+        lineHeight: 1.5,
+      },
+      '& blockquote': {
+        borderLeft: '4px solid',
+        borderColor: 'primary.main',
+        pl: 2,
+        mx: 0,
+        my: 2,
+        fontStyle: 'italic',
+        color: 'text.secondary',
+      },
+      '& a': {
+        color: 'primary.main',
+        textDecoration: 'underline',
+      },
+      '& iframe': {
+        border: 'none',
+        borderRadius: '8px',
+        maxWidth: '100%',
+      }
+    }}>
+      <EditorContent editor={editor} />
+    </Box>
   );
 };

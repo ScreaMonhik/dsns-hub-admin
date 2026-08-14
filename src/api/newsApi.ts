@@ -136,6 +136,11 @@ export const newsApi = {
     return response.data;
   },
 
+  addNewsComment: async (newsId: string, content: string) => {
+    const response = await apiClient.post<NewsComment>(`/news/${newsId}/comments`, { content });
+    return response.data;
+  },
+
   deleteNewsComment: async (newsId: string, commentId: string) => {
     const response = await apiClient.delete(`/news/${newsId}/comments/${commentId}`);
     return response.data;

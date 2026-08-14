@@ -1,6 +1,7 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box, Chip, Divider } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box, Chip, Divider, Avatar } from '@mui/material';
 import { format } from 'date-fns';
 import { PollStatus, type Poll } from '../../api/pollsApi';
+import { SecureImage } from '../common/SecureImage';
 
 interface Props {
   open: boolean;
@@ -29,7 +30,16 @@ export const PollDetailsDialog = ({ open, poll, onClose }: Props) => {
             {getStatusChip(poll.status)}
             <Chip label={`Створено: ${format(new Date(poll.createdAt), 'dd.MM.yyyy HH:mm')}`} size="small" variant="outlined" />
             {poll.author && (
-              <Chip label={`Автор: ${poll.author.firstName} ${poll.author.lastName}`} size="small" variant="outlined" />
+              <Chip 
+                label={`Автор: ${poll.author.firstName} ${poll.author.lastName}`} 
+                size="small" 
+                variant="outlined" 
+                avatar={
+                  <Avatar sx={{ width: 24, height: 24 }}>
+                    {poll.author.avatarUrl ? <SecureImage src={poll.author.avatarUrl} alt="A" /> : poll.author.firstName.charAt(0)}
+                  </Avatar>
+                }
+              />
             )}
             {poll.expiresAt && (
               <Chip 

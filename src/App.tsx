@@ -7,6 +7,8 @@ import { ukUA } from '@mui/material/locale';
 import { AdminLayout } from './components/layout/AdminLayout';
 import { Users } from './pages/Users';
 import { News } from './pages/News';
+import { Documents } from './pages/Documents';
+import { Projects } from './pages/Projects';
 import { Polls } from './pages/Polls';
 import { Chats } from './pages/Chats';
 import { useThemeStore } from './store/themeStore';
@@ -103,8 +105,8 @@ function App() {
               <Route path="/" element={<DashboardPlaceholder />} />
               <Route path="/users" element={<Users />} />
               <Route path="/news" element={<News />} />
-              <Route path="/documents" element={<h2>Модуль "Документи" (В розробці)</h2>} />
-              <Route path="/projects" element={<h2>Модуль "Проєкти" (В розробці)</h2>} />
+              <Route path="/documents" element={<Documents />} />
+              <Route path="/projects" element={<Projects />} />
               <Route path="/polls" element={<Polls />} />
               <Route path="/chats" element={<Chats />} />
             </Route>

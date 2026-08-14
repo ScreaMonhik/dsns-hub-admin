@@ -3,7 +3,7 @@ import {
   Box, Typography, Button, Paper, Table, TableBody, TableCell, 
   TableContainer, TableHead, TableRow, Pagination, CircularProgress,
   IconButton, Tooltip, Chip, MenuItem, TextField,
-  ToggleButton, ToggleButtonGroup, Card, CardContent, CardActions, Tabs, Tab
+  ToggleButton, ToggleButtonGroup, Card, CardContent, CardActions, Tabs, Tab, Avatar
 } from '@mui/material';
 import ArticleIcon from '@mui/icons-material/Article';
 import EditIcon from '@mui/icons-material/Edit';
@@ -23,7 +23,8 @@ import { NewsFormDialog } from '../components/news/NewsFormDialog';
 import { DeleteNewsDialog } from '../components/news/DeleteNewsDialog';
 import { ArchiveNewsDialog } from '../components/news/ArchiveNewsDialog';
 import { RestoreNewsDialog } from '../components/news/RestoreNewsDialog';
-import { NewsCommentsDialog } from '../components/news/NewsCommentsDialog';
+import { NewsDetailsDialog } from '../components/news/NewsDetailsDialog';
+import { useRef } from 'react';
 import { format } from 'date-fns';
 
 export const News = () => {
@@ -46,7 +47,9 @@ export const News = () => {
   const [deleteNewsItem, setDeleteNewsItem] = useState<NewsType | null>(null);
   const [archiveNewsItem, setArchiveNewsItem] = useState<NewsType | null>(null);
   const [restoreNewsItem, setRestoreNewsItem] = useState<NewsType | null>(null);
-  const [commentsNewsItem, setCommentsNewsItem] = useState<NewsType | null>(null);
+  const [detailsNewsItem, setDetailsNewsItem] = useState<NewsType | null>(null);
+
+  const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -97,6 +100,26 @@ export const News = () => {
   const openCreate = () => {
     setEditNews(null);
     setIsFormOpen(true);
+  };
+
+  const handleSingleClick = (item: NewsType) => {
+    if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+    clickTimeoutRef.current = setTimeout(() => {
+      setDetailsNewsItem(item);
+      clickTimeoutRef.current = null;
+    }, 250);
+  };
+
+  const handleDoubleClick = (item: NewsType) => {
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+    }
+    if (activeTab === 0) {
+      openEdit(item);
+    } else {
+      setDetailsNewsItem(item);
+    }
   };
 
   return (
@@ -186,8 +209,9 @@ export const News = () => {
                   <TableRow 
                     key={item.id} 
                     hover
-                    onDoubleClick={() => activeTab === 0 && openEdit(item)}
-                    sx={{ cursor: activeTab === 0 ? 'pointer' : 'default' }}
+                    onClick={() => handleSingleClick(item)}
+                    onDoubleClick={() => handleDoubleClick(item)}
+                    sx={{ cursor: 'pointer' }}
                   >
                     <TableCell sx={{ maxWidth: 300, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {item.title}
@@ -201,7 +225,14 @@ export const News = () => {
                         size="small" 
                       />
                     </TableCell>
-                    <TableCell>{`${item.author.firstName} ${item.author.lastName}`}</TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Avatar sx={{ width: 24, height: 24 }}>
+                          {item.author.avatarUrl ? <SecureImage src={item.author.avatarUrl} alt="A" /> : item.author.firstName.charAt(0)}
+                        </Avatar>
+                        {`${item.author.firstName} ${item.author.lastName}`}
+                      </Box>
+                    </TableCell>
                     <TableCell>{format(new Date(item.createdAt), 'dd.MM.yyyy HH:mm')}</TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
@@ -225,9 +256,9 @@ export const News = () => {
                         </Tooltip>
                       </Box>
                     </TableCell>
-                    <TableCell align="right">
-                      <Tooltip title="Переглянути коментарі">
-                        <IconButton color="info" onClick={() => setCommentsNewsItem(item)}>
+                    <TableCell align="right" onClick={(e) => e.stopPropagation()}>
+                      <Tooltip title="Переглянути деталі та коментарі">
+                        <IconButton color="info" onClick={() => setDetailsNewsItem(item)}>
                           <CommentIcon />
                         </IconButton>
                       </Tooltip>
@@ -272,7 +303,8 @@ export const News = () => {
             {data?.data.map((item) => (
               <Card 
                 key={item.id} 
-                onDoubleClick={() => activeTab === 0 && openEdit(item)}
+                onClick={() => handleSingleClick(item)}
+                onDoubleClick={() => handleDoubleClick(item)}
                 sx={{ 
                   display: 'flex', 
                   flexDirection: 'column',
@@ -280,7 +312,7 @@ export const News = () => {
                   '&:hover': {
                     transform: 'translateY(-4px)',
                     boxShadow: 6,
-                    cursor: activeTab === 0 ? 'pointer' : 'default'
+                    cursor: 'pointer'
                   }
                 }}
               >
@@ -301,9 +333,14 @@ export const News = () => {
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     Охоплення: {item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Загальнонаціональне'}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Автор: {item.author.firstName} {item.author.lastName}
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 1 }}>
+                    <Avatar sx={{ width: 24, height: 24 }}>
+                      {item.author.avatarUrl ? <SecureImage src={item.author.avatarUrl} alt="A" /> : item.author.firstName.charAt(0)}
+                    </Avatar>
+                    <Typography variant="body2" color="text.secondary">
+                      {item.author.firstName} {item.author.lastName}
+                    </Typography>
+                  </Box>
                   <Typography variant="body2" color="text.secondary">
                     {format(new Date(item.createdAt), 'dd.MM.yyyy HH:mm')}
                   </Typography>
@@ -322,9 +359,9 @@ export const News = () => {
                     </Box>
                   </Box>
                 </CardContent>
-                <CardActions sx={{ justifyContent: 'flex-end', borderTop: 1, borderColor: 'divider' }}>
-                  <Tooltip title="Переглянути коментарі">
-                    <IconButton size="small" color="info" onClick={() => setCommentsNewsItem(item)}><CommentIcon fontSize="small" /></IconButton>
+                <CardActions sx={{ justifyContent: 'flex-end', borderTop: 1, borderColor: 'divider' }} onClick={(e) => e.stopPropagation()}>
+                  <Tooltip title="Переглянути деталі та коментарі">
+                    <IconButton size="small" color="info" onClick={() => setDetailsNewsItem(item)}><CommentIcon fontSize="small" /></IconButton>
                   </Tooltip>
                   {activeTab === 0 ? (
                     <>
@@ -391,11 +428,11 @@ export const News = () => {
         onSuccess={fetchData}
       />
 
-      <NewsCommentsDialog
-        open={!!commentsNewsItem}
-        news={commentsNewsItem}
-        onClose={() => setCommentsNewsItem(null)}
-        onRefreshNews={fetchData}
+      <NewsDetailsDialog
+        open={!!detailsNewsItem}
+        news={detailsNewsItem}
+        onClose={() => setDetailsNewsItem(null)}
+        onRefreshList={fetchData}
       />
     </Box>
   );

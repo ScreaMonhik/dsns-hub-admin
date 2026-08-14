@@ -19,6 +19,7 @@ export const NewsCommentsDialog = ({ open, news, onClose, onRefreshNews }: NewsC
   const [comments, setComments] = useState<NewsComment[]>([]);
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (open && news) {
@@ -43,16 +44,18 @@ export const NewsCommentsDialog = ({ open, news, onClose, onRefreshNews }: NewsC
     }
   };
 
-  const handleDeleteComment = async (commentId: string) => {
-    if (!news || !window.confirm('Ви впевнені, що хочете видалити цей коментар?')) return;
+  const confirmDeleteComment = async () => {
+    if (!news || !commentToDelete) return;
     
     try {
       setApiError(null);
-      await newsApi.deleteNewsComment(news.id, commentId);
-      setComments(prev => prev.filter(c => c.id !== commentId));
-      onRefreshNews(); // Оновлюємо лічильники в головній таблиці
+      await newsApi.deleteNewsComment(news.id, commentToDelete);
+      setComments(prev => prev.filter(c => c.id !== commentToDelete));
+      onRefreshNews();
     } catch (error: any) {
       setApiError(error.response?.data?.message || 'Не вдалося видалити коментар');
+    } finally {
+      setCommentToDelete(null);
     }
   };
 
@@ -78,7 +81,7 @@ export const NewsCommentsDialog = ({ open, news, onClose, onRefreshNews }: NewsC
                   alignItems="flex-start"
                   secondaryAction={
                     <Tooltip title="Видалити коментар">
-                      <IconButton edge="end" size="small" color="error" onClick={() => handleDeleteComment(comment.id)}>
+                      <IconButton edge="end" size="small" color="error" onClick={() => setCommentToDelete(comment.id)}>
                         <DeleteIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
@@ -116,6 +119,21 @@ export const NewsCommentsDialog = ({ open, news, onClose, onRefreshNews }: NewsC
       <DialogActions>
         <Button onClick={onClose} variant="contained">Закрити</Button>
       </DialogActions>
+
+      <Dialog open={!!commentToDelete} onClose={() => setCommentToDelete(null)} maxWidth="xs" fullWidth>
+        <DialogTitle>Підтвердження видалення</DialogTitle>
+        <DialogContent dividers>
+          <Typography>
+            Ви впевнені, що хочете видалити цей коментар? Цю дію не можна скасувати.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCommentToDelete(null)}>Скасувати</Button>
+          <Button onClick={confirmDeleteComment} variant="contained" color="error">
+            Видалити
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 };
