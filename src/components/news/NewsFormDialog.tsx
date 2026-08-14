@@ -81,8 +81,12 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
       setIsUploadingCover(true);
       const res = await newsApi.uploadMedia(file);
       setValue('imageUrl', res.url);
-    } catch (err) {
-      setApiError('Помилка завантаження обкладинки');
+    } catch (err: any) {
+      if (err.response?.status === 400) {
+        setApiError('Файл пошкоджено або має непідтримуваний формат.');
+      } else {
+        setApiError('Помилка завантаження обкладинки');
+      }
     } finally {
       setIsUploadingCover(false);
     }
@@ -203,7 +207,12 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
           </Box>
 
           <Box>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>Текст новини</Typography>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              Текст новини 
+              <Typography component="span" variant="caption" color="warning.main" sx={{ ml: 1 }}>
+                (Увага: Небезпечні HTML-теги будуть автоматично вирізані після збереження)
+              </Typography>
+            </Typography>
             <Controller name="content" control={control} render={({ field }) => (
               <TipTapEditor value={field.value} onChange={field.onChange} error={!!errors.content} />
             )}/>

@@ -12,11 +12,13 @@ export interface User {
   createdAt: string;
 }
 
+import { apiClient } from '../api/apiClient';
+
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
-  setAuth: (user: User, token: string) => void;
-  logout: () => void;
+  setAuth: (user: User, accessToken: string, refreshToken: string) => void;
+  logout: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -24,13 +26,21 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       isAuthenticated: false,
-      setAuth: (user, token) => {
-        localStorage.setItem('jwt_token', token);
+      setAuth: (user, accessToken, refreshToken) => {
+        localStorage.setItem('jwt_token', accessToken);
+        localStorage.setItem('refresh_token', refreshToken);
         set({ user, isAuthenticated: true });
       },
-      logout: () => {
-        localStorage.removeItem('jwt_token');
-        set({ user: null, isAuthenticated: false });
+      logout: async () => {
+        try {
+          await apiClient.post('/auth/logout');
+        } catch (error) {
+          console.error('Logout API failed', error);
+        } finally {
+          localStorage.removeItem('jwt_token');
+          localStorage.removeItem('refresh_token');
+          set({ user: null, isAuthenticated: false });
+        }
       },
     }),
     {

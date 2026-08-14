@@ -16,6 +16,7 @@ type LoginFormInputs = z.infer<typeof loginSchema>;
 
 interface LoginResponse {
   accessToken: string;
+  refreshToken: string;
   user: User;
 }
 
@@ -37,17 +38,21 @@ export const Login = () => {
       setErrorMsg(null);
       const response = await apiClient.post<LoginResponse>('/auth/login', data);
       
-      const { accessToken, user } = response.data;
+      const { accessToken, refreshToken, user } = response.data;
       
       if (user.role !== 'ADMIN') {
         setErrorMsg('Доступ заборонено. Потрібні права адміністратора.');
         return;
       }
 
-      setAuth(user, accessToken);
+      setAuth(user, accessToken, refreshToken);
       navigate('/', { replace: true });
     } catch (error: any) {
-      setErrorMsg(error.response?.data?.message || 'Помилка авторизації');
+      if (error.response?.status === 403) {
+        setErrorMsg('Ваш обліковий запис заблоковано. Зверніться до адміністратора.');
+      } else {
+        setErrorMsg(error.response?.data?.message || 'Помилка авторизації');
+      }
     }
   };
 

@@ -154,8 +154,12 @@ export const ProjectFormDialog = ({ open, project, onClose, onSuccess }: Props) 
       onSuccess();
       onClose();
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      setApiError(err.response?.data?.message || 'Не вдалося зберегти проєкт');
+      const err = error as { response?: { status?: number, data?: { message?: string } } };
+      if (err.response?.status === 400) {
+        setApiError('Файл пошкоджено або має непідтримуваний формат.');
+      } else {
+        setApiError(err.response?.data?.message || 'Не вдалося зберегти проєкт');
+      }
     }
   };
 

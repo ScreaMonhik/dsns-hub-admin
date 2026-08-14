@@ -8,9 +8,11 @@ import {
 import { useState } from 'react';
 import { usersApi, type CreateUserPayload } from '../../api/usersApi';
 
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
 const createUserSchema = z.object({
   email: z.string().email('Некоректна адреса').endsWith('@dsns.gov.ua', 'Дозволено тільки домен @dsns.gov.ua'),
-  password: z.string().min(6, 'Мінімум 6 символів'),
+  password: z.string().regex(passwordRegex, 'Мінімум 8 символів. Обов\'язково: велика і мала літери, цифра, спецсимвол.'),
   firstName: z.string().min(2, "Обов'язкове поле"),
   lastName: z.string().min(2, "Обов'язкове поле"),
   role: z.enum(['ADMIN', 'USER']),

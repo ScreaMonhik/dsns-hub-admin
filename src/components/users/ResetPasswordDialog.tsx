@@ -9,8 +9,10 @@ import { useState } from 'react';
 import { usersApi } from '../../api/usersApi';
 import type { User } from '../../store/authStore';
 
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
 const resetPasswordSchema = z.object({
-  newPassword: z.string().min(6, 'Мінімум 6 символів'),
+  newPassword: z.string().regex(passwordRegex, 'Мінімум 8 символів. Обов\'язково: велика і мала літери, цифра, спецсимвол.'),
 });
 
 type FormInputs = z.infer<typeof resetPasswordSchema>;

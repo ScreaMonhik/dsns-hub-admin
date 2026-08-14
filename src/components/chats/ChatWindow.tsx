@@ -79,6 +79,14 @@ export const ChatWindow = ({ chat, onChatUpdate }: Props) => {
       }
     });
 
+    socketRef.current.on('exception', (error: any) => {
+      if (isMounted) {
+        import('react-hot-toast').then(({ default: toast }) => {
+          toast.error(error?.message || 'Помилка чату. Забагато запитів.');
+        });
+      }
+    });
+
     return () => {
       isMounted = false;
       socketRef.current?.disconnect();

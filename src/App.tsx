@@ -12,6 +12,7 @@ import { Projects } from './pages/Projects';
 import { Polls } from './pages/Polls';
 import { Chats } from './pages/Chats';
 import { useThemeStore } from './store/themeStore';
+import { Toaster } from 'react-hot-toast';
 
 const DashboardPlaceholder = () => (
   <div>
@@ -96,6 +97,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <Toaster position="top-right" />
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
