@@ -152,43 +152,89 @@ export const ChatWindow = ({ chat, onChatUpdate }: Props) => {
       <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2, bgcolor: 'background.default', display: 'flex', flexDirection: 'column', gap: 1 }}>
         {loadingHistory && <CircularProgress sx={{ alignSelf: 'center', mt: 2 }} />}
         
-        {!loadingHistory && messages.map((msg) => {
+        {!loadingHistory && messages.map((msg, index) => {
           const isMe = msg.senderId === user?.id;
           const senderAvatar = isMe ? user?.avatarUrl : msg.sender?.avatarUrl;
           const senderFirstName = isMe ? user?.firstName : msg.sender?.firstName;
           const senderLastName = isMe ? user?.lastName : msg.sender?.lastName;
 
+          const prevMsg = messages[index - 1];
+          const nextMsg = messages[index + 1];
+
+          // Розділювач по днях
+          const prevDate = prevMsg ? new Date(prevMsg.createdAt).toDateString() : null;
+          const currDate = new Date(msg.createdAt).toDateString();
+          const showDateSeparator = prevDate !== currDate;
+
+          // Часовий проміжок між повідомленнями (якщо > 5 хвилин - розриваємо групу)
+          const isTimeGapWithPrev = prevMsg && (new Date(msg.createdAt).getTime() - new Date(prevMsg.createdAt).getTime() > 5 * 60 * 1000);
+          const isTimeGapWithNext = nextMsg && (new Date(nextMsg.createdAt).getTime() - new Date(msg.createdAt).getTime() > 5 * 60 * 1000);
+
+          // Визначення позиції повідомлення в групі
+          const isFirstInGroup = !prevMsg || prevMsg.senderId !== msg.senderId || isTimeGapWithPrev || showDateSeparator;
+          const isLastInGroup = !nextMsg || nextMsg.senderId !== msg.senderId || isTimeGapWithNext || currDate !== new Date(nextMsg.createdAt).toDateString();
+
+          // Динамічний розрахунок Border Radius
+          const tl = !isMe && !isFirstInGroup ? 4 : 16;
+          const tr = isMe && !isFirstInGroup ? 4 : 16;
+          const br = isMe && isLastInGroup ? 0 : isMe && !isLastInGroup ? 4 : 16;
+          const bl = !isMe && isLastInGroup ? 0 : !isMe && !isLastInGroup ? 4 : 16;
+
           return (
-            <Box key={msg.id} sx={{ display: 'flex', flexDirection: isMe ? 'row-reverse' : 'row', alignItems: 'flex-end', gap: 1, mb: 1 }}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: isMe ? 'primary.main' : 'grey.400' }}>
-                {senderAvatar ? (
-                  <SecureImage src={senderAvatar} alt={senderFirstName || 'User'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <Box key={msg.id} sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+              {/* Дата-розділювач */}
+              {showDateSeparator && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+                  <Box sx={{ bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)', px: 1.5, py: 0.5, borderRadius: 4 }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                      {format(new Date(msg.createdAt), 'dd.MM.yyyy')}
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+              
+              <Box sx={{ display: 'flex', flexDirection: isMe ? 'row-reverse' : 'row', alignItems: 'flex-end', gap: 1, mb: isLastInGroup ? 2 : 0.5 }}>
+                {/* Аватар показуємо тільки на останньому повідомленні групи */}
+                {isLastInGroup ? (
+                  <Avatar sx={{ width: 32, height: 32, bgcolor: isMe ? 'primary.main' : 'grey.400' }}>
+                    {senderAvatar ? (
+                      <SecureImage src={senderAvatar} alt={senderFirstName || 'User'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      (senderFirstName?.charAt(0) || '?').toUpperCase()
+                    )}
+                  </Avatar>
                 ) : (
-                  (senderFirstName?.charAt(0) || '?').toUpperCase()
+                  <Box sx={{ width: 32, height: 32, flexShrink: 0 }} />
                 )}
-              </Avatar>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start', maxWidth: '75%' }}>
-                {!isMe && senderFirstName && (
-                  <Typography variant="caption" color="text.secondary" sx={{ ml: 1, mb: 0.5 }}>
-                    {senderFirstName} {senderLastName}
-                  </Typography>
-                )}
-                <Paper 
-                  elevation={1} 
-                  sx={{ 
-                    p: 1.5, 
-                    bgcolor: isMe ? 'primary.main' : 'background.paper',
-                    color: isMe ? 'primary.contrastText' : 'text.primary',
-                    borderRadius: 2,
-                    borderBottomRightRadius: isMe ? 0 : 8,
-                    borderBottomLeftRadius: isMe ? 8 : 0,
-                  }}
-                >
-                  <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>{msg.content}</Typography>
-                </Paper>
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, mx: 1 }}>
-                  {format(new Date(msg.createdAt), 'HH:mm')}
-                </Typography>
+                
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start', maxWidth: '75%' }}>
+                  {/* Ім'я показуємо тільки на першому повідомленні групи */}
+                  {!isMe && isFirstInGroup && senderFirstName && (
+                    <Typography variant="caption" color="text.secondary" sx={{ ml: 1, mb: 0.5, fontWeight: 500 }}>
+                      {senderFirstName} {senderLastName}
+                    </Typography>
+                  )}
+                  
+                  {/* Бульбашка повідомлення */}
+                  <Paper 
+                    elevation={1} 
+                    sx={{ 
+                      px: 1.5, 
+                      py: 1, 
+                      bgcolor: isMe ? 'primary.main' : 'background.paper',
+                      color: isMe ? 'primary.contrastText' : 'text.primary',
+                      borderRadius: `${tl}px ${tr}px ${br}px ${bl}px`,
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1.5 }}>
+                      <Typography variant="body2" sx={{ wordBreak: 'break-word', mt: 0.5 }}>{msg.content}</Typography>
+                      {/* Час перенесено всередину бульбашки */}
+                      <Typography variant="caption" sx={{ opacity: 0.7, fontSize: '0.65rem', lineHeight: 1, mb: 0.2, whiteSpace: 'nowrap' }}>
+                        {format(new Date(msg.createdAt), 'HH:mm')}
+                      </Typography>
+                    </Box>
+                  </Paper>
+                </Box>
               </Box>
             </Box>
           );
