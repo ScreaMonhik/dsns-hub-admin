@@ -21,6 +21,7 @@ export interface DocumentModel {
     id: string;
     firstName: string;
     lastName: string;
+    avatarUrl?: string | null;
   };
   departments: {
     id: string;

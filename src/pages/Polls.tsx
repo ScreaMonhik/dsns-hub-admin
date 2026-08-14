@@ -262,7 +262,7 @@ export const Polls = () => {
                       color={new Date(item.expiresAt) < new Date() ? 'error.main' : 'info.main'} 
                       sx={{ mb: 1, fontWeight: 500 }}
                     >
-                      {new Date(item.expiresAt) < new Date() ? 'Час вичерпано: ' : 'Активне до: '}
+                      {new Date(item.expiresAt) < new Date() ? 'Завершено: ' : 'Завершується: '}
                       {format(new Date(item.expiresAt), 'dd.MM.yyyy HH:mm')}
                     </Typography>
                   )}

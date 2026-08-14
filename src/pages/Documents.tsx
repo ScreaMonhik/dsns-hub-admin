@@ -1,11 +1,14 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { 
   Box, Typography, Button, Paper, Pagination, CircularProgress,
-  IconButton, Tooltip, Chip, MenuItem, TextField, Card, CardContent, CardActions, Tabs, Tab
+  IconButton, Tooltip, Chip, MenuItem, TextField, Card, CardContent, CardActions, Tabs, Tab,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, ToggleButton, ToggleButtonGroup, Avatar
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import GridViewIcon from '@mui/icons-material/GridView';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import PublicIcon from '@mui/icons-material/Public';
@@ -20,6 +23,7 @@ import { DocumentFormDialog } from '../components/documents/DocumentFormDialog';
 import { DocumentStatusDialog } from '../components/documents/DocumentStatusDialog';
 import { DeleteDocumentDialog } from '../components/documents/DeleteDocumentDialog';
 import { format } from 'date-fns';
+import { SecureImage } from '../components/common/SecureImage';
 
 export const Documents = () => {
   const [data, setData] = useState<PaginatedDocumentsResponse | null>(null);
@@ -32,12 +36,15 @@ export const Documents = () => {
   const [filterStatus, setFilterStatus] = useState<DocumentStatus | ''>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid');
   
   // Dialog States
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editDocument, setEditDocument] = useState<DocumentModel | null>(null);
   const [deleteDocumentItem, setDeleteDocumentItem] = useState<DocumentModel | null>(null);
   const [statusDialogData, setStatusDialogData] = useState<{ document: DocumentModel, action: 'publish' | 'archive' | 'unarchive' } | null>(null);
+  
+  const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -79,7 +86,8 @@ export const Documents = () => {
     }
   };
 
-  const handleViewDocument = async (doc: DocumentModel) => {
+  const handleViewDocument = async (doc: DocumentModel, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     try {
       setDownloadingId(doc.id);
       const blob = await documentsApi.downloadDocument(doc.fileUrl);
@@ -95,6 +103,25 @@ export const Documents = () => {
       alert('Не вдалося відкрити документ для перегляду.');
     } finally {
       setDownloadingId(null);
+    }
+  };
+
+  const handleSingleClick = (item: DocumentModel) => {
+    if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+    clickTimeoutRef.current = setTimeout(() => {
+      handleViewDocument(item);
+      clickTimeoutRef.current = null;
+    }, 250);
+  };
+
+  const handleDoubleClick = (item: DocumentModel) => {
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+    }
+    if (activeTab === 0) {
+      setEditDocument(item);
+      setIsFormOpen(true);
     }
   };
 
@@ -149,21 +176,87 @@ export const Documents = () => {
               </TextField>
             )}
           </Box>
+          <ToggleButtonGroup value={viewMode} exclusive onChange={(_, newMode) => { if (newMode) setViewMode(newMode); }} size="small">
+            <ToggleButton value="grid"><GridViewIcon /></ToggleButton>
+            <ToggleButton value="table"><ViewListIcon /></ToggleButton>
+          </ToggleButtonGroup>
         </Box>
 
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}><CircularProgress /></Box>
+        ) : viewMode === 'table' ? (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Назва документа</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Охоплення</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Статус</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Автор</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Оновлено</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 'bold' }}>Дії</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {docsList.map((item) => (
+                  <TableRow 
+                    key={item.id} 
+                    hover
+                    onClick={() => handleSingleClick(item)}
+                    onDoubleClick={() => handleDoubleClick(item)}
+                    sx={{ cursor: 'pointer' }}
+                  >
+                    <TableCell sx={{ maxWidth: 250, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <PictureAsPdfIcon color="error" fontSize="small" />
+                        {item.title}
+                      </Box>
+                    </TableCell>
+                    <TableCell>{item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Всі підрозділи'}</TableCell>
+                    <TableCell>{getStatusChip(item.status)}</TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Avatar sx={{ width: 24, height: 24 }}>
+                          {item.author?.avatarUrl ? <SecureImage src={item.author.avatarUrl} alt="A" /> : item.author?.firstName?.charAt(0) || '?'}
+                        </Avatar>
+                        {item.author ? `${item.author.firstName} ${item.author.lastName}` : '—'}
+                      </Box>
+                    </TableCell>
+                    <TableCell>{format(new Date(item.updatedAt), 'dd.MM.yyyy HH:mm')}</TableCell>
+                    <TableCell align="right" onClick={(e) => e.stopPropagation()}>
+                      <Tooltip title="Переглянути PDF">
+                        <IconButton color="info" onClick={(e) => handleViewDocument(item, e)} disabled={downloadingId === item.id}>
+                          {downloadingId === item.id ? <CircularProgress size={24} /> : <VisibilityIcon />}
+                        </IconButton>
+                      </Tooltip>
+                      {item.status === DocumentStatus.DRAFT && (
+                        <>
+                          <Tooltip title="Опублікувати"><IconButton color="success" onClick={() => setStatusDialogData({ document: item, action: 'publish' })}><PublicIcon /></IconButton></Tooltip>
+                          <Tooltip title="Редагувати"><IconButton color="primary" onClick={() => { setEditDocument(item); setIsFormOpen(true); }}><EditIcon /></IconButton></Tooltip>
+                          <Tooltip title="В архів"><IconButton color="warning" onClick={() => setStatusDialogData({ document: item, action: 'archive' })}><ArchiveIcon /></IconButton></Tooltip>
+                        </>
+                      )}
+                      {item.status === DocumentStatus.PUBLISHED && (
+                        <Tooltip title="В архів"><IconButton color="warning" onClick={() => setStatusDialogData({ document: item, action: 'archive' })}><ArchiveIcon /></IconButton></Tooltip>
+                      )}
+                      {item.status === DocumentStatus.ARCHIVED && (
+                        <Tooltip title="Відновити в чернетки"><IconButton color="success" onClick={() => setStatusDialogData({ document: item, action: 'unarchive' })}><UnarchiveIcon /></IconButton></Tooltip>
+                      )}
+                      <Tooltip title="Видалити"><IconButton color="error" onClick={() => setDeleteDocumentItem(item)}><DeleteIcon /></IconButton></Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {docsList.length === 0 && <TableRow><TableCell colSpan={6} align="center">Документів не знайдено</TableCell></TableRow>}
+              </TableBody>
+            </Table>
+          </TableContainer>
         ) : (
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 2 }}>
             {docsList.map((item) => (
-              <Card 
+              <Card
                 key={item.id}
-                onDoubleClick={() => {
-                  if (activeTab === 0) {
-                    setEditDocument(item);
-                    setIsFormOpen(true);
-                  }
-                }}
+                onClick={() => handleSingleClick(item)}
+                onDoubleClick={() => handleDoubleClick(item)}
                 sx={{ 
                   display: 'flex', 
                   flexDirection: 'column', 
@@ -171,7 +264,7 @@ export const Documents = () => {
                   '&:hover': { 
                     transform: 'translateY(-4px)', 
                     boxShadow: 6, 
-                    cursor: activeTab === 0 ? 'pointer' : 'default' 
+                    cursor: 'pointer' 
                   } 
                 }}
               >
@@ -196,18 +289,25 @@ export const Documents = () => {
                     <Typography variant="caption" component="div" color="text.secondary">
                       Охоплення: {item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Для всіх підрозділів'}
                     </Typography>
-                    
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Avatar sx={{ width: 20, height: 20 }}>
+                        {item.author?.avatarUrl ? <SecureImage src={item.author.avatarUrl} alt="A" /> : item.author?.firstName?.charAt(0) || '?'}
+                      </Avatar>
+                      <Typography variant="caption" color="text.secondary">
+                        {item.author ? `${item.author.firstName} ${item.author.lastName}` : 'Невідомий автор'}
+                      </Typography>
+                    </Box>
                     <Typography variant="caption" component="div" color="text.disabled">
                       Оновлено: {format(new Date(item.updatedAt), 'dd.MM.yyyy HH:mm')}
                     </Typography>
                   </Box>
                 </CardContent>
                 
-                <CardActions sx={{ justifyContent: 'space-between', borderTop: 1, borderColor: 'divider', px: 2 }}>
+                <CardActions sx={{ justifyContent: 'space-between', borderTop: 1, borderColor: 'divider', px: 2 }} onClick={(e) => e.stopPropagation()}>
                   <Button 
                     size="small" 
                     startIcon={downloadingId === item.id ? <CircularProgress size={14} /> : <VisibilityIcon />} 
-                    onClick={() => handleViewDocument(item)}
+                    onClick={(e) => handleViewDocument(item, e)}
                     disabled={downloadingId === item.id}
                   >
                     Переглянути
