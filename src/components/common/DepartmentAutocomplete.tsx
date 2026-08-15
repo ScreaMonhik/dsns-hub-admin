@@ -30,8 +30,8 @@ export function DepartmentAutocomplete<Multiple extends boolean | undefined = fa
       }
       setLoading(true);
       try {
-        const deps = await departmentsApi.getDepartments(searchQuery);
-        setOptions(deps);
+        const response = await departmentsApi.getDepartments(1, 20, searchQuery);
+        setOptions(response.data);
       } catch (error) {
         console.error('Помилка пошуку підрозділів', error);
       } finally {
