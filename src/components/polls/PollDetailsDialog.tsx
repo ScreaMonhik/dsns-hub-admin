@@ -49,6 +49,17 @@ export const PollDetailsDialog = ({ open, poll, onClose }: Props) => {
                 variant={new Date(poll.expiresAt) < new Date() ? 'filled' : 'outlined'} 
               />
             )}
+            {poll.status === PollStatus.ARCHIVED && (
+              <Chip
+                label={
+                  poll.archivedVisibleUntil && new Date(poll.archivedVisibleUntil) > new Date()
+                    ? `Видиме для користувачів до ${format(new Date(poll.archivedVisibleUntil), 'dd.MM.yyyy')}`
+                    : 'Приховано в архіві'
+                }
+                size="small"
+                color={poll.archivedVisibleUntil && new Date(poll.archivedVisibleUntil) > new Date() ? 'info' : 'default'}
+              />
+            )}
           </Box>
         </Box>
 

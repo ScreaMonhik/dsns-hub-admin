@@ -34,6 +34,7 @@ export interface Poll {
   createdAt: string;
   updatedAt: string;
   expiresAt?: string | null;
+  archivedVisibleUntil?: string | null;
   author?: PollAuthor | null;
   departments: Department[];
   options: PollOption[];
@@ -92,6 +93,11 @@ export const pollsApi = {
 
   deletePoll: async (id: string) => {
     const response = await apiClient.delete(`/polls/${id}`);
+    return response.data;
+  },
+
+  updateVisibility: async (id: string, extendDays: number) => {
+    const response = await apiClient.patch<Poll>(`/polls/${id}/visibility`, { extendDays });
     return response.data;
   },
 };

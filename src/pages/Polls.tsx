@@ -15,8 +15,10 @@ import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import PublicIcon from '@mui/icons-material/Public';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'; // Імпортуємо іконку для копіювання
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { pollsApi, PollStatus, type Poll, type PaginatedPollsResponse } from '../api/pollsApi';
+import { PollVisibilityDialog } from '../components/polls/PollVisibilityDialog';
 import type { Department } from '../api/departmentsApi';
 import { DepartmentAutocomplete } from '../components/common/DepartmentAutocomplete';
 import { PollFormDialog } from '../components/polls/PollFormDialog';
@@ -43,6 +45,7 @@ export const Polls = () => {
   const [deletePollItem, setDeletePollItem] = useState<Poll | null>(null);
   
   const [statusDialogItem, setStatusDialogItem] = useState<{ poll: Poll, targetStatus: PollStatus } | null>(null);
+  const [visibilityPoll, setVisibilityPoll] = useState<Poll | null>(null);
   const [viewPollDetails, setViewPollDetails] = useState<Poll | null>(null);
   const [isDuplicate, setIsDuplicate] = useState(false); // Стан для відслідковування режиму форми
 
@@ -184,7 +187,23 @@ export const Polls = () => {
                   >
                     <TableCell sx={{ maxWidth: 250 }}>{item.title}</TableCell>
                     <TableCell>{item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Всі підрозділи'}</TableCell>
-                    <TableCell>{getStatusChip(item.status)}</TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'flex-start' }}>
+                        {getStatusChip(item.status)}
+                        {item.status === PollStatus.ARCHIVED && (
+                          <Chip
+                            size="small"
+                            variant="outlined"
+                            color={item.archivedVisibleUntil && new Date(item.archivedVisibleUntil) > new Date() ? 'info' : 'default'}
+                            label={
+                              item.archivedVisibleUntil && new Date(item.archivedVisibleUntil) > new Date()
+                                ? `Видиме до ${format(new Date(item.archivedVisibleUntil), 'dd.MM.yyyy')}`
+                                : 'Приховано в архіві'
+                            }
+                          />
+                        )}
+                      </Box>
+                    </TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Avatar sx={{ width: 24, height: 24 }}>
@@ -214,7 +233,18 @@ export const Polls = () => {
                         </>
                       )}
                       {item.status === PollStatus.ARCHIVED && (
-                        <Tooltip title="Відновити в чернетки"><IconButton color="success" onClick={() => setStatusDialogItem({ poll: item, targetStatus: PollStatus.DRAFT })}><UnarchiveIcon /></IconButton></Tooltip>
+                        <>
+                          <Tooltip title="Керувати видимістю в архіві">
+                            <IconButton color="info" onClick={() => setVisibilityPoll(item)}>
+                              <VisibilityIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Відновити в чернетки">
+                            <IconButton color="success" onClick={() => setStatusDialogItem({ poll: item, targetStatus: PollStatus.DRAFT })}>
+                              <UnarchiveIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </>
                       )}
                       <Tooltip title="Видалити"><IconButton color="error" onClick={() => setDeletePollItem(item)}><DeleteIcon /></IconButton></Tooltip>
                     </TableCell>
@@ -244,7 +274,20 @@ export const Polls = () => {
               >
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Typography variant="h6" sx={{ fontSize: '1.1rem', mb: 1 }}>{item.title}</Typography>
-                  <Box sx={{ mb: 2, display: 'flex', gap: 1 }}>{getStatusChip(item.status)}</Box>
+                  <Box sx={{ mb: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    {getStatusChip(item.status)}
+                    {item.status === PollStatus.ARCHIVED && (
+                      <Chip
+                        size="small"
+                        color={item.archivedVisibleUntil && new Date(item.archivedVisibleUntil) > new Date() ? 'info' : 'default'}
+                        label={
+                          item.archivedVisibleUntil && new Date(item.archivedVisibleUntil) > new Date()
+                            ? `Видиме до ${format(new Date(item.archivedVisibleUntil), 'dd.MM.yyyy')}`
+                            : 'Приховано в архіві'
+                        }
+                      />
+                    )}
+                  </Box>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     Охоплення: {item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Загальнонаціональне'}
                   </Typography>
@@ -297,7 +340,18 @@ export const Polls = () => {
                     </>
                   )}
                   {item.status === PollStatus.ARCHIVED && (
-                    <Tooltip title="Відновити в чернетки"><IconButton size="small" color="success" onClick={() => setStatusDialogItem({ poll: item, targetStatus: PollStatus.DRAFT })}><UnarchiveIcon fontSize="small" /></IconButton></Tooltip>
+                    <>
+                      <Tooltip title="Керувати видимістю в архіві">
+                        <IconButton size="small" color="info" onClick={() => setVisibilityPoll(item)}>
+                          <VisibilityIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Відновити в чернетки">
+                        <IconButton size="small" color="success" onClick={() => setStatusDialogItem({ poll: item, targetStatus: PollStatus.DRAFT })}>
+                          <UnarchiveIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </>
                   )}
                   <Tooltip title="Видалити"><IconButton size="small" color="error" onClick={() => setDeletePollItem(item)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
                 </CardActions>
@@ -334,6 +388,13 @@ export const Polls = () => {
         open={!!viewPollDetails}
         poll={viewPollDetails}
         onClose={() => setViewPollDetails(null)}
+      />
+
+      <PollVisibilityDialog
+        open={!!visibilityPoll}
+        poll={visibilityPoll}
+        onClose={() => setVisibilityPoll(null)}
+        onSuccess={fetchData}
       />
     </Box>
   );
