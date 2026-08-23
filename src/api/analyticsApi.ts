@@ -50,6 +50,22 @@ export const analyticsApi = {
     if (endDate) params.endDate = endDate;
     
     const response = await apiClient.get<DashboardAnalyticsResponse>('/analytics/dashboard', { params });
+    
+    // DEBUG: Виводимо сирі дані від бекенду в консоль, щоб перевірити наявність коментарів
+    console.log('RAW JSON FROM BACKEND:', JSON.parse(JSON.stringify(response.data.activityChart)));
+    
+    // Нормалізація даних: гарантуємо, що всі необхідні ключі існують для коректного рендеру Recharts
+    if (response.data && response.data.activityChart) {
+      response.data.activityChart = response.data.activityChart.map(item => ({
+        ...item,
+        newUsers: item.newUsers || 0,
+        newProjects: item.newProjects || 0,
+        votes: item.votes || 0,
+        engagements: item.engagements || 0,
+        comments: item.comments || 0,
+      }));
+    }
+    
     return response.data;
   },
 

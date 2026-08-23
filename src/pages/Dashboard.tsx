@@ -163,18 +163,34 @@ export const Dashboard = () => {
     setActiveLines(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const getDatesForApi = () => {
+  // Тепер функція приймає поточні значення як аргументи (чиста функція)
+  const getDatesForApi = (currentPeriod: string, currentCustomRange: { start: string; end: string }) => {
     const end = new Date();
+    end.setHours(23, 59, 59, 999); // Фіксуємо самий кінець поточного дня
+
     const start = new Date();
-    
-    if (period === '14days') start.setDate(end.getDate() - 14);
-    else if (period === 'month') start.setMonth(end.getMonth() - 1);
-    else if (period === 'year') start.setFullYear(end.getFullYear() - 1);
-    else if (period === 'custom') {
-      return {
-        startDate: customRange.start ? new Date(customRange.start).toISOString() : undefined,
-        endDate: customRange.end ? new Date(customRange.end).toISOString() : undefined
-      };
+    start.setHours(0, 0, 0, 0); // Фіксуємо самий початок стартового дня
+
+    switch (currentPeriod) {
+      case 'month':
+        start.setMonth(end.getMonth() - 1);
+        break;
+      case 'year':
+        start.setFullYear(end.getFullYear() - 1);
+        break;
+      case 'custom':
+        if (currentCustomRange.start && currentCustomRange.end) {
+          return {
+            startDate: new Date(new Date(currentCustomRange.start).setHours(0, 0, 0, 0)).toISOString(),
+            endDate: new Date(new Date(currentCustomRange.end).setHours(23, 59, 59, 999)).toISOString()
+          };
+        }
+        start.setDate(end.getDate() - 14);
+        break;
+      case '14days':
+      default:
+        start.setDate(end.getDate() - 14);
+        break;
     }
 
     return {
@@ -187,7 +203,8 @@ export const Dashboard = () => {
     setExportAnchorEl(null);
     try {
       setExporting(true);
-      const { startDate, endDate } = getDatesForApi();
+      // Передаємо актуальні значення зі стейту
+      const { startDate, endDate } = getDatesForApi(period, customRange);
       await analyticsApi.exportDashboard(format, startDate, endDate);
     } catch (error) {
       console.error('Failed to export data', error);
@@ -200,36 +217,46 @@ export const Dashboard = () => {
   };
 
   useEffect(() => {
-    const fetchStats = async () => {
+    // Додаємо параметр isSilent, щоб знати, чи це фонове оновлення
+    const fetchStats = async (isSilent = false) => {
       try {
-        setLoading(true);
+        // Показуємо лоадер ТІЛЬКИ якщо це перше завантаження (не фонове)
+        if (!isSilent) setLoading(true);
         
-        // Для кастомного діапазону чекаємо, поки користувач обере обидві дати
         if (period === 'custom' && (!customRange.start || !customRange.end)) {
-          setLoading(false);
+          if (!isSilent) setLoading(false);
           return;
         }
 
-        const { startDate, endDate } = getDatesForApi();
+        // Передаємо актуальні значення зі стейту прямо у функцію
+        const { startDate, endDate } = getDatesForApi(period, customRange);
         const res = await analyticsApi.getDashboardData(startDate, endDate);
         
-        // ТИМЧАСОВО ДЛЯ ТЕСТУ: Примусово перезаписуємо масив графіка моковими даними
-        res.activityChart = generateMockChartData(startDate, endDate, period);
-
+        // Використовуємо реальні нормалізовані дані з бекенду
+        // React автоматично перемалює лише змінені цифри, екран не блиматиме
         setData(res);
       } catch (error: any) {
         console.warn('Backend analytics not ready, using mock data.');
-        const { startDate, endDate } = getDatesForApi();
+        const { startDate, endDate } = getDatesForApi(period, customRange);
         setData({
           ...MOCK_DATA,
           activityChart: generateMockChartData(startDate, endDate, period)
         });
       } finally {
-        setLoading(false);
+        if (!isSilent) setLoading(false);
       }
     };
 
-    fetchStats();
+    // 1. Початкове завантаження при відкритті сторінки або зміні фільтру
+    fetchStats(false);
+
+    // 2. Налаштування фонового опитування (Polling) кожні 60 секунд
+    const intervalId = setInterval(() => {
+      fetchStats(true); // true означає "фонове оновлення без лоадера"
+    }, 60000);
+
+    // 3. Очищення таймера при закритті сторінки або зміні фільтрів (щоб не було витоку пам'яті)
+    return () => clearInterval(intervalId);
   }, [period, customRange]); // Оновлюємо дані при зміні періоду
 
   if (!data) {
