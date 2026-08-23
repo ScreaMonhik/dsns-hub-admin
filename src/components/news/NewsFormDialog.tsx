@@ -156,8 +156,8 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
             <Box sx={{ flex: 1 }}>
               <Controller name="status" control={control} render={({ field }) => (
                 <TextField {...field} select label="Статус" fullWidth error={!!errors.status} helperText={errors.status?.message}>
-                  <MenuItem value="DRAFT">Чернетка (DRAFT)</MenuItem>
-                  <MenuItem value="PUBLISHED">Опубліковано (PUBLISHED)</MenuItem>
+                  <MenuItem value="DRAFT">Чернетка</MenuItem>
+                  <MenuItem value="PUBLISHED">Опубліковано</MenuItem>
                 </TextField>
               )}/>
             </Box>

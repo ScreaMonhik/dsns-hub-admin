@@ -27,8 +27,10 @@ import { PollStatusDialog } from '../components/polls/PollStatusDialog';
 import { PollDetailsDialog } from '../components/polls/PollDetailsDialog';
 import { format } from 'date-fns';
 import { SecureImage } from '../components/common/SecureImage';
+import { useSearchParams } from 'react-router-dom';
 
 export const Polls = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [data, setData] = useState<PaginatedPollsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   
@@ -67,6 +69,20 @@ export const Polls = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    const editId = searchParams.get('edit');
+    if (editId) {
+      pollsApi.getPollById(editId)
+        .then((item) => {
+          setEditPoll(item);
+          setIsDuplicate(false);
+          setIsFormOpen(true);
+          setSearchParams({}, { replace: true });
+        })
+        .catch((error) => console.error('Failed to fetch poll for editing', error));
+    }
+  }, [searchParams, setSearchParams]);
 
   // Безпечний масив опитувань, навіть якщо бекенд повернув помилкову структуру
   const pollsList: Poll[] = Array.isArray(data?.data) ? data.data : [];

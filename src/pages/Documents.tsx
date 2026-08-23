@@ -24,8 +24,10 @@ import { DocumentStatusDialog } from '../components/documents/DocumentStatusDial
 import { DeleteDocumentDialog } from '../components/documents/DeleteDocumentDialog';
 import { format } from 'date-fns';
 import { SecureImage } from '../components/common/SecureImage';
+import { useSearchParams } from 'react-router-dom';
 
 export const Documents = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [data, setData] = useState<PaginatedDocumentsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
@@ -71,6 +73,19 @@ export const Documents = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    const editId = searchParams.get('edit');
+    if (editId) {
+      documentsApi.getDocumentById(editId)
+        .then((item) => {
+          setEditDocument(item);
+          setIsFormOpen(true);
+          setSearchParams({}, { replace: true });
+        })
+        .catch((error) => console.error('Failed to fetch document for editing', error));
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);

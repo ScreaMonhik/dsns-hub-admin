@@ -22,9 +22,12 @@ export interface RecentUser {
   createdAt: string;
 }
 
-export interface PendingProject {
+export type DraftEntityType = 'NEWS' | 'PROJECT' | 'POLL' | 'DOCUMENT';
+
+export interface PendingDraft {
   id: string;
   title: string;
+  type: DraftEntityType;
   authorName: string;
   createdAt: string;
 }
@@ -34,7 +37,7 @@ export interface DashboardAnalyticsResponse {
   activityChart: ActivityChartData[];
   recentActivity: {
     latestUsers: RecentUser[];
-    pendingProjects: PendingProject[];
+    pendingDrafts: PendingDraft[];
   };
 }
 

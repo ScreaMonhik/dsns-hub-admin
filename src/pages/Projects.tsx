@@ -29,8 +29,10 @@ import { ProjectDetailsDialog } from '../components/projects/ProjectDetailsDialo
 import { format } from 'date-fns';
 import { SecureImage } from '../components/common/SecureImage';
 import { useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 export const Projects = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [data, setData] = useState<PaginatedProjectsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   
@@ -77,6 +79,19 @@ export const Projects = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    const editId = searchParams.get('edit');
+    if (editId) {
+      projectsApi.getProjectById(editId)
+        .then((item) => {
+          setEditProject(item);
+          setIsFormOpen(true);
+          setSearchParams({}, { replace: true });
+        })
+        .catch((error) => console.error('Failed to fetch project for editing', error));
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);

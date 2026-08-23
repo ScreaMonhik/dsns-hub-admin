@@ -62,6 +62,11 @@ export type NewsPayload = {
 };
 
 export const newsApi = {
+  getNewsById: async (id: string) => {
+    const response = await apiClient.get<News>(`/news/${id}`);
+    return response.data;
+  },
+
   getNews: async (
     page: number = 1, 
     limit: number = 10, 

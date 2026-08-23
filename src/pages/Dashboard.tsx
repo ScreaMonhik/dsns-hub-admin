@@ -1,20 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Box, Typography, Card, CardContent, CircularProgress, Paper, 
-  useTheme, Grid, List, ListItem, ListItemText, ListItemAvatar, Avatar, Divider, Chip
+  useTheme, Grid, List, ListItem, ListItemText, ListItemAvatar, Avatar, Divider, Chip, ListItemButton
 } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import ArticleIcon from '@mui/icons-material/Article';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import DescriptionIcon from '@mui/icons-material/Description';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
 } from 'recharts';
-import { analyticsApi, type DashboardAnalyticsResponse } from '../api/analyticsApi';
+import { analyticsApi, type DashboardAnalyticsResponse, type DraftEntityType } from '../api/analyticsApi';
 import { format } from 'date-fns';
+
+// Configuration for rendering different draft entity types
+const ENTITY_CONFIG: Record<DraftEntityType, { icon: ReactNode; color: string; label: string; path: string }> = {
+  NEWS: { icon: <ArticleIcon />, color: '#3b82f6', label: 'Новина', path: '/news' },
+  PROJECT: { icon: <AssignmentIcon />, color: '#f59e0b', label: 'Проєкт', path: '/projects' },
+  POLL: { icon: <HowToVoteIcon />, color: '#8b5cf6', label: 'Опитування', path: '/polls' },
+  DOCUMENT: { icon: <DescriptionIcon />, color: '#ef4444', label: 'Документ', path: '/documents' },
+};
 
 // Fallback data in case the backend is not ready yet
 const MOCK_DATA: DashboardAnalyticsResponse = {
@@ -39,17 +48,59 @@ const MOCK_DATA: DashboardAnalyticsResponse = {
       { id: '1', firstName: 'Олександр', lastName: 'Коваленко', email: 'o.kovalenko@dsns.gov.ua', createdAt: new Date().toISOString() },
       { id: '2', firstName: 'Марія', lastName: 'Шевченко', email: 'm.shevchenko@dsns.gov.ua', createdAt: new Date().toISOString() },
     ],
-    pendingProjects: [
-      { id: '1', title: 'Оновлення системи оповіщення населення', authorName: 'Іван Петренко', createdAt: new Date().toISOString() },
-      { id: '2', title: 'Закупівля нових пожежних рукавів', authorName: 'Сергій Сидоренко', createdAt: new Date().toISOString() },
+    pendingDrafts: [
+      { id: '1', title: 'Оновлення системи оповіщення', type: 'PROJECT', authorName: 'Іван Петренко', createdAt: new Date().toISOString() },
+      { id: '2', title: 'Вказівки щодо пожежної безпеки', type: 'DOCUMENT', authorName: 'Марія Коваль', createdAt: new Date().toISOString() },
+      { id: '3', title: 'Результати перевірки укриттів', type: 'NEWS', authorName: 'Сергій Сидоренко', createdAt: new Date().toISOString() },
     ]
   }
 };
 
-const PIE_COLORS = ['#10b981', '#f59e0b', '#64748b'];
+const STATUS_COLORS = {
+  projects: ['#10b981', '#f59e0b', '#64748b'],
+  news: ['#3b82f6', '#f59e0b', '#64748b'],
+  users: ['#10b981', '#ef4444'],
+  polls: ['#8b5cf6', '#64748b']
+};
+
+interface StatusPieChartProps {
+  title: string;
+  data: { name: string; value: number }[];
+  colors: string[];
+}
+
+const StatusPieChart = ({ title, data, colors }: StatusPieChartProps) => (
+  <Paper sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Typography variant="h6" sx={{ mb: 2, fontSize: '1rem', fontWeight: 600, textAlign: 'center' }}>
+      {title}
+    </Typography>
+    <Box sx={{ width: '100%', flexGrow: 1, minHeight: 220 }}>
+      <ResponsiveContainer>
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            innerRadius={60}
+            outerRadius={80}
+            paddingAngle={5}
+            dataKey="value"
+          >
+            {data.map((_, index) => (
+              <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+            ))}
+          </Pie>
+          <RechartsTooltip contentStyle={{ borderRadius: 8 }} />
+          <Legend verticalAlign="bottom" height={36} iconType="circle" />
+        </PieChart>
+      </ResponsiveContainer>
+    </Box>
+  </Paper>
+);
 
 export const Dashboard = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const [data, setData] = useState<DashboardAnalyticsResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -91,6 +142,22 @@ export const Dashboard = () => {
     { name: 'В архіві', value: data.summary.projects.archived },
   ];
 
+  const newsStatusData = [
+    { name: 'Опубліковано', value: data.summary.news.published },
+    { name: 'Чернетки', value: data.summary.news.draft },
+    { name: 'В архіві', value: data.summary.news.archived },
+  ];
+
+  const userStatusData = [
+    { name: 'Активні', value: data.summary.users.active },
+    { name: 'Заблоковані', value: data.summary.users.blocked },
+  ];
+
+  const pollStatusData = [
+    { name: 'Активні', value: data.summary.polls.active },
+    { name: 'В архіві', value: data.summary.polls.archived },
+  ];
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       <Typography variant="h4">Аналітична панель</Typography>
@@ -120,8 +187,8 @@ export const Dashboard = () => {
       </Box>
 
       <Grid container spacing={3}>
-        {/* Головний графік активності */}
-        <Grid size={{ xs: 12, lg: 8 }}>
+        {/* Головний графік активності на всю ширину */}
+        <Grid size={{ xs: 12 }}>
           <Paper sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" sx={{ mb: 3 }}>Динаміка залученості (останні 14 днів)</Typography>
             <Box sx={{ width: '100%', height: 350 }}>
@@ -148,37 +215,23 @@ export const Dashboard = () => {
           </Paper>
         </Grid>
 
-        {/* Кругова діаграма статусу проєктів */}
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <Paper sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Typography variant="h6" sx={{ mb: 3 }}>Стан проєктів</Typography>
-            <Box sx={{ width: '100%', flexGrow: 1, minHeight: 300 }}>
-              <ResponsiveContainer>
-                <PieChart>
-                  <Pie
-                    data={projectStatusData}
-                    cx="50%"
-                    cy="45%"
-                    innerRadius={80}
-                    outerRadius={110}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {projectStatusData.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <RechartsTooltip contentStyle={{ borderRadius: 8 }} />
-                  <Legend verticalAlign="bottom" height={36} iconType="circle" />
-                </PieChart>
-              </ResponsiveContainer>
-            </Box>
-          </Paper>
+        {/* 4 Симетричні кругові діаграми */}
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+          <StatusPieChart title="Стан проєктів" data={projectStatusData} colors={STATUS_COLORS.projects} />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+          <StatusPieChart title="Стан новин" data={newsStatusData} colors={STATUS_COLORS.news} />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+          <StatusPieChart title="Опитування" data={pollStatusData} colors={STATUS_COLORS.polls} />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+          <StatusPieChart title="Користувачі" data={userStatusData} colors={STATUS_COLORS.users} />
         </Grid>
 
         {/* Останні зареєстровані користувачі */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Paper sx={{ p: 3 }}>
+          <Paper sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>Нові співробітники</Typography>
             <List disablePadding>
               {data.recentActivity.latestUsers.map((user, idx) => (
@@ -207,30 +260,47 @@ export const Dashboard = () => {
           </Paper>
         </Grid>
 
-        {/* Проєкти на модерації */}
+        {/* Матеріали на модерації */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Paper sx={{ p: 3 }}>
+          <Paper sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>Очікують публікації (Чернетки)</Typography>
             <List disablePadding>
-              {data.recentActivity.pendingProjects.map((project, idx) => (
-                <Box key={project.id}>
-                  <ListItem disableGutters sx={{ py: 1.5 }}>
-                    <ListItemAvatar>
-                      <Avatar sx={{ bgcolor: 'warning.light', color: 'warning.contrastText' }}>
-                        <PendingActionsIcon />
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText 
-                      primary={<Typography variant="body2" sx={{ fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{project.title}</Typography>}
-                      secondary={`Автор: ${project.authorName}`} 
-                    />
-                    <Chip size="small" label="Чернетка" sx={{ ml: 2 }} />
-                  </ListItem>
-                  {idx < data.recentActivity.pendingProjects.length - 1 && <Divider component="li" />}
-                </Box>
-              ))}
-              {data.recentActivity.pendingProjects.length === 0 && (
-                <Typography color="text.secondary" variant="body2" sx={{ py: 2 }}>Усі проєкти опубліковані</Typography>
+              {data.recentActivity.pendingDrafts.map((draft, idx) => {
+                const config = ENTITY_CONFIG[draft.type];
+                
+                return (
+                  <Box key={`${draft.type}-${draft.id}`}>
+                    <ListItem disablePadding sx={{ py: 0.5 }}>
+                      <ListItemButton 
+                        onClick={() => navigate(`${config.path}?edit=${draft.id}`)}
+                        sx={{ borderRadius: 1 }}
+                      >
+                        <ListItemAvatar>
+                          <Avatar sx={{ bgcolor: `${config.color}15`, color: config.color }}>
+                            {config.icon}
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText 
+                          primary={
+                            <Typography variant="body2" sx={{ fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                              {draft.title}
+                            </Typography>
+                          }
+                          secondary={`Автор: ${draft.authorName}`} 
+                        />
+                        <Chip 
+                          size="small" 
+                          label={config.label} 
+                          sx={{ ml: 2, bgcolor: `${config.color}20`, color: config.color, fontWeight: 500 }} 
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                    {idx < data.recentActivity.pendingDrafts.length - 1 && <Divider component="li" />}
+                  </Box>
+                );
+              })}
+              {data.recentActivity.pendingDrafts.length === 0 && (
+                <Typography color="text.secondary" variant="body2" sx={{ py: 2 }}>Нових матеріалів на розгляді немає</Typography>
               )}
             </List>
           </Paper>

@@ -26,8 +26,10 @@ import { RestoreNewsDialog } from '../components/news/RestoreNewsDialog';
 import { NewsDetailsDialog } from '../components/news/NewsDetailsDialog';
 import { useRef } from 'react';
 import { format } from 'date-fns';
+import { useSearchParams } from 'react-router-dom';
 
 export const News = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [data, setData] = useState<NewsListResponse | null>(null);
   const [categories, setCategories] = useState<NewsCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,6 +75,19 @@ export const News = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    const editId = searchParams.get('edit');
+    if (editId) {
+      newsApi.getNewsById(editId)
+        .then((item) => {
+          setEditNews(item);
+          setIsFormOpen(true);
+          setSearchParams({}, { replace: true });
+        })
+        .catch((error) => console.error('Failed to fetch news for editing', error));
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);

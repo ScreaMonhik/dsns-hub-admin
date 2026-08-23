@@ -63,6 +63,11 @@ export interface CreatePollDto {
 export interface UpdatePollDto extends Partial<CreatePollDto> {}
 
 export const pollsApi = {
+  getPollById: async (id: string) => {
+    const response = await apiClient.get<Poll>(`/polls/${id}`);
+    return response.data;
+  },
+
   getPolls: async (
     page: number = 1,
     limit: number = 10,

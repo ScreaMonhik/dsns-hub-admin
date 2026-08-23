@@ -55,6 +55,11 @@ export interface UpdateDocumentPayload {
 }
 
 export const documentsApi = {
+  getDocumentById: async (id: string) => {
+    const response = await apiClient.get<DocumentModel>(`/documents/${id}`);
+    return response.data;
+  },
+
   getDocuments: async (
     page: number = 1,
     limit: number = 10,
