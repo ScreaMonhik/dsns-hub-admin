@@ -12,6 +12,8 @@ export interface ActivityChartData {
   newUsers: number;
   newProjects: number;
   votes: number;
+  engagements: number;
+  comments: number;
 }
 
 export interface RecentUser {
@@ -42,8 +44,12 @@ export interface DashboardAnalyticsResponse {
 }
 
 export const analyticsApi = {
-  getDashboardData: async (): Promise<DashboardAnalyticsResponse> => {
-    const response = await apiClient.get<DashboardAnalyticsResponse>('/analytics/dashboard');
+  getDashboardData: async (startDate?: string, endDate?: string): Promise<DashboardAnalyticsResponse> => {
+    const params: Record<string, string> = {};
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+    
+    const response = await apiClient.get<DashboardAnalyticsResponse>('/analytics/dashboard', { params });
     return response.data;
   },
 };

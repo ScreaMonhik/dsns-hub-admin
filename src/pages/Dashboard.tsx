@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Box, Typography, Card, CardContent, CircularProgress, Paper, 
-  useTheme, Grid, List, ListItem, ListItemText, ListItemAvatar, Avatar, Divider, Chip, ListItemButton
+  useTheme, Grid, List, ListItem, ListItemText, ListItemAvatar, Avatar, Divider, Chip, ListItemButton, TextField, MenuItem
 } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import ArticleIcon from '@mui/icons-material/Article';
@@ -16,6 +16,10 @@ import {
 } from 'recharts';
 import { analyticsApi, type DashboardAnalyticsResponse, type DraftEntityType } from '../api/analyticsApi';
 import { format } from 'date-fns';
+import { uk } from 'date-fns/locale';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 // Configuration for rendering different draft entity types
 const ENTITY_CONFIG: Record<DraftEntityType, { icon: ReactNode; color: string; label: string; path: string }> = {
@@ -26,6 +30,49 @@ const ENTITY_CONFIG: Record<DraftEntityType, { icon: ReactNode; color: string; l
 };
 
 // Fallback data in case the backend is not ready yet
+// Динамічний генератор мокових даних графіка для тестування фільтрів
+const generateMockChartData = (startDateStr?: string, endDateStr?: string, period?: string) => {
+  const end = endDateStr ? new Date(endDateStr) : new Date();
+  const start = startDateStr ? new Date(startDateStr) : new Date();
+  if (!startDateStr) start.setDate(end.getDate() - 14);
+
+  // Спеціальна логіка для графіка за рік (по місяцях)
+  if (period === 'year') {
+    return Array.from({ length: 12 }).map((_, i) => {
+      const d = new Date(end);
+      d.setMonth(d.getMonth() - (11 - i));
+      return {
+        date: format(d, 'MMM yy', { locale: uk }),
+        newUsers: Math.floor(Math.random() * 150) + 50,
+        newProjects: Math.floor(Math.random() * 30) + 10,
+        votes: Math.floor(Math.random() * 4000) + 1000,
+        engagements: Math.floor(Math.random() * 2500) + 500,
+        comments: Math.floor(Math.random() * 800) + 100,
+      };
+    });
+  }
+
+  // Логіка для інших періодів (по днях)
+  const diffTime = Math.abs(end.getTime() - start.getTime());
+  const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+  
+  const pointsCount = diffDays > 31 ? 30 : diffDays;
+  const step = diffDays / pointsCount;
+
+  return Array.from({ length: pointsCount }).map((_, i) => {
+    const d = new Date(start);
+    d.setDate(d.getDate() + (i * step));
+    return {
+      date: format(d, 'dd.MM.yy'),
+      newUsers: Math.floor(Math.random() * 20),
+      newProjects: Math.floor(Math.random() * 5),
+      votes: Math.floor(Math.random() * 500) + 50,
+      engagements: Math.floor(Math.random() * 300) + 10,
+      comments: Math.floor(Math.random() * 100) + 5,
+    };
+  });
+};
+
 const MOCK_DATA: DashboardAnalyticsResponse = {
   summary: {
     users: { total: 1250, active: 1200, blocked: 45, admins: 5 },
@@ -33,16 +80,7 @@ const MOCK_DATA: DashboardAnalyticsResponse = {
     news: { total: 350, draft: 5, published: 300, archived: 45 },
     polls: { total: 45, active: 5, archived: 40, totalVotes: 15420 }
   },
-  activityChart: Array.from({ length: 14 }).map((_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - (13 - i));
-    return {
-      date: format(d, 'dd.MM'),
-      newUsers: Math.floor(Math.random() * 20),
-      newProjects: Math.floor(Math.random() * 5),
-      votes: Math.floor(Math.random() * 500) + 50,
-    };
-  }),
+  activityChart: [], // Буде заповнено динамічно
   recentActivity: {
     latestUsers: [
       { id: '1', firstName: 'Олександр', lastName: 'Коваленко', email: 'o.kovalenko@dsns.gov.ua', createdAt: new Date().toISOString() },
@@ -74,9 +112,9 @@ const StatusPieChart = ({ title, data, colors }: StatusPieChartProps) => (
     <Typography variant="h6" sx={{ mb: 2, fontSize: '1rem', fontWeight: 600, textAlign: 'center' }}>
       {title}
     </Typography>
-    <Box sx={{ width: '100%', flexGrow: 1, minHeight: 220 }}>
+    <Box sx={{ width: '100%', flexGrow: 1, minHeight: 220, '& *, & *:focus, & *:active': { outline: 'none !important' } }}>
       <ResponsiveContainer>
-        <PieChart>
+        <PieChart style={{ outline: 'none' }}>
           <Pie
             data={data}
             cx="50%"
@@ -85,9 +123,10 @@ const StatusPieChart = ({ title, data, colors }: StatusPieChartProps) => (
             outerRadius={80}
             paddingAngle={5}
             dataKey="value"
+            style={{ outline: 'none' }}
           >
             {data.map((_, index) => (
-              <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+              <Cell key={`cell-${index}`} fill={colors[index % colors.length]} style={{ outline: 'none' }} />
             ))}
           </Pie>
           <RechartsTooltip contentStyle={{ borderRadius: 8 }} />
@@ -104,24 +143,74 @@ export const Dashboard = () => {
   const [data, setData] = useState<DashboardAnalyticsResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const [period, setPeriod] = useState<string>('14days');
+  const [customRange, setCustomRange] = useState({ start: '', end: '' });
+
+  const [activeLines, setActiveLines] = useState<Record<string, boolean>>({
+    votes: true,
+    newUsers: true,
+    engagements: true,
+    comments: true,
+  });
+
+  const toggleLine = (key: string) => {
+    setActiveLines(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const getDatesForApi = () => {
+    const end = new Date();
+    const start = new Date();
+    
+    if (period === '14days') start.setDate(end.getDate() - 14);
+    else if (period === 'month') start.setMonth(end.getMonth() - 1);
+    else if (period === 'year') start.setFullYear(end.getFullYear() - 1);
+    else if (period === 'custom') {
+      return {
+        startDate: customRange.start ? new Date(customRange.start).toISOString() : undefined,
+        endDate: customRange.end ? new Date(customRange.end).toISOString() : undefined
+      };
+    }
+
+    return {
+      startDate: start.toISOString(),
+      endDate: end.toISOString()
+    };
+  };
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        const res = await analyticsApi.getDashboardData();
+        
+        // Для кастомного діапазону чекаємо, поки користувач обере обидві дати
+        if (period === 'custom' && (!customRange.start || !customRange.end)) {
+          setLoading(false);
+          return;
+        }
+
+        const { startDate, endDate } = getDatesForApi();
+        const res = await analyticsApi.getDashboardData(startDate, endDate);
+        
+        // ТИМЧАСОВО ДЛЯ ТЕСТУ: Примусово перезаписуємо масив графіка моковими даними
+        res.activityChart = generateMockChartData(startDate, endDate, period);
+
         setData(res);
       } catch (error: any) {
-        console.warn('Backend analytics not ready, using mock data. Error:', error.message);
-        setData(MOCK_DATA);
+        console.warn('Backend analytics not ready, using mock data.');
+        const { startDate, endDate } = getDatesForApi();
+        setData({
+          ...MOCK_DATA,
+          activityChart: generateMockChartData(startDate, endDate, period)
+        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchStats();
-  }, []);
+  }, [period, customRange]); // Оновлюємо дані при зміні періоду
 
-  if (loading || !data) {
+  if (!data) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
         <CircularProgress />
@@ -190,14 +279,100 @@ export const Dashboard = () => {
         {/* Головний графік активності на всю ширину */}
         <Grid size={{ xs: 12 }}>
           <Paper sx={{ p: 3, height: '100%' }}>
-            <Typography variant="h6" sx={{ mb: 3 }}>Динаміка залученості (останні 14 днів)</Typography>
-            <Box sx={{ width: '100%', height: 350 }}>
+            
+            {/* Панель керування фільтрами графіка */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
+              <Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                  <Typography variant="h6">Динаміка залученості</Typography>
+                  {loading && <CircularProgress size={16} />}
+                </Box>
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+                  <TextField
+                    select
+                    size="small"
+                    value={period}
+                    onChange={(e) => setPeriod(e.target.value)}
+                    sx={{ minWidth: 180 }}
+                  >
+                    <MenuItem value="14days">Останні 14 днів</MenuItem>
+                    <MenuItem value="month">Останній місяць</MenuItem>
+                    <MenuItem value="year">Останній рік</MenuItem>
+                    <MenuItem value="custom">Довільний період</MenuItem>
+                  </TextField>
+                  
+                  {period === 'custom' && (
+                    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={uk}>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <DatePicker
+                          label="З"
+                          value={customRange.start ? new Date(customRange.start) : null}
+                          onChange={(newValue) => setCustomRange(p => ({ ...p, start: newValue ? (newValue as Date).toISOString() : '' }))}
+                          slotProps={{ textField: { size: 'small', sx: { width: 150 } } }}
+                        />
+                        <DatePicker
+                          label="По"
+                          value={customRange.end ? new Date(customRange.end) : null}
+                          onChange={(newValue) => setCustomRange(p => ({ ...p, end: newValue ? (newValue as Date).toISOString() : '' }))}
+                          minDate={customRange.start ? new Date(customRange.start) : undefined}
+                          slotProps={{ textField: { size: 'small', sx: { width: 150 } } }}
+                        />
+                      </Box>
+                    </LocalizationProvider>
+                  )}
+                </Box>
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                <Chip
+                  label="Голоси в опитуваннях" 
+                  onClick={() => toggleLine('votes')}
+                  color="info"
+                  variant={activeLines.votes ? 'filled' : 'outlined'}
+                  sx={{ opacity: activeLines.votes ? 1 : 0.5 }}
+                />
+                <Chip 
+                  label="Оцінки (Лайки/Дизлайки)" 
+                  onClick={() => toggleLine('engagements')}
+                  color="success"
+                  variant={activeLines.engagements ? 'filled' : 'outlined'}
+                  sx={{ opacity: activeLines.engagements ? 1 : 0.5 }}
+                />
+                <Chip 
+                  label="Коментарі" 
+                  onClick={() => toggleLine('comments')}
+                  color="warning"
+                  variant={activeLines.comments ? 'filled' : 'outlined'}
+                  sx={{ opacity: activeLines.comments ? 1 : 0.5 }}
+                />
+                <Chip 
+                  label="Нові користувачі" 
+                  onClick={() => toggleLine('newUsers')}
+                  color="primary"
+                  variant={activeLines.newUsers ? 'filled' : 'outlined'}
+                  sx={{ opacity: activeLines.newUsers ? 1 : 0.5 }}
+                />
+              </Box>
+            </Box>
+            <Box sx={{ width: '100%', height: 350, mt: 2, '& *, & *:focus, & *:active': { outline: 'none !important' } }}>
               <ResponsiveContainer>
-                <AreaChart data={data.activityChart} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                <AreaChart 
+                  data={data.activityChart} 
+                  margin={{ top: 5, right: 20, bottom: 5, left: 0 }} 
+                  style={{ outline: 'none' }}
+                >
                   <defs>
                     <linearGradient id="colorVotes" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor={theme.palette.info.main} stopOpacity={0.3}/>
                       <stop offset="95%" stopColor={theme.palette.info.main} stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorEngagements" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={theme.palette.success.main} stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor={theme.palette.success.main} stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorComments" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={theme.palette.warning.main} stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor={theme.palette.warning.main} stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} vertical={false} />
@@ -206,9 +381,13 @@ export const Dashboard = () => {
                   <RechartsTooltip 
                     contentStyle={{ backgroundColor: theme.palette.background.paper, borderColor: theme.palette.divider, borderRadius: 8 }}
                     itemStyle={{ color: theme.palette.text.primary }}
+                    cursor={{ stroke: theme.palette.divider, strokeWidth: 1, fill: 'transparent' }}
+                    itemSorter={(item) => ['votes', 'engagements', 'comments', 'newUsers'].indexOf(item.dataKey as string)}
                   />
-                  <Area type="monotone" name="Голоси в опитуваннях" dataKey="votes" stroke={theme.palette.info.main} fillOpacity={1} fill="url(#colorVotes)" strokeWidth={2} />
-                  <Area type="monotone" name="Нові користувачі" dataKey="newUsers" stroke={theme.palette.primary.main} fill="none" strokeWidth={2} />
+                  {activeLines.votes && <Area type="monotone" name="Голоси в опитуваннях" dataKey="votes" stroke={theme.palette.info.main} fillOpacity={1} fill="url(#colorVotes)" strokeWidth={2} />}
+                  {activeLines.engagements && <Area type="monotone" name="Оцінки (Лайки/Дизлайки)" dataKey="engagements" stroke={theme.palette.success.main} fillOpacity={1} fill="url(#colorEngagements)" strokeWidth={2} />}
+                  {activeLines.comments && <Area type="monotone" name="Коментарі" dataKey="comments" stroke={theme.palette.warning.main} fillOpacity={1} fill="url(#colorComments)" strokeWidth={2} />}
+                  {activeLines.newUsers && <Area type="monotone" name="Нові користувачі" dataKey="newUsers" stroke={theme.palette.primary.main} fill="none" strokeWidth={2} />}
                 </AreaChart>
               </ResponsiveContainer>
             </Box>
