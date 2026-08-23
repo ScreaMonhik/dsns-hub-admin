@@ -5,6 +5,7 @@ import { Login } from './pages/Login';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { ukUA } from '@mui/material/locale';
 import { AdminLayout } from './components/layout/AdminLayout';
+import { Dashboard } from './pages/Dashboard';
 import { Users } from './pages/Users';
 import { News } from './pages/News';
 import { Documents } from './pages/Documents';
@@ -13,13 +14,6 @@ import { Polls } from './pages/Polls';
 import { Chats } from './pages/Chats';
 import { useThemeStore } from './store/themeStore';
 import { Toaster } from 'react-hot-toast';
-
-const DashboardPlaceholder = () => (
-  <div>
-    <h1>Панель Адміністратора</h1>
-    <p>Вітаємо в адмін-панелі DSNS Hub. Оберіть модуль з бокового меню.</p>
-  </div>
-);
 
 function App() {
   const mode = useThemeStore((state) => state.mode);
@@ -104,7 +98,7 @@ function App() {
           
           <Route element={<ProtectedRoute />}>
             <Route element={<AdminLayout />}>
-              <Route path="/" element={<DashboardPlaceholder />} />
+              <Route path="/" element={<Dashboard />} />
               <Route path="/users" element={<Users />} />
               <Route path="/news" element={<News />} />
               <Route path="/documents" element={<Documents />} />

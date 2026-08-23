@@ -1,6 +1,6 @@
 import { 
   Dialog, DialogTitle, DialogContent, DialogContentText, 
-  DialogActions, Button, Box, Alert 
+  DialogActions, Button, Alert 
 } from '@mui/material';
 import { useState } from 'react';
 import { usersApi } from '../../api/usersApi';

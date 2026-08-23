@@ -1,5 +1,6 @@
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Box } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import ArticleIcon from '@mui/icons-material/Article';
 import DescriptionIcon from '@mui/icons-material/Description';
 import AssignmentIcon from '@mui/icons-material/Assignment';
@@ -10,6 +11,7 @@ import ChatIcon from '@mui/icons-material/Chat';
 const DRAWER_WIDTH = 240;
 
 const menuItems = [
+  { text: 'Головна', path: '/', icon: <DashboardIcon /> },
   { text: 'Користувачі', path: '/users', icon: <PeopleIcon /> },
   { text: 'Новини', path: '/news', icon: <ArticleIcon /> },
   { text: 'Документи', path: '/documents', icon: <DescriptionIcon /> },
@@ -34,17 +36,23 @@ export const Sidebar = () => {
       <Toolbar /> {/* Spacer for Header */}
       <Box sx={{ overflow: 'auto' }}>
         <List>
-          {menuItems.map((item) => (
-            <ListItem key={item.text} disablePadding>
-              <ListItemButton
-                selected={location.pathname.startsWith(item.path)}
-                onClick={() => navigate(item.path)}
-              >
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.text} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+          {menuItems.map((item) => {
+            const isSelected = item.path === '/' 
+              ? location.pathname === '/' 
+              : location.pathname.startsWith(item.path);
+
+            return (
+              <ListItem key={item.text} disablePadding>
+                <ListItemButton
+                  selected={isSelected}
+                  onClick={() => navigate(item.path)}
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
         </List>
       </Box>
     </Drawer>
