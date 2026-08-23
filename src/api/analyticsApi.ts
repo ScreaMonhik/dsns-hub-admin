@@ -52,4 +52,27 @@ export const analyticsApi = {
     const response = await apiClient.get<DashboardAnalyticsResponse>('/analytics/dashboard', { params });
     return response.data;
   },
+
+  exportDashboard: async (format: 'csv' | 'pdf', startDate?: string, endDate?: string): Promise<void> => {
+    const params: Record<string, string> = { format };
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+
+    const response = await apiClient.get('/analytics/export', { 
+      params,
+      responseType: 'blob' 
+    });
+
+    // Створення посилання для завантаження файлу
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `dsns_report_${new Date().toISOString().split('T')[0]}.${format}`);
+    document.body.appendChild(link);
+    link.click();
+    
+    // Очищення пам'яті
+    link.parentNode?.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  }
 };

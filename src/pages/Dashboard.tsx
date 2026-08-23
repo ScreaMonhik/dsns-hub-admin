@@ -2,9 +2,12 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Box, Typography, Card, CardContent, CircularProgress, Paper, 
-  useTheme, Grid, List, ListItem, ListItemText, ListItemAvatar, Avatar, Divider, Chip, ListItemButton, TextField, MenuItem
+  useTheme, Grid, List, ListItem, ListItemText, ListItemAvatar, Avatar, Divider, Chip, ListItemButton, TextField, MenuItem, Button, Menu
 } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
+import DownloadIcon from '@mui/icons-material/Download';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import TableChartIcon from '@mui/icons-material/TableChart';
 import ArticleIcon from '@mui/icons-material/Article';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
@@ -143,6 +146,9 @@ export const Dashboard = () => {
   const [data, setData] = useState<DashboardAnalyticsResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
+  const [exporting, setExporting] = useState<boolean>(false);
+
   const [period, setPeriod] = useState<string>('14days');
   const [customRange, setCustomRange] = useState({ start: '', end: '' });
 
@@ -175,6 +181,22 @@ export const Dashboard = () => {
       startDate: start.toISOString(),
       endDate: end.toISOString()
     };
+  };
+
+  const handleExport = async (format: 'csv' | 'pdf') => {
+    setExportAnchorEl(null);
+    try {
+      setExporting(true);
+      const { startDate, endDate } = getDatesForApi();
+      await analyticsApi.exportDashboard(format, startDate, endDate);
+    } catch (error) {
+      console.error('Failed to export data', error);
+      import('react-hot-toast').then(({ default: toast }) => {
+        toast.error('Помилка експорту. Можливо, бекенд ще не підтримує цю функцію.');
+      });
+    } finally {
+      setExporting(false);
+    }
   };
 
   useEffect(() => {
@@ -249,7 +271,31 @@ export const Dashboard = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <Typography variant="h4">Аналітична панель</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+        <Typography variant="h4">Аналітична панель</Typography>
+        <Button 
+          variant="outlined" 
+          startIcon={exporting ? <CircularProgress size={20} color="inherit" /> : <DownloadIcon />}
+          onClick={(e) => setExportAnchorEl(e.currentTarget)}
+          disabled={exporting}
+        >
+          Експорт звіту
+        </Button>
+        <Menu
+          anchorEl={exportAnchorEl}
+          open={Boolean(exportAnchorEl)}
+          onClose={() => setExportAnchorEl(null)}
+        >
+          <MenuItem onClick={() => handleExport('pdf')}>
+            <PictureAsPdfIcon sx={{ mr: 1, color: 'error.main' }} fontSize="small" /> 
+            Завантажити PDF
+          </MenuItem>
+          <MenuItem onClick={() => handleExport('csv')}>
+            <TableChartIcon sx={{ mr: 1, color: 'success.main' }} fontSize="small" /> 
+            Завантажити CSV (Excel)
+          </MenuItem>
+        </Menu>
+      </Box>
 
       {/* Головні показники */}
       <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 3 }}>
