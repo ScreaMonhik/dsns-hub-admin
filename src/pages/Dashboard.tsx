@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Box, Typography, Card, CardContent, CircularProgress, Paper, 
+  Box, Pagination, Typography, Card, CardContent, CircularProgress, Paper, 
   useTheme, Grid, List, ListItem, ListItemText, ListItemAvatar, Avatar, Divider, Chip, ListItemButton, TextField, MenuItem, Button, Menu
 } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
@@ -145,6 +145,10 @@ export const Dashboard = () => {
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardAnalyticsResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Стейт для пагінації чернеток (MUI Pagination починається з 1)
+  const [draftsPage, setDraftsPage] = useState(1);
+  const DRAFTS_PER_PAGE = 5;
 
   const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
   const [exporting, setExporting] = useState<boolean>(false);
@@ -517,43 +521,66 @@ export const Dashboard = () => {
           <Paper sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>Очікують публікації (Чернетки)</Typography>
             <List disablePadding>
-              {data.recentActivity.pendingDrafts.map((draft, idx) => {
-                const config = ENTITY_CONFIG[draft.type];
-                
+              {(() => {
+                const drafts = data.recentActivity.pendingDrafts || [];
+                const totalPages = Math.ceil(drafts.length / DRAFTS_PER_PAGE);
+                const startIndex = (draftsPage - 1) * DRAFTS_PER_PAGE;
+                const currentDrafts = drafts.slice(startIndex, startIndex + DRAFTS_PER_PAGE);
+
+                if (drafts.length === 0) {
+                  return <Typography color="text.secondary" variant="body2" sx={{ py: 2 }}>Нових матеріалів на розгляді немає</Typography>;
+                }
+
                 return (
-                  <Box key={`${draft.type}-${draft.id}`}>
-                    <ListItem disablePadding sx={{ py: 0.5 }}>
-                      <ListItemButton 
-                        onClick={() => navigate(`${config.path}?edit=${draft.id}`)}
-                        sx={{ borderRadius: 1 }}
-                      >
-                        <ListItemAvatar>
-                          <Avatar sx={{ bgcolor: `${config.color}15`, color: config.color }}>
-                            {config.icon}
-                          </Avatar>
-                        </ListItemAvatar>
-                        <ListItemText 
-                          primary={
-                            <Typography variant="body2" sx={{ fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                              {draft.title}
-                            </Typography>
-                          }
-                          secondary={`Автор: ${draft.authorName}`} 
-                        />
-                        <Chip 
+                  <Box>
+                    {currentDrafts.map((draft, idx) => {
+                      const config = ENTITY_CONFIG[draft.type];
+                      return (
+                        <Box key={`${draft.type}-${draft.id}`}>
+                          <ListItem disablePadding sx={{ py: 0.5 }}>
+                            <ListItemButton 
+                              onClick={() => navigate(`${config.path}?edit=${draft.id}`)}
+                              sx={{ borderRadius: 1 }}
+                            >
+                              <ListItemAvatar>
+                                <Avatar sx={{ bgcolor: `${config.color}15`, color: config.color }}>
+                                  {config.icon}
+                                </Avatar>
+                              </ListItemAvatar>
+                              <ListItemText 
+                                primary={
+                                  <Typography variant="body2" sx={{ fontWeight: 600, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                    {draft.title}
+                                  </Typography>
+                                }
+                                secondary={`Автор: ${draft.authorName}`} 
+                              />
+                              <Chip 
+                                size="small" 
+                                label={config.label} 
+                                sx={{ ml: 2, bgcolor: `${config.color}20`, color: config.color, fontWeight: 500 }} 
+                              />
+                            </ListItemButton>
+                          </ListItem>
+                          {idx < currentDrafts.length - 1 && <Divider component="li" />}
+                        </Box>
+                      );
+                    })}
+                    
+                    {totalPages > 1 && (
+                      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, pt: 1 }}>
+                        <Pagination 
+                          count={totalPages} 
+                          page={draftsPage} 
+                          onChange={(_, value) => setDraftsPage(value)} 
+                          color="primary" 
                           size="small" 
-                          label={config.label} 
-                          sx={{ ml: 2, bgcolor: `${config.color}20`, color: config.color, fontWeight: 500 }} 
                         />
-                      </ListItemButton>
-                    </ListItem>
-                    {idx < data.recentActivity.pendingDrafts.length - 1 && <Divider component="li" />}
+                      </Box>
+                    )}
                   </Box>
                 );
-              })}
-              {data.recentActivity.pendingDrafts.length === 0 && (
-                <Typography color="text.secondary" variant="body2" sx={{ py: 2 }}>Нових матеріалів на розгляді немає</Typography>
-              )}
+              })()}
             </List>
           </Paper>
         </Grid>
