@@ -487,12 +487,14 @@ export const Dashboard = () => {
 
         {/* Останні зареєстровані користувачі */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Paper sx={{ p: 3, height: '100%' }}>
+          {/* Додаємо таку ж мінімальну висоту картки, як і у чернеток */}
+          <Paper sx={{ p: 3, height: '100%', minHeight: 525, display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>Нові співробітники</Typography>
-            <List disablePadding>
+            <List disablePadding sx={{ height: 380, overflow: 'hidden' }}>
               {data.recentActivity.latestUsers.map((user, idx) => (
                 <Box key={user.id}>
-                  <ListItem disableGutters sx={{ py: 1.5 }}>
+                  {/* Задаємо жорстку висоту 72px для ідеального вирівнювання */}
+                  <ListItem disableGutters sx={{ height: 72 }}>
                     <ListItemAvatar>
                       <Avatar sx={{ bgcolor: 'primary.main' }}>
                         <AccountCircleIcon />
@@ -518,29 +520,33 @@ export const Dashboard = () => {
 
         {/* Матеріали на модерації */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Paper sx={{ p: 3, height: '100%' }}>
+          {/* Фіксуємо мінімальну висоту всієї картки (приблизно 525px, як для 5 елементів) */}
+          <Paper sx={{ p: 3, height: '100%', minHeight: 525, display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>Очікують публікації (Чернетки)</Typography>
-            <List disablePadding>
-              {(() => {
-                const drafts = data.recentActivity.pendingDrafts || [];
-                const totalPages = Math.ceil(drafts.length / DRAFTS_PER_PAGE);
-                const startIndex = (draftsPage - 1) * DRAFTS_PER_PAGE;
-                const currentDrafts = drafts.slice(startIndex, startIndex + DRAFTS_PER_PAGE);
+            
+            {(() => {
+              const drafts = data.recentActivity.pendingDrafts || [];
+              const totalPages = Math.ceil(drafts.length / DRAFTS_PER_PAGE);
+              const startIndex = (draftsPage - 1) * DRAFTS_PER_PAGE;
+              const currentDrafts = drafts.slice(startIndex, startIndex + DRAFTS_PER_PAGE);
 
-                if (drafts.length === 0) {
-                  return <Typography color="text.secondary" variant="body2" sx={{ py: 2 }}>Нових матеріалів на розгляді немає</Typography>;
-                }
+              if (drafts.length === 0) {
+                return <Typography color="text.secondary" variant="body2" sx={{ py: 2 }}>Нових матеріалів на розгляді немає</Typography>;
+              }
 
-                return (
-                  <Box>
+              return (
+                <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                  {/* Замість minHeight задаємо жорстку висоту для списку та обрізаємо зайве */}
+                  <List disablePadding sx={{ height: 380, overflow: 'hidden' }}>
                     {currentDrafts.map((draft, idx) => {
                       const config = ENTITY_CONFIG[draft.type];
                       return (
                         <Box key={`${draft.type}-${draft.id}`}>
-                          <ListItem disablePadding sx={{ py: 0.5 }}>
+                          {/* Задаємо жорстку висоту 72px для ідеального вирівнювання */}
+                          <ListItem disablePadding sx={{ height: 72 }}>
                             <ListItemButton 
                               onClick={() => navigate(`${config.path}?edit=${draft.id}`)}
-                              sx={{ borderRadius: 1 }}
+                              sx={{ borderRadius: 1, height: '100%' }}
                             >
                               <ListItemAvatar>
                                 <Avatar sx={{ bgcolor: `${config.color}15`, color: config.color }}>
@@ -566,22 +572,22 @@ export const Dashboard = () => {
                         </Box>
                       );
                     })}
-                    
-                    {totalPages > 1 && (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, pt: 1 }}>
-                        <Pagination 
-                          count={totalPages} 
-                          page={draftsPage} 
-                          onChange={(_, value) => setDraftsPage(value)} 
-                          color="primary" 
-                          size="small" 
-                        />
-                      </Box>
-                    )}
-                  </Box>
-                );
-              })()}
-            </List>
+                  </List>
+                  
+                  {totalPages > 1 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 'auto', pt: 2 }}>
+                      <Pagination 
+                        count={totalPages} 
+                        page={draftsPage} 
+                        onChange={(_, value) => setDraftsPage(value)} 
+                        color="primary" 
+                        size="small" 
+                      />
+                    </Box>
+                  )}
+                </Box>
+              );
+            })()}
           </Paper>
         </Grid>
       </Grid>
