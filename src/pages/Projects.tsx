@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { 
   Box, Typography, Button, Paper, Pagination, CircularProgress,
   IconButton, Tooltip, Chip, MenuItem, TextField, Card, CardContent, CardActions, Tabs, Tab,
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, ToggleButton, ToggleButtonGroup, Avatar
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, ToggleButton, ToggleButtonGroup, Avatar, Skeleton
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -200,7 +200,87 @@ export const Projects = () => {
         </Box>
 
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}><CircularProgress /></Box>
+          viewMode === 'table' ? (
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Назва проєкту</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Охоплення</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Статус</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Автор</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Створено</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Статистика</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 'bold' }}>Дії</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {Array.from({ length: 5 }).map((_, idx) => (
+                    <TableRow key={idx}>
+                      <TableCell><Skeleton variant="text" width={240} /></TableCell>
+                      <TableCell><Skeleton variant="text" width={140} /></TableCell>
+                      <TableCell><Skeleton variant="rounded" width={90} height={24} sx={{ borderRadius: 4 }} /></TableCell>
+                      <TableCell><Skeleton variant="text" width={120} /></TableCell>
+                      <TableCell><Skeleton variant="text" width={80} /></TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 1.5 }}>
+                          <Skeleton variant="circular" width={20} height={20} />
+                          <Skeleton variant="circular" width={20} height={20} />
+                          <Skeleton variant="circular" width={20} height={20} />
+                        </Box>
+                      </TableCell>
+                      <TableCell align="right">
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                          <Skeleton variant="circular" width={32} height={32} />
+                          <Skeleton variant="circular" width={32} height={32} />
+                          <Skeleton variant="circular" width={32} height={32} />
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ) : (
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 2 }}>
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <Card key={idx} sx={{ display: 'flex', flexDirection: 'column', height: 280 }}>
+                  <CardContent sx={{ flexGrow: 1 }}>
+                    <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start', mb: 1.5 }}>
+                      <Skeleton variant="rounded" width={40} height={40} />
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Skeleton variant="text" width="90%" height={28} sx={{ mb: 0.5 }} />
+                        <Skeleton variant="rounded" width={90} height={24} sx={{ borderRadius: 4 }} />
+                      </Box>
+                    </Box>
+                    <Skeleton variant="text" width="100%" />
+                    <Skeleton variant="text" width="100%" />
+                    <Skeleton variant="text" width="60%" sx={{ mb: 1.5 }} />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mt: 'auto', mb: 1.5 }}>
+                      <Skeleton variant="text" width="50%" />
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Skeleton variant="circular" width={20} height={20} />
+                        <Skeleton variant="text" width="40%" />
+                      </Box>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', pt: 1.5, borderTop: '1px dashed', borderColor: 'divider' }}>
+                      <Skeleton variant="text" width={30} />
+                      <Skeleton variant="text" width={30} />
+                      <Skeleton variant="text" width={30} />
+                    </Box>
+                  </CardContent>
+                  <CardActions sx={{ justifyContent: 'space-between', borderTop: 1, borderColor: 'divider', px: 2 }}>
+                    <Skeleton variant="text" width={100} height={32} />
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Skeleton variant="circular" width={28} height={28} />
+                      <Skeleton variant="circular" width={28} height={28} />
+                      <Skeleton variant="circular" width={28} height={28} />
+                    </Box>
+                  </CardActions>
+                </Card>
+              ))}
+            </Box>
+          )
         ) : viewMode === 'table' ? (
           <TableContainer>
             <Table>

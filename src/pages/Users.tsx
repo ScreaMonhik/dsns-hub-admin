@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { 
   Box, Typography, Button, Paper, Table, TableBody, TableCell, 
   TableContainer, TableHead, TableRow, Pagination, CircularProgress,
-  OutlinedInput, InputAdornment, IconButton, Tooltip, Chip
+  OutlinedInput, InputAdornment, IconButton, Tooltip, Chip, Skeleton
 } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import EditIcon from '@mui/icons-material/Edit';
@@ -95,11 +95,23 @@ export const Users = () => {
             </TableHead>
             <TableBody>
               {loading ? (
-                <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
-                    <CircularProgress />
-                  </TableCell>
-                </TableRow>
+                Array.from({ length: 5 }).map((_, idx) => (
+                  <TableRow key={idx}>
+                    <TableCell><Skeleton variant="text" width={180} /></TableCell>
+                    <TableCell><Skeleton variant="text" width={220} /></TableCell>
+                    <TableCell><Skeleton variant="text" width={100} /></TableCell>
+                    <TableCell>
+                      <Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: 4 }} />
+                    </TableCell>
+                    <TableCell align="right">
+                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                        <Skeleton variant="circular" width={32} height={32} />
+                        <Skeleton variant="circular" width={32} height={32} />
+                        <Skeleton variant="circular" width={32} height={32} />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))
               ) : data?.data.map((user) => (
                 <TableRow key={user.id} hover>
                   <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>

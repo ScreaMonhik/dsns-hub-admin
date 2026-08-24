@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Box, Button, TextField, Typography, Container, Alert } from '@mui/material';
+import { Box, Button, TextField, Typography, Container, Alert, CircularProgress } from '@mui/material';
 import { useAuthStore, type User } from '../store/authStore';
 import { apiClient } from '../api/apiClient';
 
@@ -97,10 +97,11 @@ export const Login = () => {
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            sx={{ mt: 3, mb: 2, height: 48 }}
             disabled={isSubmitting}
+            startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : undefined}
           >
-            {isSubmitting ? 'Вхід...' : 'Увійти'}
+            {isSubmitting ? 'Виконується вхід...' : 'Увійти'}
           </Button>
         </Box>
       </Box>

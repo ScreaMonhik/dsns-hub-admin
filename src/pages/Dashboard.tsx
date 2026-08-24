@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Box, Pagination, Typography, Card, CardContent, CircularProgress, Paper, 
-  useTheme, Grid, List, ListItem, ListItemText, ListItemAvatar, Avatar, Divider, Chip, ListItemButton, TextField, MenuItem, Button, Menu
+  useTheme, Grid, List, ListItem, ListItemText, ListItemAvatar, Avatar, Divider, Chip, ListItemButton, TextField, MenuItem, Button, Menu, Skeleton
 } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -265,8 +265,92 @@ export const Dashboard = () => {
 
   if (!data) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <CircularProgress />
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        {/* Заголовок та кнопка експорту */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Skeleton variant="text" width={240} height={40} />
+          <Skeleton variant="rounded" width={140} height={36} />
+        </Box>
+
+        {/* 4 Картки основних показників */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 3 }}>
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <Card key={idx}>
+              <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <Box sx={{ width: '60%' }}>
+                  <Skeleton variant="text" width="80%" height={20} />
+                  <Skeleton variant="text" width="60%" height={40} />
+                  <Skeleton variant="text" width="50%" height={16} />
+                </Box>
+                <Skeleton variant="rounded" width={48} height={48} />
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
+
+        <Grid container spacing={3}>
+          {/* Головний графік */}
+          <Grid size={{ xs: 12 }}>
+            <Paper sx={{ p: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+                <Skeleton variant="text" width={200} height={32} />
+                <Skeleton variant="rounded" width={180} height={36} />
+              </Box>
+              <Skeleton variant="rounded" width="100%" height={350} />
+            </Paper>
+          </Grid>
+
+          {/* 4 Кругові діаграми */}
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <Grid key={idx} size={{ xs: 12, sm: 6, lg: 3 }}>
+              <Paper sx={{ p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Skeleton variant="text" width={120} height={24} sx={{ mb: 2 }} />
+                <Skeleton variant="circular" width={160} height={160} />
+              </Paper>
+            </Grid>
+          ))}
+
+          {/* Список нових співробітників */}
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Paper sx={{ p: 3, height: '100%', minHeight: 525 }}>
+              <Skeleton variant="text" width={180} height={32} sx={{ mb: 2 }} />
+              <List disablePadding sx={{ height: 380 }}>
+                {Array.from({ length: 5 }).map((_, idx) => (
+                  <ListItem key={idx} disableGutters sx={{ height: 72 }}>
+                    <ListItemAvatar>
+                      <Skeleton variant="circular" width={40} height={40} />
+                    </ListItemAvatar>
+                    <ListItemText 
+                      primary={<Skeleton variant="text" width="60%" />} 
+                      secondary={<Skeleton variant="text" width="40%" />} 
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Paper>
+          </Grid>
+
+          {/* Список чернеток */}
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Paper sx={{ p: 3, height: '100%', minHeight: 525 }}>
+              <Skeleton variant="text" width={220} height={32} sx={{ mb: 2 }} />
+              <List disablePadding sx={{ height: 380 }}>
+                {Array.from({ length: 5 }).map((_, idx) => (
+                  <ListItem key={idx} disablePadding sx={{ height: 72 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', px: 2 }}>
+                      <Skeleton variant="circular" width={40} height={40} sx={{ mr: 2 }} />
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Skeleton variant="text" width="70%" />
+                        <Skeleton variant="text" width="40%" />
+                      </Box>
+                      <Skeleton variant="rounded" width={60} height={24} />
+                    </Box>
+                  </ListItem>
+                ))}
+              </List>
+            </Paper>
+          </Grid>
+        </Grid>
       </Box>
     );
   }
