@@ -10,6 +10,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { pollsApi, PollStatus, type Poll } from '../../api/pollsApi';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { uk } from 'date-fns/locale';
 import { DepartmentAutocomplete } from '../common/DepartmentAutocomplete';
 import type { Department } from '../../api/departmentsApi';
 
@@ -211,16 +215,25 @@ export const PollFormDialog = ({ open, poll, onClose, onSuccess, isDuplicate }: 
             <TextField {...field} label="Опис (необов'язково)" multiline rows={2} fullWidth />
           )}/>
 
-          <Controller name="expiresAt" control={control} render={({ field }) => (
-            <TextField 
-              {...field} 
-              type="datetime-local" 
-              label="Дата та час завершення (необов'язково)" 
-              slotProps={{ inputLabel: { shrink: true } }}
-              fullWidth 
-              error={!!errors.expiresAt}
-              helperText={errors.expiresAt?.message || 'Якщо вказано, опитування автоматично завершиться в цей час'}
-            />
+          <Controller name="expiresAt" control={control} render={({ field: { onChange, value, ...restField } }) => (
+            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={uk}>
+              <DateTimePicker
+                {...restField}
+                label="Дата та час завершення (необов'язково)"
+                value={value ? new Date(value) : null}
+                disablePast
+                onChange={(newValue) => {
+                  onChange(newValue ? (newValue as Date).toISOString() : '');
+                }}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    error: !!errors.expiresAt,
+                    helperText: errors.expiresAt?.message || 'Якщо вказано, опитування автоматично завершиться в цей час',
+                  }
+                }}
+              />
+            </LocalizationProvider>
           )}/>
 
           <Box>
