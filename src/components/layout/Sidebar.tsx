@@ -7,22 +7,26 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import PeopleIcon from '@mui/icons-material/People';
 import ChatIcon from '@mui/icons-material/Chat';
+import SecurityIcon from '@mui/icons-material/Security';
+import { useAuthStore } from '../../store/authStore';
 
 const DRAWER_WIDTH = 240;
-
-const menuItems = [
-  { text: 'Головна', path: '/', icon: <DashboardIcon /> },
-  { text: 'Користувачі', path: '/users', icon: <PeopleIcon /> },
-  { text: 'Новини', path: '/news', icon: <ArticleIcon /> },
-  { text: 'Документи', path: '/documents', icon: <DescriptionIcon /> },
-  { text: 'Проєкти', path: '/projects', icon: <AssignmentIcon /> },
-  { text: 'Опитування', path: '/polls', icon: <HowToVoteIcon /> },
-  { text: 'Чати', path: '/chats', icon: <ChatIcon /> },
-];
 
 export const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuthStore();
+
+  const menuItems = [
+    { text: 'Головна', path: '/', icon: <DashboardIcon /> },
+    { text: 'Користувачі', path: '/users', icon: <PeopleIcon /> },
+    { text: 'Новини', path: '/news', icon: <ArticleIcon /> },
+    { text: 'Документи', path: '/documents', icon: <DescriptionIcon /> },
+    { text: 'Проєкти', path: '/projects', icon: <AssignmentIcon /> },
+    { text: 'Опитування', path: '/polls', icon: <HowToVoteIcon /> },
+    { text: 'Чати', path: '/chats', icon: <ChatIcon /> },
+    ...(user?.role === 'SUPER_ADMIN' ? [{ text: 'Аудит', path: '/audit-logs', icon: <SecurityIcon /> }] : []),
+  ];
 
   return (
     <Drawer

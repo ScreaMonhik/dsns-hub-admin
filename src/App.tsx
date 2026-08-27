@@ -12,6 +12,7 @@ import { Documents } from './pages/Documents';
 import { Projects } from './pages/Projects';
 import { Polls } from './pages/Polls';
 import { Chats } from './pages/Chats';
+import { AuditLogs } from './pages/AuditLogs';
 import { useThemeStore } from './store/themeStore';
 import { Toaster } from 'react-hot-toast';
 
@@ -105,6 +106,7 @@ function App() {
               <Route path="/projects" element={<Projects />} />
               <Route path="/polls" element={<Polls />} />
               <Route path="/chats" element={<Chats />} />
+              <Route path="/audit-logs" element={<AuditLogs />} />
             </Route>
           </Route>
 

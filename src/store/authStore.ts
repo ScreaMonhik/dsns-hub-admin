@@ -6,7 +6,7 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  role: 'ADMIN' | 'USER';
+  role: 'SUPER_ADMIN' | 'ADMIN' | 'USER';
   isActive: boolean;
   avatarUrl: string | null;
   createdAt: string;

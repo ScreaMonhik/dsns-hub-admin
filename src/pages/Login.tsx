@@ -40,8 +40,8 @@ export const Login = () => {
       
       const { accessToken, refreshToken, user } = response.data;
       
-      if (user.role !== 'ADMIN') {
-        setErrorMsg('Доступ заборонено. Потрібні права адміністратора.');
+      if (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN') {
+        setErrorMsg('Доступ заборонено. Потрібні права адміністратора або суперадміністратора.');
         return;
       }
 

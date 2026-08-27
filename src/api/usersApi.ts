@@ -15,7 +15,7 @@ export type CreateUserPayload = Omit<User, 'id' | 'createdAt' | 'avatarUrl'> & {
 export interface UpdateUserPayload {
   firstName?: string;
   lastName?: string;
-  role?: 'ADMIN' | 'USER';
+  role?: 'SUPER_ADMIN' | 'ADMIN' | 'USER';
   isActive?: boolean;
 }
 

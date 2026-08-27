@@ -8,8 +8,7 @@ export const ProtectedRoute = () => {
     return <Navigate to="/login" replace />;
   }
 
-  if (user?.role !== 'ADMIN') {
-    // Optionally redirect to a 403 Forbidden page, but login is safer for forced re-auth
+  if (user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN') {
     return <Navigate to="/login" replace />;
   }
 

@@ -7,6 +7,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { usersApi, type CreateUserPayload } from '../../api/usersApi';
+import { useAuthStore } from '../../store/authStore';
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
@@ -15,7 +16,7 @@ const createUserSchema = z.object({
   password: z.string().regex(passwordRegex, 'Мінімум 8 символів. Обов\'язково: велика і мала літери, цифра, спецсимвол.'),
   firstName: z.string().min(2, "Обов'язкове поле"),
   lastName: z.string().min(2, "Обов'язкове поле"),
-  role: z.enum(['ADMIN', 'USER']),
+  role: z.enum(['SUPER_ADMIN', 'ADMIN', 'USER']),
   isActive: z.boolean(),
 });
 
@@ -28,6 +29,7 @@ interface Props {
 }
 
 export const CreateUserDialog = ({ open, onClose, onSuccess }: Props) => {
+  const currentUser = useAuthStore((state) => state.user);
   const [apiError, setApiError] = useState<string | null>(null);
 
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormInputs>({
@@ -97,6 +99,9 @@ export const CreateUserDialog = ({ open, onClose, onSuccess }: Props) => {
                 <TextField {...field} select label="Роль" error={!!errors.role} helperText={errors.role?.message} fullWidth>
                   <MenuItem value="USER">Користувач</MenuItem>
                   <MenuItem value="ADMIN">Адміністратор</MenuItem>
+                  {currentUser?.role === 'SUPER_ADMIN' && (
+                    <MenuItem value="SUPER_ADMIN">Супер-адміністратор</MenuItem>
+                  )}
                 </TextField>
               )}
             />

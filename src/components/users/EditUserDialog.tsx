@@ -7,12 +7,12 @@ import {
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { usersApi, type UpdateUserPayload } from '../../api/usersApi';
-import type { User } from '../../store/authStore';
+import { useAuthStore, type User } from '../../store/authStore';
 
 const editUserSchema = z.object({
   firstName: z.string().min(2, "Обов'язкове поле"),
   lastName: z.string().min(2, "Обов'язкове поле"),
-  role: z.enum(['ADMIN', 'USER']),
+  role: z.enum(['SUPER_ADMIN', 'ADMIN', 'USER']),
   isActive: z.boolean(),
 });
 
@@ -26,6 +26,7 @@ interface Props {
 }
 
 export const EditUserDialog = ({ open, user, onClose, onSuccess }: Props) => {
+  const currentUser = useAuthStore((state) => state.user);
   const [apiError, setApiError] = useState<string | null>(null);
 
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormInputs>({
@@ -86,6 +87,9 @@ export const EditUserDialog = ({ open, user, onClose, onSuccess }: Props) => {
                 <TextField {...field} select label="Роль" error={!!errors.role} helperText={errors.role?.message} fullWidth>
                   <MenuItem value="USER">Користувач</MenuItem>
                   <MenuItem value="ADMIN">Адміністратор</MenuItem>
+                  {currentUser?.role === 'SUPER_ADMIN' && (
+                    <MenuItem value="SUPER_ADMIN">Супер-адміністратор</MenuItem>
+                  )}
                 </TextField>
               )}
             />
