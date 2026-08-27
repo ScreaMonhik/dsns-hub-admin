@@ -103,9 +103,21 @@ export const NewsDetailsDialog = ({ open, news, onClose, onRefreshList }: Props)
             <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>{news.title}</Typography>
             
             <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap', alignItems: 'center' }}>
-              <Chip label={news.status === 'PUBLISHED' ? 'Опубліковано' : news.status === 'ARCHIVED' ? 'В архіві' : 'Чернетка'} color={news.status === 'PUBLISHED' ? 'success' : news.status === 'ARCHIVED' ? 'warning' : 'default'} size="small" />
+              <Chip 
+                label={
+                  news.status === 'PUBLISHED' ? 'Опубліковано' : 
+                  news.status === 'SCHEDULED' ? 'Заплановано' : 
+                  news.status === 'ARCHIVED' ? 'В архіві' : 'Чернетка'
+                } 
+                color={
+                  news.status === 'PUBLISHED' ? 'success' : 
+                  news.status === 'SCHEDULED' ? 'info' : 
+                  news.status === 'ARCHIVED' ? 'warning' : 'default'
+                } 
+                size="small" 
+              />
               {news.category && <Chip label={news.category.name} size="small" variant="outlined" />}
-              <Chip label={format(new Date(news.createdAt), 'dd.MM.yyyy HH:mm')} size="small" variant="outlined" />
+              <Chip label={format(new Date(news.publishedAt || news.createdAt), 'dd.MM.yyyy HH:mm')} size="small" variant="outlined" />
               <Chip 
                 label={`${news.author.firstName} ${news.author.lastName}`} 
                 size="small" 

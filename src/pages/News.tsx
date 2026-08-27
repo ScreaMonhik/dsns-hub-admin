@@ -137,6 +137,16 @@ export const News = () => {
     }
   };
 
+  const getNewsStatusChip = (status: NewsStatus) => {
+    switch (status) {
+      case 'PUBLISHED': return <Chip label="Опубліковано" color="success" size="small" />;
+      case 'SCHEDULED': return <Chip label="Заплановано" color="info" size="small" />;
+      case 'ARCHIVED': return <Chip label="В архіві" color="warning" size="small" />;
+      case 'DRAFT': return <Chip label="Чернетка" color="default" size="small" />;
+      default: return <Chip label={status} size="small" />;
+    }
+  };
+
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -175,6 +185,7 @@ export const News = () => {
               <TextField select size="small" label="Статус" value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value as NewsStatus | ''); setPage(1); }} sx={{ minWidth: 160 }}>
                 <MenuItem value="">Всі активні</MenuItem>
                 <MenuItem value="PUBLISHED">Опубліковано</MenuItem>
+                <MenuItem value="SCHEDULED">Заплановано</MenuItem>
                 <MenuItem value="DRAFT">Чернетка</MenuItem>
               </TextField>
             )}
@@ -224,9 +235,9 @@ export const News = () => {
                       <TableCell><Skeleton variant="text" width={240} /></TableCell>
                       <TableCell><Skeleton variant="text" width={140} /></TableCell>
                       <TableCell><Skeleton variant="text" width={100} /></TableCell>
-                      <TableCell><Skeleton variant="rounded" width={90} height={24} sx={{ borderRadius: 4 }} /></TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <TableCell><Skeleton variant="rounded" width={90} height={24} sx={{ borderRadius: 4 }} /></TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Skeleton variant="circular" width={24} height={24} />
                           <Skeleton variant="text" width={110} />
                         </Box>
@@ -315,13 +326,7 @@ export const News = () => {
                     </TableCell>
                     <TableCell>{item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Всі підрозділи'}</TableCell>
                     <TableCell>{item.category?.name || '—'}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={item.status === 'PUBLISHED' ? 'Опубліковано' : item.status === 'ARCHIVED' ? 'В архіві' : 'Чернетка'}
-                        color={item.status === 'PUBLISHED' ? 'success' : item.status === 'ARCHIVED' ? 'warning' : 'default'} 
-                        size="small" 
-                      />
-                    </TableCell>
+                    <TableCell>{getNewsStatusChip(item.status)}</TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Avatar sx={{ width: 24, height: 24 }}>
@@ -425,7 +430,7 @@ export const News = () => {
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1, mb: 1, flexWrap: 'wrap' }}>
                     <Chip size="small" label={item.category?.name || 'Без категорії'} variant="outlined" />
-                    <Chip size="small" label={item.status === 'PUBLISHED' ? 'Опубліковано' : item.status === 'ARCHIVED' ? 'В архіві' : 'Чернетка'} color={item.status === 'PUBLISHED' ? 'success' : item.status === 'ARCHIVED' ? 'warning' : 'default'} />
+                    {getNewsStatusChip(item.status)}
                   </Box>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     Охоплення: {item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Загальнонаціональне'}

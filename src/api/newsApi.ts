@@ -1,6 +1,6 @@
 import { apiClient } from './apiClient';
 
-export type NewsStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+export type NewsStatus = 'DRAFT' | 'PUBLISHED' | 'SCHEDULED' | 'ARCHIVED';
 
 export interface NewsCategory {
   id: string;
@@ -13,6 +13,7 @@ export interface News {
   content: string;
   imageUrl: string | null;
   status: NewsStatus;
+  publishedAt?: string | null;
   categoryId: string | null;
   category: NewsCategory | null;
   departments?: { id: string; name: string }[];
@@ -57,6 +58,7 @@ export type NewsPayload = {
   content: string;
   imageUrl: string | null;
   status: NewsStatus;
+  publishedAt?: string | null;
   categoryId: string | null;
   departmentIds?: string[];
 };

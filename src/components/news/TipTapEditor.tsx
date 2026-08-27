@@ -463,10 +463,44 @@ export const TipTapViewer = ({ value }: { value: string }) => {
     })(),
   });
 
+  useEffect(() => {
+    if (!editor || value === undefined) return;
+
+    let isJson = false;
+    let parsedValue: any = value;
+
+    if (typeof value === 'string') {
+      try {
+        parsedValue = JSON.parse(value);
+        isJson = true;
+      } catch {
+        isJson = false;
+      }
+    } else if (typeof value === 'object') {
+      isJson = true;
+      parsedValue = value;
+    }
+
+    const currentJSON = JSON.stringify(editor.getJSON());
+    const compareValue = isJson ? JSON.stringify(parsedValue) : value;
+
+    if (compareValue !== currentJSON && value !== editor.getHTML()) {
+      if (isJson) {
+        try {
+          editor.commands.setContent(parsedValue);
+        } catch (error) {
+          console.error('Failed to set JSON content in TipTapViewer:', error);
+        }
+      } else {
+        editor.commands.setContent(value || '');
+      }
+    }
+  }, [value, editor]);
+
   if (!editor) return null;
 
   return (
-    <Box sx={{ 
+    <Box sx={{
       '& .ProseMirror': { 
         outline: 'none',
         fontFamily: 'inherit',
