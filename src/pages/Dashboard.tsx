@@ -80,7 +80,7 @@ const MOCK_DATA: DashboardAnalyticsResponse = {
   summary: {
     users: { total: 1250, active: 1200, blocked: 45, admins: 5 },
     projects: { total: 142, draft: 12, published: 98, archived: 32 },
-    news: { total: 350, draft: 5, published: 300, archived: 45 },
+    news: { total: 350, draft: 5, scheduled: 5, published: 295, archived: 45 },
     polls: { total: 45, active: 5, archived: 40, totalVotes: 15420 }
   },
   activityChart: [], // Буде заповнено динамічно
@@ -99,7 +99,7 @@ const MOCK_DATA: DashboardAnalyticsResponse = {
 
 const STATUS_COLORS = {
   projects: ['#10b981', '#f59e0b', '#64748b'],
-  news: ['#3b82f6', '#f59e0b', '#64748b'],
+  news: ['#3b82f6', '#0ea5e9', '#f59e0b', '#64748b'],
   users: ['#10b981', '#ef4444'],
   polls: ['#8b5cf6', '#64748b']
 };
@@ -370,6 +370,7 @@ export const Dashboard = () => {
 
   const newsStatusData = [
     { name: 'Опубліковано', value: data.summary.news.published },
+    { name: 'Заплановано', value: data.summary.news.scheduled || 0 },
     { name: 'Чернетки', value: data.summary.news.draft },
     { name: 'В архіві', value: data.summary.news.archived },
   ];

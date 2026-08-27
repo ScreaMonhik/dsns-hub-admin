@@ -3,7 +3,7 @@ import { apiClient } from './apiClient';
 export interface DashboardSummary {
   users: { total: number; active: number; blocked: number; admins: number };
   projects: { total: number; draft: number; published: number; archived: number };
-  news: { total: number; draft: number; published: number; archived: number };
+  news: { total: number; draft: number; scheduled: number; published: number; archived: number };
   polls: { total: number; active: number; archived: number; totalVotes: number };
 }
 
