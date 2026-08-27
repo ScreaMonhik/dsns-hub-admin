@@ -331,9 +331,11 @@ export const Documents = () => {
                         <Tooltip title="В архів"><IconButton color="warning" onClick={() => setStatusDialogData({ document: item, action: 'archive' })}><ArchiveIcon /></IconButton></Tooltip>
                       )}
                       {item.status === DocumentStatus.ARCHIVED && (
-                        <Tooltip title="Відновити в чернетки"><IconButton color="success" onClick={() => setStatusDialogData({ document: item, action: 'unarchive' })}><UnarchiveIcon /></IconButton></Tooltip>
+                        <>
+                          <Tooltip title="Відновити в чернетки"><IconButton color="success" onClick={() => setStatusDialogData({ document: item, action: 'unarchive' })}><UnarchiveIcon /></IconButton></Tooltip>
+                          <Tooltip title="Видалити"><IconButton color="error" onClick={() => setDeleteDocumentItem(item)}><DeleteIcon /></IconButton></Tooltip>
+                        </>
                       )}
-                      <Tooltip title="Видалити"><IconButton color="error" onClick={() => setDeleteDocumentItem(item)}><DeleteIcon /></IconButton></Tooltip>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -415,9 +417,11 @@ export const Documents = () => {
                       <Tooltip title="В архів"><IconButton size="small" color="warning" onClick={() => setStatusDialogData({ document: item, action: 'archive' })}><ArchiveIcon fontSize="small" /></IconButton></Tooltip>
                     )}
                     {item.status === DocumentStatus.ARCHIVED && (
-                      <Tooltip title="Відновити в чернетки"><IconButton size="small" color="success" onClick={() => setStatusDialogData({ document: item, action: 'unarchive' })}><UnarchiveIcon fontSize="small" /></IconButton></Tooltip>
+                      <>
+                        <Tooltip title="Відновити в чернетки"><IconButton size="small" color="success" onClick={() => setStatusDialogData({ document: item, action: 'unarchive' })}><UnarchiveIcon fontSize="small" /></IconButton></Tooltip>
+                        <Tooltip title="Видалити"><IconButton size="small" color="error" onClick={() => setDeleteDocumentItem(item)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
+                      </>
                     )}
-                    <Tooltip title="Видалити"><IconButton size="small" color="error" onClick={() => setDeleteDocumentItem(item)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
                   </Box>
                 </CardActions>
               </Card>

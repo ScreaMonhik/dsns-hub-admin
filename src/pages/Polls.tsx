@@ -336,9 +336,9 @@ export const Polls = () => {
                               <UnarchiveIcon />
                             </IconButton>
                           </Tooltip>
+                          <Tooltip title="Видалити"><IconButton color="error" onClick={() => setDeletePollItem(item)}><DeleteIcon /></IconButton></Tooltip>
                         </>
                       )}
-                      <Tooltip title="Видалити"><IconButton color="error" onClick={() => setDeletePollItem(item)}><DeleteIcon /></IconButton></Tooltip>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -443,9 +443,9 @@ export const Polls = () => {
                           <UnarchiveIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
+                      <Tooltip title="Видалити"><IconButton size="small" color="error" onClick={() => setDeletePollItem(item)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
                     </>
                   )}
-                  <Tooltip title="Видалити"><IconButton size="small" color="error" onClick={() => setDeletePollItem(item)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
                 </CardActions>
               </Card>
             ))}

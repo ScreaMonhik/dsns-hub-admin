@@ -12,6 +12,7 @@ import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
+import PublicIcon from '@mui/icons-material/Public';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import CommentIcon from '@mui/icons-material/Comment';
@@ -101,6 +102,23 @@ export const News = () => {
 
   const handleRestore = (newsItem: NewsType) => {
     setRestoreNewsItem(newsItem);
+  };
+
+  const handleQuickPublish = async (newsItem: NewsType) => {
+    try {
+      await newsApi.updateNews(newsItem.id, {
+        title: newsItem.title,
+        content: newsItem.content,
+        imageUrl: newsItem.imageUrl,
+        categoryId: newsItem.categoryId,
+        departmentIds: newsItem.departments?.map(d => d.id),
+        status: 'PUBLISHED',
+        publishedAt: new Date().toISOString(),
+      });
+      fetchData();
+    } catch (error) {
+      console.error('Failed to publish news', error);
+    }
   };
 
   const openDelete = (news: NewsType) => {
@@ -366,6 +384,13 @@ export const News = () => {
                       </Tooltip>
                       {activeTab === 0 ? (
                         <>
+                          {(item.status === 'DRAFT' || item.status === 'SCHEDULED') && (
+                            <Tooltip title="Опублікувати зараз">
+                              <IconButton color="success" onClick={() => handleQuickPublish(item)}>
+                                <PublicIcon />
+                              </IconButton>
+                            </Tooltip>
+                          )}
                           <Tooltip title="Редагувати">
                             <IconButton color="primary" onClick={() => openEdit(item)}>
                               <EditIcon />
@@ -467,6 +492,11 @@ export const News = () => {
                   </Tooltip>
                   {activeTab === 0 ? (
                     <>
+                      {(item.status === 'DRAFT' || item.status === 'SCHEDULED') && (
+                        <Tooltip title="Опублікувати зараз">
+                          <IconButton size="small" color="success" onClick={() => handleQuickPublish(item)}><PublicIcon fontSize="small" /></IconButton>
+                        </Tooltip>
+                      )}
                       <Tooltip title="Редагувати">
                         <IconButton size="small" color="primary" onClick={() => openEdit(item)}><EditIcon fontSize="small" /></IconButton>
                       </Tooltip>
