@@ -7,6 +7,7 @@ import {
 import DownloadIcon from '@mui/icons-material/Download';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import TableChartIcon from '@mui/icons-material/TableChart';
+import toast from 'react-hot-toast';
 import { auditApi, type PaginatedAuditLogsResponse } from '../api/auditApi';
 import { format } from 'date-fns';
 import { useCan } from '../hooks/useCan';
@@ -47,7 +48,7 @@ export const AuditLogs = () => {
       await auditApi.exportLogs(format);
     } catch (error) {
       console.error('Export failed', error);
-      alert('Помилка експорту.');
+      toast.error('Помилка експорту.');
     } finally {
       setExporting(false);
     }

@@ -16,6 +16,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
+import toast from 'react-hot-toast';
 import { documentsApi, DocumentStatus, type DocumentModel, type PaginatedDocumentsResponse } from '../api/documentsApi';
 import type { Department } from '../api/departmentsApi';
 import { DepartmentAutocomplete } from '../components/common/DepartmentAutocomplete';
@@ -115,7 +116,7 @@ export const Documents = () => {
       setTimeout(() => window.URL.revokeObjectURL(url), 60000);
     } catch (error) {
       console.error('Failed to view document', error);
-      alert('Не вдалося відкрити документ для перегляду.');
+      toast.error('Не вдалося відкрити документ для перегляду.');
     } finally {
       setDownloadingId(null);
     }

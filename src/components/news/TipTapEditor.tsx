@@ -29,6 +29,7 @@ import YouTubeIcon from '@mui/icons-material/YouTube';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import TitleIcon from '@mui/icons-material/Title';
 import { useState, useRef, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { newsApi } from '../../api/newsApi';
 import { SecureImage } from '../common/SecureImage';
 import { getFullUrl } from '../../utils/url';
@@ -180,7 +181,7 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
       editor.chain().focus().setImage({ src: res.url }).run();
     } catch (err) {
       console.error('Failed to upload image:', err);
-      alert('Помилка завантаження зображення');
+      toast.error('Помилка завантаження зображення');
     } finally {
       setIsImageUploading(false);
       if (imageInputRef.current) imageInputRef.current.value = '';
@@ -199,7 +200,7 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
       }).run();
     } catch (err) {
       console.error('Failed to upload video:', err);
-      alert('Помилка завантаження відео. Можливо перевищено ліміт розміру файлу.');
+      toast.error('Помилка завантаження відео. Можливо перевищено ліміт розміру файлу.');
     } finally {
       setIsVideoUploading(false);
       if (videoInputRef.current) videoInputRef.current.value = '';

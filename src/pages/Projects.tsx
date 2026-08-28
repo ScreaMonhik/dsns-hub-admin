@@ -19,6 +19,7 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import CommentIcon from '@mui/icons-material/Comment';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import InputAdornment from '@mui/material/InputAdornment';
+import toast from 'react-hot-toast';
 import { projectsApi, ProjectStatus, type ProjectModel, type PaginatedProjectsResponse } from '../api/projectsApi';
 import type { Department } from '../api/departmentsApi';
 import { DepartmentAutocomplete } from '../components/common/DepartmentAutocomplete';
@@ -117,7 +118,7 @@ export const Projects = () => {
       setTimeout(() => window.URL.revokeObjectURL(url), 60000);
     } catch (error) {
       console.error('Failed to view document', error);
-      alert('Не вдалося відкрити PDF документ.');
+      toast.error('Не вдалося відкрити PDF документ.');
     } finally {
       setDownloadingId(null);
     }

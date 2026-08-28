@@ -7,6 +7,7 @@ import SendIcon from '@mui/icons-material/Send';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { projectsApi, ProjectStatus, type ProjectModel } from '../../api/projectsApi';
 import { SecureImage } from '../common/SecureImage';
@@ -75,7 +76,7 @@ export const ProjectDetailsDialog = ({ open, projectId, onClose, onRefreshList }
       setTimeout(() => window.URL.revokeObjectURL(url), 60000);
     } catch (error) {
       console.error('Failed to view document', error);
-      alert('Не вдалося відкрити PDF документ.');
+      toast.error('Не вдалося відкрити PDF документ.');
     }
   };
 
