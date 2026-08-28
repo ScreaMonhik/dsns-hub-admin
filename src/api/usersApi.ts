@@ -28,7 +28,7 @@ export const usersApi = {
   },
   
   createUser: async (payload: CreateUserPayload) => {
-    const response = await apiClient.post<User>('/auth/register', payload);
+    const response = await apiClient.post<User>('/users', payload);
     return response.data;
   },
 

@@ -9,6 +9,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import LockResetIcon from '@mui/icons-material/LockReset';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
+import { format } from 'date-fns';
 import { usersApi, type UsersResponse } from '../api/usersApi';
 import { CreateUserDialog } from '../components/users/CreateUserDialog';
 import { EditUserDialog } from '../components/users/EditUserDialog';
@@ -90,6 +91,7 @@ export const Users = () => {
                 <TableCell>Електронна пошта</TableCell>
                 <TableCell>Роль</TableCell>
                 <TableCell>Статус</TableCell>
+                <TableCell>Дата реєстрації</TableCell>
                 <TableCell align="right">Дії</TableCell>
               </TableRow>
             </TableHead>
@@ -103,6 +105,7 @@ export const Users = () => {
                     <TableCell>
                       <Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: 4 }} />
                     </TableCell>
+                    <TableCell><Skeleton variant="text" width={120} /></TableCell>
                     <TableCell align="right">
                       <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
                         <Skeleton variant="circular" width={32} height={32} />
@@ -130,6 +133,11 @@ export const Users = () => {
                       size="small" 
                     />
                   </TableCell>
+                  <TableCell>
+                    {user.createdAt && !isNaN(Date.parse(user.createdAt)) 
+                      ? format(new Date(user.createdAt), 'dd.MM.yyyy') 
+                      : '—'}
+                  </TableCell>
                   <TableCell align="right">
                     <Tooltip title="Редагувати / Блокувати">
                       <IconButton color="primary" onClick={() => setEditUser(user)}>
@@ -151,7 +159,7 @@ export const Users = () => {
               ))}
               {!loading && data?.data.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} align="center">Користувачів не знайдено</TableCell>
+                  <TableCell colSpan={6} align="center">Користувачів не знайдено</TableCell>
                 </TableRow>
               )}
             </TableBody>
