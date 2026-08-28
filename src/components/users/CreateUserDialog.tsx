@@ -3,8 +3,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, 
-  Button, TextField, MenuItem, Box, Alert 
+  Button, TextField, MenuItem, Box, Alert, IconButton, InputAdornment
 } from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useState } from 'react';
 import { usersApi, type CreateUserPayload } from '../../api/usersApi';
 import { useCan } from '../../hooks/useCan';
@@ -31,6 +33,7 @@ interface Props {
 export const CreateUserDialog = ({ open, onClose, onSuccess }: Props) => {
   const { isSuperAdmin } = useCan();
   const [apiError, setApiError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormInputs>({
     resolver: zodResolver(createUserSchema),
@@ -73,7 +76,25 @@ export const CreateUserDialog = ({ open, onClose, onSuccess }: Props) => {
               name="password"
               control={control}
               render={({ field }) => (
-                <TextField {...field} type="password" label="Пароль" error={!!errors.password} helperText={errors.password?.message} fullWidth />
+                <TextField 
+                  {...field} 
+                  type={showPassword ? 'text' : 'password'} 
+                  label="Пароль" 
+                  error={!!errors.password} 
+                  helperText={errors.password?.message} 
+                  fullWidth 
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }
+                  }}
+                />
               )}
             />
             <Box sx={{ display: 'flex', gap: 2 }}>

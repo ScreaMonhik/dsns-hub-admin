@@ -5,12 +5,14 @@ import { z } from 'zod';
 import { 
   Box, Typography, Paper, Tabs, Tab, Button, TextField, 
   Avatar, CircularProgress, Grid, Divider, Table, TableBody, 
-  TableCell, TableContainer, TableHead, TableRow, Pagination, Chip, IconButton
+  TableCell, TableContainer, TableHead, TableRow, Pagination, Chip, IconButton, InputAdornment
 } from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import PersonIcon from '@mui/icons-material/Person';
 import SecurityIcon from '@mui/icons-material/Security';
 import HistoryIcon from '@mui/icons-material/History';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { useAuthStore } from '../store/authStore';
@@ -56,6 +58,10 @@ export const Profile = () => {
   const [logsData, setLogsData] = useState<PaginatedAuditLogsResponse | null>(null);
   const [logsLoading, setLogsLoading] = useState(false);
   const [logsPage, setLogsPage] = useState(1);
+
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<PasswordFormInputs>({
     resolver: zodResolver(passwordSchema),
@@ -206,21 +212,75 @@ export const Profile = () => {
               name="oldPassword"
               control={control}
               render={({ field }) => (
-                <TextField {...field} type="password" label="Поточний пароль" error={!!errors.oldPassword} helperText={errors.oldPassword?.message} fullWidth />
+                <TextField 
+                  {...field} 
+                  type={showOldPassword ? 'text' : 'password'} 
+                  label="Поточний пароль" 
+                  error={!!errors.oldPassword} 
+                  helperText={errors.oldPassword?.message} 
+                  fullWidth 
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => setShowOldPassword(!showOldPassword)} edge="end">
+                            {showOldPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }
+                  }}
+                />
               )}
             />
             <Controller
               name="newPassword"
               control={control}
               render={({ field }) => (
-                <TextField {...field} type="password" label="Новий пароль" error={!!errors.newPassword} helperText={errors.newPassword?.message} fullWidth />
+                <TextField 
+                  {...field} 
+                  type={showNewPassword ? 'text' : 'password'} 
+                  label="Новий пароль" 
+                  error={!!errors.newPassword} 
+                  helperText={errors.newPassword?.message} 
+                  fullWidth 
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => setShowNewPassword(!showNewPassword)} edge="end">
+                            {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }
+                  }}
+                />
               )}
             />
             <Controller
               name="confirmPassword"
               control={control}
               render={({ field }) => (
-                <TextField {...field} type="password" label="Підтвердження нового пароля" error={!!errors.confirmPassword} helperText={errors.confirmPassword?.message} fullWidth />
+                <TextField 
+                  {...field} 
+                  type={showConfirmPassword ? 'text' : 'password'} 
+                  label="Підтвердження нового пароля" 
+                  error={!!errors.confirmPassword} 
+                  helperText={errors.confirmPassword?.message} 
+                  fullWidth 
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
+                            {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }
+                  }}
+                />
               )}
             />
             <Button type="submit" variant="contained" disabled={isSubmitting} size="large">

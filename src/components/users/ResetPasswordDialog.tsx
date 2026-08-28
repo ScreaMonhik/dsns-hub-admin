@@ -3,8 +3,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, 
-  Button, TextField, Box, Alert 
+  Button, TextField, Box, Alert, IconButton, InputAdornment 
 } from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useState } from 'react';
 import { usersApi } from '../../api/usersApi';
 import type { User } from '../../store/authStore';
@@ -26,6 +28,7 @@ interface Props {
 
 export const ResetPasswordDialog = ({ open, user, onClose, onSuccess }: Props) => {
   const [apiError, setApiError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormInputs>({
     resolver: zodResolver(resetPasswordSchema),
@@ -61,7 +64,25 @@ export const ResetPasswordDialog = ({ open, user, onClose, onSuccess }: Props) =
             name="newPassword"
             control={control}
             render={({ field }) => (
-              <TextField {...field} type="password" label="Новий пароль" error={!!errors.newPassword} helperText={errors.newPassword?.message} fullWidth />
+              <TextField 
+                {...field} 
+                type={showPassword ? 'text' : 'password'} 
+                label="Новий пароль" 
+                error={!!errors.newPassword} 
+                helperText={errors.newPassword?.message} 
+                fullWidth 
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }
+                }}
+              />
             )}
           />
         </DialogContent>
