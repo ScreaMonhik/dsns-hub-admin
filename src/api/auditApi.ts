@@ -36,13 +36,15 @@ export const auditApi = {
     action?: string,
     resource?: string,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
+    userId?: string
   ) => {
     const params: Record<string, string | number> = { page, limit };
     if (action) params.action = action;
     if (resource) params.resource = resource;
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
+    if (userId) params.userId = userId;
 
     const response = await apiClient.get<PaginatedAuditLogsResponse>('/audit-logs', { params });
     return response.data;

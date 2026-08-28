@@ -19,6 +19,7 @@ interface AuthState {
   isAuthenticated: boolean;
   setAuth: (user: User, accessToken: string, refreshToken: string) => void;
   logout: () => Promise<void>;
+  updateCurrentUser: (data: Partial<User>) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -39,9 +40,13 @@ export const useAuthStore = create<AuthState>()(
         } finally {
           localStorage.removeItem('jwt_token');
           localStorage.removeItem('refresh_token');
+          localStorage.removeItem('refresh_token');
           set({ user: null, isAuthenticated: false });
         }
       },
+      updateCurrentUser: (data) => set((state) => ({ 
+        user: state.user ? { ...state.user, ...data } : null 
+      })),
     }),
     {
       name: 'auth_storage',

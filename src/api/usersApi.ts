@@ -37,6 +37,20 @@ export const usersApi = {
     return response.data;
   },
 
+  changeMyPassword: async (payload: { oldPassword: string; newPassword: string }) => {
+    const response = await apiClient.patch('/users/me/password', payload);
+    return response.data;
+  },
+
+  uploadMyAvatar: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await apiClient.patch<{ avatarUrl: string }>('/users/me/avatar', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
   resetPassword: async (id: string, newPassword: string) => {
     const response = await apiClient.post(`/users/${id}/reset-password`, { newPassword });
     return response.data;
