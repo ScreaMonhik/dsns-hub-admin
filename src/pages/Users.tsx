@@ -116,7 +116,13 @@ export const Users = () => {
                 <TableRow key={user.id} hover>
                   <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
                   <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.role === 'ADMIN' ? 'Адміністратор' : 'Користувач'}</TableCell>
+                  <TableCell>
+                    {user.role === 'SUPER_ADMIN' 
+                      ? 'Супер-адміністратор' 
+                      : user.role === 'ADMIN' 
+                      ? 'Адміністратор' 
+                      : 'Користувач'}
+                  </TableCell>
                   <TableCell>
                     <Chip 
                       label={user.isActive ? 'Активний' : 'Заблокований'} 

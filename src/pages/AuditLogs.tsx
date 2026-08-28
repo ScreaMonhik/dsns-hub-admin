@@ -9,11 +9,11 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import { auditApi, type PaginatedAuditLogsResponse } from '../api/auditApi';
 import { format } from 'date-fns';
-import { useAuthStore } from '../store/authStore';
-import { Navigate } from 'react-router-dom';
+import { useCan } from '../hooks/useCan';
+import { PermissionGuard } from '../components/common/PermissionGuard';
 
 export const AuditLogs = () => {
-  const { user } = useAuthStore();
+  const { isSuperAdmin } = useCan();
   const [data, setData] = useState<PaginatedAuditLogsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -35,14 +35,10 @@ export const AuditLogs = () => {
   }, [page, actionFilter, resourceFilter]);
 
   useEffect(() => {
-    if (user?.role === 'SUPER_ADMIN') {
+    if (isSuperAdmin) {
       fetchLogs();
     }
-  }, [fetchLogs, user?.role]);
-
-  if (user?.role !== 'SUPER_ADMIN') {
-    return <Navigate to="/" replace />;
-  }
+  }, [fetchLogs, isSuperAdmin]);
 
   const handleExport = async (format: 'csv' | 'pdf') => {
     setExportAnchorEl(null);
@@ -68,9 +64,10 @@ export const AuditLogs = () => {
   };
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">Журнал аудиту</Typography>
+    <PermissionGuard require="SUPER_ADMIN" redirectTo="/">
+      <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="h4">Журнал аудиту</Typography>
         <Box>
           <Button 
             variant="outlined" 
@@ -192,7 +189,8 @@ export const AuditLogs = () => {
             />
           </Box>
         )}
-      </Paper>
-    </Box>
+        </Paper>
+      </Box>
+    </PermissionGuard>
   );
 };

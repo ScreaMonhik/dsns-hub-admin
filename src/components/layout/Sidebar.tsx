@@ -9,14 +9,14 @@ import PeopleIcon from '@mui/icons-material/People';
 import ChatIcon from '@mui/icons-material/Chat';
 import SecurityIcon from '@mui/icons-material/Security';
 import CampaignIcon from '@mui/icons-material/Campaign';
-import { useAuthStore } from '../../store/authStore';
+import { useCan } from '../../hooks/useCan';
 
 const DRAWER_WIDTH = 240;
 
 export const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuthStore();
+  const { isSuperAdmin } = useCan();
 
   const menuItems = [
     { text: 'Головна', path: '/', icon: <DashboardIcon /> },
@@ -27,7 +27,7 @@ export const Sidebar = () => {
     { text: 'Опитування', path: '/polls', icon: <HowToVoteIcon /> },
     { text: 'Чати', path: '/chats', icon: <ChatIcon /> },
     { text: 'Розсилки', path: '/broadcasts', icon: <CampaignIcon /> },
-    ...(user?.role === 'SUPER_ADMIN' ? [{ text: 'Аудит', path: '/audit-logs', icon: <SecurityIcon /> }] : []),
+    ...(isSuperAdmin ? [{ text: 'Аудит', path: '/audit-logs', icon: <SecurityIcon /> }] : []),
   ];
 
   return (

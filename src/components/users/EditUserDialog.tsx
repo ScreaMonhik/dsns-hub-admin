@@ -7,7 +7,8 @@ import {
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { usersApi, type UpdateUserPayload } from '../../api/usersApi';
-import { useAuthStore, type User } from '../../store/authStore';
+import { type User } from '../../store/authStore';
+import { useCan } from '../../hooks/useCan';
 
 const editUserSchema = z.object({
   firstName: z.string().min(2, "Обов'язкове поле"),
@@ -26,7 +27,7 @@ interface Props {
 }
 
 export const EditUserDialog = ({ open, user, onClose, onSuccess }: Props) => {
-  const currentUser = useAuthStore((state) => state.user);
+  const { isSuperAdmin } = useCan();
   const [apiError, setApiError] = useState<string | null>(null);
 
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormInputs>({
@@ -87,7 +88,7 @@ export const EditUserDialog = ({ open, user, onClose, onSuccess }: Props) => {
                 <TextField {...field} select label="Роль" error={!!errors.role} helperText={errors.role?.message} fullWidth>
                   <MenuItem value="USER">Користувач</MenuItem>
                   <MenuItem value="ADMIN">Адміністратор</MenuItem>
-                  {currentUser?.role === 'SUPER_ADMIN' && (
+                  {isSuperAdmin && (
                     <MenuItem value="SUPER_ADMIN">Супер-адміністратор</MenuItem>
                   )}
                 </TextField>

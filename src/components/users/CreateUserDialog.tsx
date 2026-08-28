@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { usersApi, type CreateUserPayload } from '../../api/usersApi';
-import { useAuthStore } from '../../store/authStore';
+import { useCan } from '../../hooks/useCan';
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
@@ -29,7 +29,7 @@ interface Props {
 }
 
 export const CreateUserDialog = ({ open, onClose, onSuccess }: Props) => {
-  const currentUser = useAuthStore((state) => state.user);
+  const { isSuperAdmin } = useCan();
   const [apiError, setApiError] = useState<string | null>(null);
 
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormInputs>({
@@ -99,7 +99,7 @@ export const CreateUserDialog = ({ open, onClose, onSuccess }: Props) => {
                 <TextField {...field} select label="Роль" error={!!errors.role} helperText={errors.role?.message} fullWidth>
                   <MenuItem value="USER">Користувач</MenuItem>
                   <MenuItem value="ADMIN">Адміністратор</MenuItem>
-                  {currentUser?.role === 'SUPER_ADMIN' && (
+                  {isSuperAdmin && (
                     <MenuItem value="SUPER_ADMIN">Супер-адміністратор</MenuItem>
                   )}
                 </TextField>
