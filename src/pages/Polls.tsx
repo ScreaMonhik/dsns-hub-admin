@@ -130,11 +130,19 @@ export const Polls = () => {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4">Управління опитуваннями</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => { setEditPoll(null); setIsDuplicate(false); setIsFormOpen(true); }}>
+        <Button 
+          variant="contained" 
+          startIcon={
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <AddIcon fontSize="small" />
+              <HowToVoteIcon fontSize="small" />
+            </Box>
+          } 
+          onClick={() => { setEditPoll(null); setIsDuplicate(false); setIsFormOpen(true); }}
+        >
           Створити опитування
         </Button>
       </Box>
-
       <Paper sx={{ width: '100%', mb: 2, p: 2 }}>
         <Tabs value={activeTab} onChange={handleTabChange} sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
           <Tab label="Активні / Чернетки" />

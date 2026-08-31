@@ -151,7 +151,16 @@ export const Projects = () => {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4">Ініціативи та Проєкти</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => { setEditProject(null); setIsFormOpen(true); }}>
+        <Button 
+          variant="contained" 
+          startIcon={
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <AddIcon fontSize="small" />
+              <AssignmentIcon fontSize="small" />
+            </Box>
+          } 
+          onClick={() => { setEditProject(null); setIsFormOpen(true); }}
+        >
           Створити проєкт
         </Button>
       </Box>

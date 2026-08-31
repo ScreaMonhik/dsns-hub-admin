@@ -5,6 +5,7 @@ import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, ToggleButton, ToggleButtonGroup, Avatar, Skeleton
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ViewListIcon from '@mui/icons-material/ViewList';
@@ -149,7 +150,7 @@ export const Documents = () => {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4">Нормативні документи</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => { setEditDocument(null); setIsFormOpen(true); }}>
+        <Button variant="contained" startIcon={<NoteAddIcon />} onClick={() => { setEditDocument(null); setIsFormOpen(true); }}>
           Додати документ
         </Button>
       </Box>

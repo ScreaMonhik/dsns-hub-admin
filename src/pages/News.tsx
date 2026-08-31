@@ -6,6 +6,7 @@ import {
   ToggleButton, ToggleButtonGroup, Card, CardContent, CardActions, Tabs, Tab, Avatar, Skeleton
 } from '@mui/material';
 import ArticleIcon from '@mui/icons-material/Article';
+import PostAddIcon from '@mui/icons-material/PostAdd';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ViewListIcon from '@mui/icons-material/ViewList';
@@ -169,7 +170,7 @@ export const News = () => {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4">Управління новинами</Typography>
-        <Button variant="contained" startIcon={<ArticleIcon />} onClick={openCreate}>
+        <Button variant="contained" startIcon={<PostAddIcon />} onClick={openCreate}>
           Додати новину
         </Button>
       </Box>
