@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
+import { PageBreadcrumbs } from './PageBreadcrumbs';
 import { useIdleTimer } from '../../hooks/useIdleTimer';
 import { useAuthStore } from '../../store/authStore';
 
@@ -23,6 +24,7 @@ export const AdminLayout = () => {
       <Sidebar />
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Toolbar /> {/* Spacer for Header */}
+        <PageBreadcrumbs />
         <Outlet />
       </Box>
     </Box>
