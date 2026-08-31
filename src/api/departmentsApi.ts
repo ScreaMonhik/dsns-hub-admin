@@ -67,4 +67,20 @@ export const departmentsApi = {
     const response = await apiClient.patch<{ message: string }>('/departments/reorder', { items });
     return response.data;
   },
+
+  exportDepartmentsJson: async (): Promise<void> => {
+    const response = await apiClient.get('/departments/export-json', {
+      responseType: 'blob'
+    });
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `departments_structure_${new Date().toISOString().split('T')[0]}.json`);
+    document.body.appendChild(link);
+    link.click();
+    
+    link.parentNode?.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  },
 };

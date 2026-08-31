@@ -7,6 +7,7 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import DownloadIcon from '@mui/icons-material/Download';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -197,6 +198,7 @@ export const Departments = () => {
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
   const [savingOrder, setSavingOrder] = useState(false);
+  const [exporting, setExporting] = useState(false);
   
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
@@ -238,6 +240,19 @@ export const Departments = () => {
   useEffect(() => {
     fetchDepartments();
   }, [fetchDepartments]);
+
+  const handleExportJson = async () => {
+    try {
+      setExporting(true);
+      setApiError(null);
+      await departmentsApi.exportDepartmentsJson();
+    } catch (error) {
+      console.error('Failed to export departments JSON', error);
+      setApiError('Не вдалося експортувати структуру підрозділів.');
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const flattenedTree = useMemo(() => buildFlattenedTree(departments, expandedIds), [departments, expandedIds]);
 
@@ -362,6 +377,14 @@ export const Departments = () => {
           <Typography variant="h4">Структура підрозділів</Typography>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
             {savingOrder && <CircularProgress size={20} />}
+            <Button
+              variant="outlined"
+              startIcon={exporting ? <CircularProgress size={20} color="inherit" /> : <DownloadIcon />}
+              onClick={handleExportJson}
+              disabled={exporting || loading}
+            >
+              Експорт JSON
+            </Button>
             <Button 
               variant="contained" 
               startIcon={<AddIcon />}
