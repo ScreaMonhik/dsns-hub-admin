@@ -28,6 +28,9 @@ import { PollDetailsDialog } from '../components/polls/PollDetailsDialog';
 import { format } from 'date-fns';
 import { SecureImage } from '../components/common/SecureImage';
 import { useSearchParams } from 'react-router-dom';
+import { Checkbox } from '@mui/material';
+import { BulkActionsBar } from '../components/common/BulkActionsBar';
+import { BulkConfirmDialog, type BulkActionType } from '../components/common/BulkConfirmDialog';
 
 export const Polls = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -50,6 +53,49 @@ export const Polls = () => {
   const [visibilityPoll, setVisibilityPoll] = useState<Poll | null>(null);
   const [viewPollDetails, setViewPollDetails] = useState<Poll | null>(null);
   const [isDuplicate, setIsDuplicate] = useState(false); // Стан для відслідковування режиму форми
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [bulkProcessing, setBulkProcessing] = useState(false);
+  const [bulkAction, setBulkAction] = useState<BulkActionType | null>(null);
+
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked && data) {
+      const itemsToSelect = activeTab === 0 ? data.data.filter(item => item.status !== 'ARCHIVED') : data.data;
+      setSelectedItems(itemsToSelect.map(item => item.id));
+    } else {
+      setSelectedItems([]);
+    }
+  };
+
+  const handleSelectOne = (id: string, e: React.MouseEvent | React.ChangeEvent) => {
+    e.stopPropagation();
+    setSelectedItems(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const handleBulkAction = (action: BulkActionType) => {
+    if (!selectedItems.length) return;
+    setBulkAction(action);
+  };
+
+  const executeBulkAction = async () => {
+    if (!selectedItems.length || !bulkAction) return;
+
+    setBulkProcessing(true);
+    try {
+      await Promise.all(selectedItems.map(id => {
+        if (bulkAction === 'delete') return pollsApi.deletePoll(id);
+        if (bulkAction === 'publish') return pollsApi.updatePoll(id, { status: 'PUBLISHED' } as any);
+        if (bulkAction === 'archive') return pollsApi.updatePoll(id, { status: 'ARCHIVED' } as any);
+        if (bulkAction === 'unarchive') return pollsApi.updatePoll(id, { status: 'DRAFT' } as any);
+      }));
+      setSelectedItems([]);
+      fetchData();
+    } catch (error) {
+      console.error('Bulk action error', error);
+    } finally {
+      setBulkProcessing(false);
+      setBulkAction(null);
+    }
+  };
 
   const fetchData = useCallback(async () => {
     try {
@@ -190,6 +236,14 @@ export const Polls = () => {
               <Table>
                 <TableHead>
                   <TableRow>
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        color="primary"
+                        indeterminate={selectedItems.length > 0 && selectedItems.length < (pollsList.length || 0)}
+                        checked={pollsList.length > 0 && selectedItems.length === pollsList.length}
+                        onChange={handleSelectAll}
+                      />
+                    </TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>Заголовок</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>Охоплення</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>Статус</TableCell>
@@ -202,6 +256,7 @@ export const Polls = () => {
                 <TableBody>
                   {Array.from({ length: 5 }).map((_, idx) => (
                     <TableRow key={idx}>
+                      <TableCell padding="checkbox"><Skeleton variant="circular" width={24} height={24} /></TableCell>
                       <TableCell><Skeleton variant="text" width={220} /></TableCell>
                       <TableCell><Skeleton variant="text" width={140} /></TableCell>
                       <TableCell>
@@ -283,8 +338,17 @@ export const Polls = () => {
                     hover 
                     onClick={() => handleSingleClick(item)}
                     onDoubleClick={() => handleDoubleClick(item)}
+                    selected={selectedItems.includes(item.id)}
                     sx={{ cursor: 'pointer' }}
                   >
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        color="primary"
+                        checked={selectedItems.includes(item.id)}
+                        onChange={(e) => handleSelectOne(item.id, e)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </TableCell>
                     <TableCell sx={{ maxWidth: 250 }}>{item.title}</TableCell>
                     <TableCell>{item.departments?.length ? item.departments.map(d => d.name).join(', ') : 'Всі підрозділи'}</TableCell>
                     <TableCell>
@@ -364,7 +428,10 @@ export const Polls = () => {
                 sx={{
                   display: 'flex', 
                   flexDirection: 'column',
+                  position: 'relative',
                   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  border: selectedItems.includes(item.id) ? 2 : 0,
+                  borderColor: 'primary.main',
                   '&:hover': {
                     transform: 'translateY(-4px)',
                     boxShadow: 6,
@@ -372,6 +439,14 @@ export const Polls = () => {
                   }
                 }}
               >
+                <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 2 }}>
+                  <Checkbox
+                    size="small"
+                    checked={selectedItems.includes(item.id)}
+                    onChange={(e) => handleSelectOne(item.id, e)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </Box>
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Typography variant="h6" sx={{ fontSize: '1.1rem', mb: 1 }}>{item.title}</Typography>
                   <Box sx={{ mb: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
@@ -495,6 +570,25 @@ export const Polls = () => {
         poll={visibilityPoll}
         onClose={() => setVisibilityPoll(null)}
         onSuccess={fetchData}
+      />
+
+      <BulkActionsBar
+        selectedCount={selectedItems.length}
+        onClear={() => setSelectedItems([])}
+        onPublish={activeTab === 0 ? () => handleBulkAction('publish') : undefined}
+        onArchive={activeTab === 0 ? () => handleBulkAction('archive') : undefined}
+        onUnarchive={activeTab === 1 ? () => handleBulkAction('unarchive') : undefined}
+        onDelete={activeTab === 1 ? () => handleBulkAction('delete') : undefined}
+        isProcessing={bulkProcessing}
+      />
+
+      <BulkConfirmDialog
+        open={!!bulkAction}
+        action={bulkAction}
+        count={selectedItems.length}
+        onClose={() => setBulkAction(null)}
+        onConfirm={executeBulkAction}
+        isProcessing={bulkProcessing}
       />
     </Box>
   );

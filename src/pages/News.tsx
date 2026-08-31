@@ -29,6 +29,9 @@ import { NewsDetailsDialog } from '../components/news/NewsDetailsDialog';
 import { useRef } from 'react';
 import { format } from 'date-fns';
 import { useSearchParams } from 'react-router-dom';
+import { Checkbox } from '@mui/material';
+import { BulkActionsBar } from '../components/common/BulkActionsBar';
+import { BulkConfirmDialog, type BulkActionType } from '../components/common/BulkConfirmDialog';
 
 export const News = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -52,8 +55,50 @@ export const News = () => {
   const [archiveNewsItem, setArchiveNewsItem] = useState<NewsType | null>(null);
   const [restoreNewsItem, setRestoreNewsItem] = useState<NewsType | null>(null);
   const [detailsNewsItem, setDetailsNewsItem] = useState<NewsType | null>(null);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [bulkProcessing, setBulkProcessing] = useState(false);
+  const [bulkAction, setBulkAction] = useState<BulkActionType | null>(null);
 
   const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked && data) {
+      setSelectedItems(data.data.map(item => item.id));
+    } else {
+      setSelectedItems([]);
+    }
+  };
+
+  const handleSelectOne = (id: string, e: React.MouseEvent | React.ChangeEvent) => {
+    e.stopPropagation();
+    setSelectedItems(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const handleBulkAction = (action: BulkActionType) => {
+    if (!selectedItems.length) return;
+    setBulkAction(action);
+  };
+
+  const executeBulkAction = async () => {
+    if (!selectedItems.length || !bulkAction) return;
+
+    setBulkProcessing(true);
+    try {
+      await Promise.all(selectedItems.map(id => {
+        if (bulkAction === 'delete') return newsApi.deleteNews(id);
+        if (bulkAction === 'publish') return newsApi.updateNews(id, { status: 'PUBLISHED', publishedAt: new Date().toISOString() } as any);
+        if (bulkAction === 'archive') return newsApi.updateNews(id, { status: 'ARCHIVED' } as any);
+        if (bulkAction === 'unarchive') return newsApi.updateNews(id, { status: 'DRAFT' } as any);
+      }));
+      setSelectedItems([]);
+      fetchData();
+    } catch (error) {
+      console.error('Bulk action error', error);
+    } finally {
+      setBulkProcessing(false);
+      setBulkAction(null);
+    }
+  };
 
   const fetchData = useCallback(async () => {
     try {
@@ -238,6 +283,14 @@ export const News = () => {
               <Table>
                 <TableHead>
                   <TableRow>
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        color="primary"
+                        indeterminate={selectedItems.length > 0 && selectedItems.length < (data?.data?.length ?? 0)}
+                        checked={(data?.data?.length ?? 0) > 0 && selectedItems.length === (data?.data?.length ?? 0)}
+                        onChange={handleSelectAll}
+                      />
+                    </TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>Заголовок</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>Охоплення</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>Категорія</TableCell>
@@ -251,6 +304,7 @@ export const News = () => {
                 <TableBody>
                   {Array.from({ length: 5 }).map((_, idx) => (
                     <TableRow key={idx}>
+                      <TableCell padding="checkbox"><Skeleton variant="circular" width={24} height={24} /></TableCell>
                       <TableCell><Skeleton variant="text" width={240} /></TableCell>
                       <TableCell><Skeleton variant="text" width={140} /></TableCell>
                       <TableCell><Skeleton variant="text" width={100} /></TableCell>
@@ -338,8 +392,17 @@ export const News = () => {
                     hover
                     onClick={() => handleSingleClick(item)}
                     onDoubleClick={() => handleDoubleClick(item)}
+                    selected={selectedItems.includes(item.id)}
                     sx={{ cursor: 'pointer' }}
                   >
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        color="primary"
+                        checked={selectedItems.includes(item.id)}
+                        onChange={(e) => handleSelectOne(item.id, e)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </TableCell>
                     <TableCell sx={{ maxWidth: 300, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {item.title}
                     </TableCell>
@@ -436,7 +499,10 @@ export const News = () => {
                 sx={{ 
                   display: 'flex', 
                   flexDirection: 'column',
+                  position: 'relative',
                   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  border: selectedItems.includes(item.id) ? 2 : 0,
+                  borderColor: 'primary.main',
                   '&:hover': {
                     transform: 'translateY(-4px)',
                     boxShadow: 6,
@@ -444,6 +510,14 @@ export const News = () => {
                   }
                 }}
               >
+                <Box sx={{ position: 'absolute', top: 8, left: 8, zIndex: 2, bgcolor: 'background.paper', borderRadius: 1, boxShadow: 1 }}>
+                  <Checkbox
+                    size="small"
+                    checked={selectedItems.includes(item.id)}
+                    onChange={(e) => handleSelectOne(item.id, e)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </Box>
                 <SecureImage
                   src={item.imageUrl ?? undefined}
                   alt={item.title}
@@ -566,6 +640,25 @@ export const News = () => {
         news={detailsNewsItem}
         onClose={() => setDetailsNewsItem(null)}
         onRefreshList={fetchData}
+      />
+
+      <BulkActionsBar
+        selectedCount={selectedItems.length}
+        onClear={() => setSelectedItems([])}
+        onPublish={activeTab === 0 ? () => handleBulkAction('publish') : undefined}
+        onArchive={activeTab === 0 ? () => handleBulkAction('archive') : undefined}
+        onUnarchive={activeTab === 1 ? () => handleBulkAction('unarchive') : undefined}
+        onDelete={activeTab === 1 ? () => handleBulkAction('delete') : undefined}
+        isProcessing={bulkProcessing}
+      />
+
+      <BulkConfirmDialog
+        open={!!bulkAction}
+        action={bulkAction}
+        count={selectedItems.length}
+        onClose={() => setBulkAction(null)}
+        onConfirm={executeBulkAction}
+        isProcessing={bulkProcessing}
       />
     </Box>
   );

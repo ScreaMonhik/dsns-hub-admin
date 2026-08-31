@@ -16,6 +16,9 @@ import { EditUserDialog } from '../components/users/EditUserDialog';
 import { ResetPasswordDialog } from '../components/users/ResetPasswordDialog';
 import { DeleteUserDialog } from '../components/users/DeleteUserDialog';
 import type { User } from '../store/authStore';
+import { Checkbox } from '@mui/material';
+import { BulkActionsBar } from '../components/common/BulkActionsBar';
+import { BulkConfirmDialog, type BulkActionType } from '../components/common/BulkConfirmDialog';
 
 export const Users = () => {
   const [data, setData] = useState<UsersResponse | null>(null);
@@ -29,6 +32,43 @@ export const Users = () => {
   const [editUser, setEditUser] = useState<User | null>(null);
   const [resetPassUser, setResetPassUser] = useState<User | null>(null);
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [bulkProcessing, setBulkProcessing] = useState(false);
+  const [bulkAction, setBulkAction] = useState<BulkActionType | null>(null);
+
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked && data) {
+      setSelectedItems(data.data.map(item => item.id));
+    } else {
+      setSelectedItems([]);
+    }
+  };
+
+  const handleSelectOne = (id: string, e: React.MouseEvent | React.ChangeEvent) => {
+    e.stopPropagation();
+    setSelectedItems(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const handleBulkAction = (action: BulkActionType) => {
+    if (!selectedItems.length) return;
+    setBulkAction(action);
+  };
+
+  const executeBulkAction = async () => {
+    if (!selectedItems.length || !bulkAction) return;
+
+    setBulkProcessing(true);
+    try {
+      await Promise.all(selectedItems.map(id => usersApi.deleteUser(id)));
+      setSelectedItems([]);
+      fetchUsers(page, debouncedSearch);
+    } catch (error) {
+      console.error('Bulk action error', error);
+    } finally {
+      setBulkProcessing(false);
+      setBulkAction(null);
+    }
+  };
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -86,8 +126,16 @@ export const Users = () => {
         <TableContainer>
           <Table>
             <TableHead>
-              <TableRow>
-                <TableCell>Ім'я та Прізвище</TableCell>
+                  <TableRow>
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        color="primary"
+                        indeterminate={selectedItems.length > 0 && selectedItems.length < (data?.data?.length ?? 0)}
+                        checked={(data?.data?.length ?? 0) > 0 && selectedItems.length === (data?.data?.length ?? 0)}
+                        onChange={handleSelectAll}
+                      />
+                    </TableCell>
+                    <TableCell>Ім'я та Прізвище</TableCell>
                 <TableCell>Електронна пошта</TableCell>
                 <TableCell>Роль</TableCell>
                 <TableCell>Статус</TableCell>
@@ -99,7 +147,8 @@ export const Users = () => {
               {loading ? (
                 Array.from({ length: 5 }).map((_, idx) => (
                   <TableRow key={idx}>
-                    <TableCell><Skeleton variant="text" width={180} /></TableCell>
+                      <TableCell padding="checkbox"><Skeleton variant="circular" width={24} height={24} /></TableCell>
+                      <TableCell><Skeleton variant="text" width={180} /></TableCell>
                     <TableCell><Skeleton variant="text" width={220} /></TableCell>
                     <TableCell><Skeleton variant="text" width={100} /></TableCell>
                     <TableCell>
@@ -116,7 +165,14 @@ export const Users = () => {
                   </TableRow>
                 ))
               ) : data?.data.map((user) => (
-                <TableRow key={user.id} hover>
+                <TableRow key={user.id} hover selected={selectedItems.includes(user.id)}>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      color="primary"
+                      checked={selectedItems.includes(user.id)}
+                      onChange={(e) => handleSelectOne(user.id, e)}
+                    />
+                  </TableCell>
                   <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
@@ -203,6 +259,22 @@ export const Users = () => {
         user={deleteUser}
         onClose={() => setDeleteUser(null)}
         onSuccess={() => fetchUsers(page, debouncedSearch)}
+      />
+
+      <BulkActionsBar
+        selectedCount={selectedItems.length}
+        onClear={() => setSelectedItems([])}
+        onDelete={() => handleBulkAction('delete')}
+        isProcessing={bulkProcessing}
+      />
+
+      <BulkConfirmDialog
+        open={!!bulkAction}
+        action={bulkAction}
+        count={selectedItems.length}
+        onClose={() => setBulkAction(null)}
+        onConfirm={executeBulkAction}
+        isProcessing={bulkProcessing}
       />
     </Box>
   );

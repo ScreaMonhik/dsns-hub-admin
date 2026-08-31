@@ -27,6 +27,8 @@ import { DeleteDocumentDialog } from '../components/documents/DeleteDocumentDial
 import { format } from 'date-fns';
 import { SecureImage } from '../components/common/SecureImage';
 import { useSearchParams } from 'react-router-dom';
+import { Checkbox } from '@mui/material';
+import { BulkActionsBar } from '../components/common/BulkActionsBar';
 
 export const Documents = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -47,8 +49,46 @@ export const Documents = () => {
   const [editDocument, setEditDocument] = useState<DocumentModel | null>(null);
   const [deleteDocumentItem, setDeleteDocumentItem] = useState<DocumentModel | null>(null);
   const [statusDialogData, setStatusDialogData] = useState<{ document: DocumentModel, action: 'publish' | 'archive' | 'unarchive' } | null>(null);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [bulkProcessing, setBulkProcessing] = useState(false);
   
   const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked && data) {
+      const itemsToSelect = activeTab === 0 ? data.data.filter(item => item.status !== 'ARCHIVED') : data.data;
+      setSelectedItems(itemsToSelect.map(item => item.id));
+    } else {
+      setSelectedItems([]);
+    }
+  };
+
+  const handleSelectOne = (id: string, e: React.MouseEvent | React.ChangeEvent) => {
+    e.stopPropagation();
+    setSelectedItems(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const handleBulkAction = async (action: 'publish' | 'archive' | 'unarchive' | 'delete') => {
+    if (!selectedItems.length) return;
+    const actionText = action === 'delete' ? 'видалити' : action === 'publish' ? 'опублікувати' : action === 'unarchive' ? 'відновити з архіву' : 'перемістити в архів';
+    if (!window.confirm(`Ви впевнені, що хочете ${actionText} вибрані записи (${selectedItems.length} шт.)?`)) return;
+
+    setBulkProcessing(true);
+    try {
+      await Promise.all(selectedItems.map(id => {
+        if (action === 'delete') return documentsApi.deleteDocument(id);
+        if (action === 'publish') return documentsApi.publishDocument(id);
+        if (action === 'archive') return documentsApi.archiveDocument(id);
+        if (action === 'unarchive') return documentsApi.unarchiveDocument(id);
+      }));
+      setSelectedItems([]);
+      fetchData();
+    } catch (error) {
+      console.error('Bulk action error', error);
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -205,6 +245,14 @@ export const Documents = () => {
               <Table>
                 <TableHead>
                   <TableRow>
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        color="primary"
+                        indeterminate={selectedItems.length > 0 && selectedItems.length < (docsList.length || 0)}
+                        checked={docsList.length > 0 && selectedItems.length === docsList.length}
+                        onChange={handleSelectAll}
+                      />
+                    </TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>Назва документа</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>Охоплення</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>Статус</TableCell>
@@ -216,6 +264,7 @@ export const Documents = () => {
                 <TableBody>
                   {Array.from({ length: 5 }).map((_, idx) => (
                     <TableRow key={idx}>
+                      <TableCell padding="checkbox"><Skeleton variant="circular" width={24} height={24} /></TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Skeleton variant="rectangular" width={20} height={24} />
@@ -297,8 +346,17 @@ export const Documents = () => {
                     hover
                     onClick={() => handleSingleClick(item)}
                     onDoubleClick={() => handleDoubleClick(item)}
+                    selected={selectedItems.includes(item.id)}
                     sx={{ cursor: 'pointer' }}
                   >
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        color="primary"
+                        checked={selectedItems.includes(item.id)}
+                        onChange={(e) => handleSelectOne(item.id, e)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </TableCell>
                     <TableCell sx={{ maxWidth: 250, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <PictureAsPdfIcon color="error" fontSize="small" />
@@ -355,7 +413,10 @@ export const Documents = () => {
                 sx={{ 
                   display: 'flex', 
                   flexDirection: 'column', 
+                  position: 'relative',
                   transition: 'transform 0.3s ease, box-shadow 0.3s ease', 
+                  border: selectedItems.includes(item.id) ? 2 : 0,
+                  borderColor: 'primary.main',
                   '&:hover': { 
                     transform: 'translateY(-4px)', 
                     boxShadow: 6, 
@@ -363,6 +424,14 @@ export const Documents = () => {
                   } 
                 }}
               >
+                <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 2 }}>
+                  <Checkbox
+                    size="small"
+                    checked={selectedItems.includes(item.id)}
+                    onChange={(e) => handleSelectOne(item.id, e)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </Box>
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start', mb: 1.5 }}>
                     <Box sx={{ p: 1, bgcolor: 'error.main', color: 'error.contrastText', borderRadius: 1, display: 'flex' }}>
@@ -447,6 +516,16 @@ export const Documents = () => {
         action={statusDialogData?.action || null} 
         onClose={() => setStatusDialogData(null)} 
         onSuccess={fetchData} 
+      />
+
+      <BulkActionsBar
+        selectedCount={selectedItems.length}
+        onClear={() => setSelectedItems([])}
+        onPublish={activeTab === 0 ? () => handleBulkAction('publish') : undefined}
+        onArchive={activeTab === 0 ? () => handleBulkAction('archive') : undefined}
+        onUnarchive={activeTab === 1 ? () => handleBulkAction('unarchive') : undefined}
+        onDelete={() => handleBulkAction('delete')}
+        isProcessing={bulkProcessing}
       />
     </Box>
   );
