@@ -30,9 +30,19 @@ import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import TitleIcon from '@mui/icons-material/Title';
 import { useState, useRef, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import DOMPurify from 'dompurify';
 import { newsApi } from '../../api/newsApi';
 import { SecureImage } from '../common/SecureImage';
 import { getFullUrl } from '../../utils/url';
+
+const PURIFY_CONFIG = {
+  ADD_TAGS: ['iframe', 'video'],
+  ADD_ATTR: ['allowfullscreen', 'frameborder', 'controls', 'target'],
+};
+
+const sanitizeHtmlContent = (html: string) => {
+  return DOMPurify.sanitize(html, PURIFY_CONFIG);
+};
 
 // Кастомний вузол для TipTap: рендерить наш SecureImage
 const TipTapSecureImage = (props: any) => {
@@ -128,7 +138,7 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
       try {
         return typeof value === 'string' ? JSON.parse(value) : value;
       } catch {
-        return value;
+        return sanitizeHtmlContent(value);
       }
     })(),
     onUpdate: ({ editor }) => {
@@ -158,16 +168,16 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
     const compareValue = isJson ? JSON.stringify(parsedValue) : value;
 
     if (compareValue !== currentJSON && value !== editor.getHTML()) {
-      if (isJson) {
-        try {
-          editor.commands.setContent(parsedValue);
-        } catch (error) {
-          console.error('Failed to set JSON content in TipTap:', error);
+        if (isJson) {
+          try {
+            editor.commands.setContent(parsedValue);
+          } catch (error) {
+            console.error('Failed to set JSON content in TipTap:', error);
+          }
+        } else {
+          editor.commands.setContent(sanitizeHtmlContent(value || ''));
         }
-      } else {
-        editor.commands.setContent(value || '');
       }
-    }
   }, [value, editor]);
 
   if (!editor) return null;
@@ -459,7 +469,7 @@ export const TipTapViewer = ({ value }: { value: string }) => {
       try {
         return typeof value === 'string' ? JSON.parse(value) : value;
       } catch {
-        return value;
+        return sanitizeHtmlContent(value);
       }
     })(),
   });
@@ -493,7 +503,7 @@ export const TipTapViewer = ({ value }: { value: string }) => {
           console.error('Failed to set JSON content in TipTapViewer:', error);
         }
       } else {
-        editor.commands.setContent(value || '');
+        editor.commands.setContent(sanitizeHtmlContent(value || ''));
       }
     }
   }, [value, editor]);
