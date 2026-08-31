@@ -11,6 +11,7 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import PersonIcon from '@mui/icons-material/Person';
 import SecurityIcon from '@mui/icons-material/Security';
 import HistoryIcon from '@mui/icons-material/History';
+import DevicesIcon from '@mui/icons-material/Devices';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import toast from 'react-hot-toast';
@@ -19,6 +20,7 @@ import { useAuthStore } from '../store/authStore';
 import { usersApi } from '../api/usersApi';
 import { auditApi, type PaginatedAuditLogsResponse } from '../api/auditApi';
 import { SecureImage } from '../components/common/SecureImage';
+import { ActiveSessionsTab } from '../components/profile/ActiveSessionsTab';
 
 const passwordSchema = z.object({
   oldPassword: z.string().min(1, 'Введіть поточний пароль'),
@@ -135,6 +137,7 @@ export const Profile = () => {
           <Tab icon={<PersonIcon />} iconPosition="start" label="Профіль" />
           <Tab icon={<SecurityIcon />} iconPosition="start" label="Безпека" />
           <Tab icon={<HistoryIcon />} iconPosition="start" label="Моя активність" />
+          <Tab icon={<DevicesIcon />} iconPosition="start" label="Активні сесії" />
         </Tabs>
 
         {/* 1. Вкладка "Профіль" */}
@@ -333,6 +336,11 @@ export const Profile = () => {
               <Pagination count={logsData.meta.lastPage} page={logsPage} onChange={(_, value) => setLogsPage(value)} color="primary" />
             </Box>
           )}
+        </TabPanel>
+
+        {/* 4. Вкладка "Активні сесії" */}
+        <TabPanel value={tabValue} index={3}>
+          <ActiveSessionsTab />
         </TabPanel>
       </Paper>
     </Box>

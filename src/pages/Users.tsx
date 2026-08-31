@@ -5,9 +5,11 @@ import {
   OutlinedInput, InputAdornment, IconButton, Tooltip, Chip, Skeleton
 } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import EditIcon from '@mui/icons-material/Edit';
 import LockResetIcon from '@mui/icons-material/LockReset';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import DevicesIcon from '@mui/icons-material/Devices';
+import { UserSessionsDialog } from '../components/users/UserSessionsDialog';
 import SearchIcon from '@mui/icons-material/Search';
 import { format } from 'date-fns';
 import { usersApi, type UsersResponse } from '../api/usersApi';
@@ -32,6 +34,7 @@ export const Users = () => {
   const [editUser, setEditUser] = useState<User | null>(null);
   const [resetPassUser, setResetPassUser] = useState<User | null>(null);
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
+  const [sessionsUser, setSessionsUser] = useState<User | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [bulkProcessing, setBulkProcessing] = useState(false);
   const [bulkAction, setBulkAction] = useState<BulkActionType | null>(null);
@@ -200,8 +203,13 @@ export const Users = () => {
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
+                    <Tooltip title="Активні сесії користувача">
+                      <IconButton color="info" size="small" onClick={() => setSessionsUser(user)}>
+                        <DevicesIcon />
+                      </IconButton>
+                    </Tooltip>
                     <Tooltip title="Скинути пароль">
-                      <IconButton color="warning" onClick={() => setResetPassUser(user)}>
+                      <IconButton color="warning" size="small" onClick={() => setResetPassUser(user)}>
                         <LockResetIcon />
                       </IconButton>
                     </Tooltip>
@@ -275,6 +283,12 @@ export const Users = () => {
         onClose={() => setBulkAction(null)}
         onConfirm={executeBulkAction}
         isProcessing={bulkProcessing}
+      />
+
+      <UserSessionsDialog
+        open={!!sessionsUser}
+        user={sessionsUser}
+        onClose={() => setSessionsUser(null)}
       />
     </Box>
   );
