@@ -15,6 +15,7 @@ import { Chats } from './pages/Chats';
 import { AuditLogs } from './pages/AuditLogs';
 import { Broadcasts } from './pages/Broadcasts';
 import { Profile } from './pages/Profile';
+import { Settings } from './pages/Settings';
 import { useThemeStore } from './store/themeStore';
 import { Toaster } from 'react-hot-toast';
 
@@ -111,6 +112,7 @@ function App() {
               <Route path="/broadcasts" element={<Broadcasts />} />
               <Route path="/audit-logs" element={<AuditLogs />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/settings" element={<Settings />} />
             </Route>
           </Route>
 

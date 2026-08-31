@@ -13,6 +13,7 @@ const routeNames: Record<string, string> = {
   'broadcasts': 'Розсилки',
   'audit-logs': 'Журнал аудиту',
   'profile': 'Особистий кабінет',
+  'settings': 'Налаштування системи',
 };
 
 export const PageBreadcrumbs = () => {

@@ -6,6 +6,7 @@ import { Sidebar } from './Sidebar';
 import { PageBreadcrumbs } from './PageBreadcrumbs';
 import { useIdleTimer } from '../../hooks/useIdleTimer';
 import { useAuthStore } from '../../store/authStore';
+import { GlobalBanner } from './GlobalBanner';
 
 export const AdminLayout = () => {
   const { logout } = useAuthStore();
@@ -24,6 +25,7 @@ export const AdminLayout = () => {
       <Sidebar />
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Toolbar /> {/* Spacer for Header */}
+        <GlobalBanner />
         <PageBreadcrumbs />
         <Outlet />
       </Box>
