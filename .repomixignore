@@ -1,0 +1,55 @@
+# Dependencies & Build Output
+node_modules/
+dist/
+build/
+out-tsc/
+coverage/
+.cache/
+.nyc_output/
+.git/
+.oxlintrc.json
+
+# Test Artifacts & Test Specs (Keep context clean during UI/Feature dev)
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+src/setupTests.ts
+test/
+
+# Media & Static Assets
+public/
+src/assets/
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.webp
+*.pdf
+
+# Fonts
+*.woff
+*.woff2
+*.eot
+*.ttf
+*.otf
+
+# Lockfiles, Logs & Temporary Files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+*.log
+*.tsbuildinfo
+*.pem
+uploads/
+
+# IDE, Editor & Tooling Configs
+.idea/
+.vscode/
+.DS_Store
+.env*
+tsconfig*.json
+README.md
+repomix.config.json

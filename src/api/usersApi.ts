@@ -51,8 +51,8 @@ export const usersApi = {
     return response.data;
   },
 
-  resetPassword: async (id: string, newPassword: string) => {
-    const response = await apiClient.post(`/users/${id}/reset-password`, { newPassword });
+  resetPassword: async (id: string): Promise<{ message: string; tempPassword: string }> => {
+    const response = await apiClient.post<{ message: string; tempPassword: string }>(`/users/${id}/reset-password`);
     return response.data;
   },
 

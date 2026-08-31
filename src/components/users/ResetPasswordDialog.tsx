@@ -1,23 +1,12 @@
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { 
-  Dialog, DialogTitle, DialogContent, DialogActions, 
-  Button, TextField, Box, Alert, IconButton, InputAdornment 
-} from '@mui/material';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useState } from 'react';
+import { 
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, 
+  Button, Box, Alert, IconButton, Typography, InputAdornment, OutlinedInput 
+} from '@mui/material';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CheckIcon from '@mui/icons-material/Check';
 import { usersApi } from '../../api/usersApi';
 import type { User } from '../../store/authStore';
-
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
-const resetPasswordSchema = z.object({
-  newPassword: z.string().regex(passwordRegex, 'Мінімум 8 символів. Обов\'язково: велика і мала літери, цифра, спецсимвол.'),
-});
-
-type FormInputs = z.infer<typeof resetPasswordSchema>;
 
 interface Props {
   open: boolean;
@@ -28,71 +17,93 @@ interface Props {
 
 export const ResetPasswordDialog = ({ open, user, onClose, onSuccess }: Props) => {
   const [apiError, setApiError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [tempPassword, setTempPassword] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
-  const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormInputs>({
-    resolver: zodResolver(resetPasswordSchema),
-    defaultValues: { newPassword: '' },
-  });
-
-  const onSubmit = async (data: FormInputs) => {
+  const handleReset = async () => {
     if (!user) return;
     try {
+      setIsSubmitting(true);
       setApiError(null);
-      await usersApi.resetPassword(user.id, data.newPassword);
-      reset();
+      const response = await usersApi.resetPassword(user.id);
+      setTempPassword(response.tempPassword);
       onSuccess();
-      onClose();
-    } catch (error: any) {
-      setApiError(error.response?.data?.message || 'Не вдалося скинути пароль');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      setApiError(err.response?.data?.message || 'Не вдалося скинути пароль');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCopy = () => {
+    if (tempPassword) {
+      navigator.clipboard.writeText(tempPassword);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
   const handleClose = () => {
-    reset();
     setApiError(null);
+    setTempPassword(null);
+    setCopied(false);
     onClose();
-  }
+  };
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
-      <DialogTitle>Скидання пароля для {user?.email}</DialogTitle>
-      <Box component="form" onSubmit={handleSubmit(onSubmit)}>
-        <DialogContent dividers>
-          {apiError && <Alert severity="error" sx={{ mb: 2 }}>{apiError}</Alert>}
-          <Controller
-            name="newPassword"
-            control={control}
-            render={({ field }) => (
-              <TextField 
-                {...field} 
-                type={showPassword ? 'text' : 'password'} 
-                label="Новий пароль" 
-                error={!!errors.newPassword} 
-                helperText={errors.newPassword?.message} 
-                fullWidth 
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }
-                }}
-              />
-            )}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} disabled={isSubmitting}>Скасувати</Button>
-          <Button type="submit" variant="contained" color="warning" disabled={isSubmitting}>
-            {isSubmitting ? 'Скидання...' : 'Скинути пароль'}
-          </Button>
-        </DialogActions>
-      </Box>
+      <DialogTitle>Скидання пароля</DialogTitle>
+      <DialogContent dividers>
+        {apiError && <Alert severity="error" sx={{ mb: 2 }}>{apiError}</Alert>}
+        
+        {!tempPassword ? (
+          <DialogContentText>
+            Ви впевнені, що хочете скинути пароль для користувача <strong>{user?.email}</strong>? 
+            Система автоматично згенерує новий безпечний тимчасовий пароль.
+          </DialogContentText>
+        ) : (
+          <Box>
+            <Alert severity="success" sx={{ mb: 3 }}>
+              Пароль успішно скинуто! Обов'язково скопіюйте його та передайте користувачу для входу.
+            </Alert>
+            <Typography variant="subtitle2" gutterBottom color="text.secondary">
+              Тимчасовий пароль:
+            </Typography>
+            <OutlinedInput
+              fullWidth
+              readOnly
+              value={tempPassword}
+              sx={{ fontWeight: 'bold', fontFamily: 'monospace' }}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton 
+                    onClick={handleCopy} 
+                    edge="end" 
+                    color={copied ? "success" : "primary"}
+                    title="Копіювати в буфер обміну"
+                  >
+                    {copied ? <CheckIcon /> : <ContentCopyIcon />}
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
+          </Box>
+        )}
+      </DialogContent>
+      <DialogActions>
+        {!tempPassword ? (
+          <>
+            <Button onClick={handleClose} disabled={isSubmitting}>Скасувати</Button>
+            <Button onClick={handleReset} variant="contained" color="warning" disabled={isSubmitting}>
+              {isSubmitting ? 'Скидання...' : 'Скинути пароль'}
+            </Button>
+          </>
+        ) : (
+          <Button onClick={handleClose} variant="contained">Закрити</Button>
+        )}
+      </DialogActions>
     </Dialog>
   );
 };
