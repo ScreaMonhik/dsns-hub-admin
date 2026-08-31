@@ -18,6 +18,7 @@ import { Profile } from './pages/Profile';
 import { Settings } from './pages/Settings';
 import { useThemeStore } from './store/themeStore';
 import { Toaster } from 'react-hot-toast';
+import { Departments } from './pages/Departments';
 
 function App() {
   const mode = useThemeStore((state) => state.mode);
@@ -113,6 +114,7 @@ function App() {
               <Route path="/audit-logs" element={<AuditLogs />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/departments" element={<Departments />} />
             </Route>
           </Route>
 

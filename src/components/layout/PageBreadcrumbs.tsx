@@ -14,6 +14,7 @@ const routeNames: Record<string, string> = {
   'audit-logs': 'Журнал аудиту',
   'profile': 'Особистий кабінет',
   'settings': 'Налаштування системи',
+  'departments': 'Структура підрозділів',
 };
 
 export const PageBreadcrumbs = () => {

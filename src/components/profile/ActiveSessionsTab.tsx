@@ -5,7 +5,6 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions 
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import DevicesIcon from '@mui/icons-material/Devices';
 import DesktopWindowsIcon from '@mui/icons-material/DesktopWindows';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import toast from 'react-hot-toast';

@@ -1,11 +1,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { 
   Box, Typography, Button, Paper, Table, TableBody, TableCell, 
-  TableContainer, TableHead, TableRow, Pagination, CircularProgress,
+  TableContainer, TableHead, TableRow, Pagination,
   IconButton, Tooltip, Chip, MenuItem, TextField,
   ToggleButton, ToggleButtonGroup, Card, CardContent, CardActions, Tabs, Tab, Avatar, Skeleton
 } from '@mui/material';
-import ArticleIcon from '@mui/icons-material/Article';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';

@@ -10,6 +10,7 @@ import ChatIcon from '@mui/icons-material/Chat';
 import SecurityIcon from '@mui/icons-material/Security';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import SettingsIcon from '@mui/icons-material/Settings';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import { useCan } from '../../hooks/useCan';
 
 const DRAWER_WIDTH = 240;
@@ -29,6 +30,7 @@ export const Sidebar = () => {
     { text: 'Чати', path: '/chats', icon: <ChatIcon /> },
     { text: 'Розсилки', path: '/broadcasts', icon: <CampaignIcon /> },
     ...(isSuperAdmin ? [
+      { text: 'Підрозділи', path: '/departments', icon: <AccountTreeIcon /> },
       { text: 'Аудит', path: '/audit-logs', icon: <SecurityIcon /> },
       { text: 'Налаштування', path: '/settings', icon: <SettingsIcon /> }
     ] : []),
