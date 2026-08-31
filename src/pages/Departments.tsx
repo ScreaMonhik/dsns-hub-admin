@@ -82,7 +82,6 @@ const SortableDepartmentItem = ({
     transition,
     zIndex: isDragging ? 999 : 1,
     opacity: isDragging ? 0.8 : 1,
-    backgroundColor: isDragging ? 'var(--mui-palette-action-hover)' : 'inherit',
     borderBottom: '1px solid var(--mui-palette-divider)',
     boxShadow: isDragging ? '0 4px 12px rgba(0,0,0,0.1)' : 'none',
   };
@@ -114,11 +113,15 @@ const SortableDepartmentItem = ({
       sx={{ 
         display: 'flex', 
         alignItems: 'center', 
-        bgcolor: 'background.paper',
+        bgcolor: isDragging ? 'action.hover' : 'background.paper',
         py: 1.5,
         px: 2,
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        transition: 'background-color 0.2s ease',
+        '&:hover': { 
+          bgcolor: 'action.hover' 
+        }
       }}
     >
       <Box 
