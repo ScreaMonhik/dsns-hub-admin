@@ -1,22 +1,47 @@
+import { useState, useEffect } from 'react';
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, 
-  Button, Typography, Box, Chip, Divider, Avatar 
+  Button, Typography, Box, Chip, Divider, Avatar, CircularProgress, Alert
 } from '@mui/material';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import DevicesIcon from '@mui/icons-material/Devices';
 import { format } from 'date-fns';
-import type { EmergencyBroadcast, BroadcastSeverity } from '../../api/broadcastsApi';
+import { broadcastsApi, type EmergencyBroadcast, type BroadcastSeverity } from '../../api/broadcastsApi';
 import { SecureImage } from '../common/SecureImage';
 
 interface Props {
   open: boolean;
-  broadcast: EmergencyBroadcast | null;
+  broadcastId: string | null;
   onClose: () => void;
 }
 
-export const BroadcastDetailsDialog = ({ open, broadcast, onClose }: Props) => {
-  if (!broadcast) return null;
+export const BroadcastDetailsDialog = ({ open, broadcastId, onClose }: Props) => {
+  const [broadcast, setBroadcast] = useState<EmergencyBroadcast | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (open && broadcastId) {
+      const fetchDetails = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const data = await broadcastsApi.getBroadcastById(broadcastId);
+          setBroadcast(data);
+        } catch (err: any) {
+          setError(err.response?.data?.message || 'Не вдалося завантажити деталі розсилки');
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchDetails();
+    } else {
+      setBroadcast(null);
+    }
+  }, [open, broadcastId]);
+
+  if (!open) return null;
 
   const getSeverityChip = (severity: BroadcastSeverity) => {
     switch (severity) {
@@ -44,7 +69,17 @@ export const BroadcastDetailsDialog = ({ open, broadcast, onClose }: Props) => {
         <CampaignIcon color="primary" /> Деталі розсилки та звіт про доставку
       </DialogTitle>
       
-      <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+      <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, minHeight: 200 }}>
+        {loading && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', py: 5 }}>
+            <CircularProgress />
+          </Box>
+        )}
+        
+        {error && <Alert severity="error">{error}</Alert>}
+
+        {!loading && broadcast && (
+          <>
         <Box>
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 1, flexWrap: 'wrap' }}>
             {getSeverityChip(broadcast.severity)}
@@ -125,6 +160,8 @@ export const BroadcastDetailsDialog = ({ open, broadcast, onClose }: Props) => {
               </Typography>
             </Box>
           </Box>
+        )}
+          </>
         )}
       </DialogContent>
 

@@ -22,7 +22,7 @@ export const Broadcasts = () => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [selectedBroadcast, setSelectedBroadcast] = useState<EmergencyBroadcast | null>(null);
+  const [selectedBroadcastId, setSelectedBroadcastId] = useState<string | null>(null);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -114,6 +114,7 @@ export const Broadcasts = () => {
               <TableRow>
                 <TableCell sx={{ fontWeight: 'bold' }}>Заголовок та зміст</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Рівень загрози</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Статус</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Звуковий сигнал</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Охоплення</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Час відправки</TableCell>
@@ -126,6 +127,7 @@ export const Broadcasts = () => {
                   <TableRow key={idx}>
                     <TableCell><Skeleton variant="text" width={220} /></TableCell>
                     <TableCell><Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: 4 }} /></TableCell>
+                    <TableCell><Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: 4 }} /></TableCell>
                     <TableCell><Skeleton variant="text" width={100} /></TableCell>
                     <TableCell><Skeleton variant="text" width={80} /></TableCell>
                     <TableCell><Skeleton variant="text" width={120} /></TableCell>
@@ -136,7 +138,7 @@ export const Broadcasts = () => {
                 <TableRow 
                   key={item.id} 
                   hover 
-                  onClick={() => setSelectedBroadcast(item)} 
+                  onClick={() => setSelectedBroadcastId(item.id)} 
                   sx={{ cursor: 'pointer' }}
                 >
                   <TableCell sx={{ maxWidth: 320 }}>
@@ -148,6 +150,14 @@ export const Broadcasts = () => {
                     </Typography>
                   </TableCell>
                   <TableCell>{getSeverityChip(item.severity)}</TableCell>
+                  <TableCell>
+                    <Chip 
+                      label={item.status === 'SENT' ? 'Відправлено' : item.status === 'FAILED' ? 'Помилка' : 'В обробці'} 
+                      color={item.status === 'SENT' ? 'success' : item.status === 'FAILED' ? 'error' : 'default'} 
+                      size="small" 
+                      variant="outlined" 
+                    />
+                  </TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <VolumeUpIcon fontSize="small" color="action" />
@@ -162,7 +172,7 @@ export const Broadcasts = () => {
                   <TableCell>{format(new Date(item.createdAt), 'dd.MM.yyyy HH:mm:ss')}</TableCell>
                   <TableCell align="right" onClick={(e) => e.stopPropagation()}>
                     <Tooltip title="Переглянути звіт">
-                      <IconButton color="primary" onClick={() => setSelectedBroadcast(item)}>
+                      <IconButton color="primary" onClick={() => setSelectedBroadcastId(item.id)}>
                         <VisibilityIcon />
                       </IconButton>
                     </Tooltip>
@@ -171,7 +181,7 @@ export const Broadcasts = () => {
               ))}
               {!loading && data?.data.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
+                  <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
                     Екстрених розсилок ще не відправлялося
                   </TableCell>
                 </TableRow>
@@ -199,9 +209,9 @@ export const Broadcasts = () => {
       />
 
       <BroadcastDetailsDialog
-        open={!!selectedBroadcast}
-        broadcast={selectedBroadcast}
-        onClose={() => setSelectedBroadcast(null)}
+        open={!!selectedBroadcastId}
+        broadcastId={selectedBroadcastId}
+        onClose={() => setSelectedBroadcastId(null)}
       />
     </Box>
   );
