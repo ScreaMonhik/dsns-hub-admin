@@ -30,19 +30,10 @@ import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import TitleIcon from '@mui/icons-material/Title';
 import { useState, useRef, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import DOMPurify from 'dompurify';
 import { newsApi } from '../../api/newsApi';
 import { SecureImage } from '../common/SecureImage';
-import { getFullUrl } from '../../utils/url';
-
-const PURIFY_CONFIG = {
-  ADD_TAGS: ['iframe', 'video'],
-  ADD_ATTR: ['allowfullscreen', 'frameborder', 'controls', 'target'],
-};
-
-const sanitizeHtmlContent = (html: string) => {
-  return DOMPurify.sanitize(html, PURIFY_CONFIG);
-};
+import { getFullUrl, isSafeHttpUrl, isSafeYoutubeUrl } from '../../utils/url';
+import { sanitizeHtmlContent } from '../../utils/sanitizeHtml';
 
 // Кастомний вузол для TipTap: рендерить наш SecureImage
 const TipTapSecureImage = (props: any) => {
@@ -120,6 +111,12 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
         openOnClick: false,
         autolink: true,
         defaultProtocol: 'https',
+        protocols: ['http', 'https'],
+        HTMLAttributes: {
+          rel: 'noopener noreferrer nofollow',
+          target: '_blank',
+        },
+        validate: (href) => isSafeHttpUrl(href),
       }),
       Youtube.configure({
         inline: false,
@@ -185,6 +182,11 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      toast.error('Дозволені лише зображення JPEG, PNG або WebP');
+      if (imageInputRef.current) imageInputRef.current.value = '';
+      return;
+    }
     try {
       setIsImageUploading(true);
       const res = await newsApi.uploadMedia(file);
@@ -201,6 +203,11 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
   const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    if (!['video/mp4', 'video/webm', 'video/ogg'].includes(file.type)) {
+      toast.error('Дозволені лише відео MP4, WebM або OGG');
+      if (videoInputRef.current) videoInputRef.current.value = '';
+      return;
+    }
     try {
       setIsVideoUploading(true);
       const res = await newsApi.uploadMedia(file);
@@ -225,6 +232,9 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
   const confirmLink = () => {
     if (!linkDialog.url) {
       editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    } else if (!isSafeHttpUrl(linkDialog.url)) {
+      toast.error('Дозволені лише посилання http/https');
+      return;
     } else {
       editor.chain().focus().extendMarkRange('link').setLink({ href: linkDialog.url }).run();
     }
@@ -233,6 +243,10 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
 
   const confirmYouTube = () => {
     if (youtubeDialog.url) {
+      if (!isSafeYoutubeUrl(youtubeDialog.url)) {
+        toast.error('Вставте коректне посилання на YouTube');
+        return;
+      }
       editor.chain().focus().setYoutubeVideo({ src: youtubeDialog.url }).run();
     }
     setYoutubeDialog({ open: false, url: '' });
@@ -460,7 +474,17 @@ export const TipTapViewer = ({ value }: { value: string }) => {
       SecureImageExtension,
       VideoExtension,
       Underline,
-      Link.configure({ openOnClick: true, autolink: true, defaultProtocol: 'https' }),
+      Link.configure({
+        openOnClick: true,
+        autolink: true,
+        defaultProtocol: 'https',
+        protocols: ['http', 'https'],
+        HTMLAttributes: {
+          rel: 'noopener noreferrer nofollow',
+          target: '_blank',
+        },
+        validate: (href) => isSafeHttpUrl(href),
+      }),
       Youtube.configure({ inline: false, width: 640, height: 360 }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
     ],

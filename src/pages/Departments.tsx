@@ -17,6 +17,7 @@ import { departmentsApi, type Department } from '../api/departmentsApi';
 import { DepartmentFormDialog } from '../components/departments/DepartmentFormDialog';
 import { DeleteDepartmentDialog } from '../components/departments/DeleteDepartmentDialog';
 import { PermissionGuard } from '../components/common/PermissionGuard';
+import { useCan } from '../hooks/useCan';
 
 import {
   DndContext,
@@ -197,6 +198,7 @@ const SortableDepartmentItem = ({
 };
 
 export const Departments = () => {
+  const { isSuperAdmin } = useCan();
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -241,8 +243,12 @@ export const Departments = () => {
   }, []);
 
   useEffect(() => {
-    fetchDepartments();
-  }, [fetchDepartments]);
+    if (isSuperAdmin) {
+      fetchDepartments();
+    } else {
+      setLoading(false);
+    }
+  }, [fetchDepartments, isSuperAdmin]);
 
   const handleExportJson = async () => {
     try {

@@ -1,19 +1,29 @@
 import { useState, useEffect } from 'react';
-import type { ImgHTMLAttributes } from 'react'; // Виправлено імпорт типів
+import type { ImgHTMLAttributes } from 'react';
 import { apiClient } from '../../api/apiClient';
+import { isInternalApiUrl, toApiRequestUrl } from '../../utils/url';
+
+const DEFAULT_FALLBACK =
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400">
+      <rect fill="#e2e8f0" width="100%" height="100%"/>
+      <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#64748b" font-family="sans-serif" font-size="20">Немає обкладинки</text>
+    </svg>`
+  );
 
 interface SecureImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src'> {
   src?: string | null;
   fallback?: string;
 }
 
-export const SecureImage = ({ 
-  src, 
-  fallback = 'https://placehold.co/600x400?text=Немає+обкладинки', 
-  alt, 
-  className, 
-  style, 
-  ...props 
+export const SecureImage = ({
+  src,
+  fallback = DEFAULT_FALLBACK,
+  alt,
+  className,
+  style,
+  ...props
 }: SecureImageProps) => {
   const [imgSrc, setImgSrc] = useState<string>(fallback);
   const [isLoading, setIsLoading] = useState<boolean>(!!src);
@@ -31,8 +41,7 @@ export const SecureImage = ({
         return;
       }
 
-      // Якщо це зовнішнє посилання або base64, одразу показуємо його
-      if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:')) {
+      if (src.startsWith('data:image/')) {
         if (isMounted) {
           setImgSrc(src);
           setIsLoading(false);
@@ -40,10 +49,18 @@ export const SecureImage = ({
         return;
       }
 
+      if (!isInternalApiUrl(src)) {
+        if (isMounted) {
+          setImgSrc(fallback);
+          setIsLoading(false);
+        }
+        return;
+      }
+
       setIsLoading(true);
       try {
-        const response = await apiClient.get(src, {
-          responseType: 'blob', // Обов'язково отримуємо бінарник
+        const response = await apiClient.get(toApiRequestUrl(src), {
+          responseType: 'blob',
         });
 
         objectUrl = URL.createObjectURL(response.data);
@@ -61,7 +78,6 @@ export const SecureImage = ({
 
     fetchImage();
 
-    // Очищення пам'яті
     return () => {
       isMounted = false;
       if (objectUrl) {
@@ -75,10 +91,10 @@ export const SecureImage = ({
       src={imgSrc}
       alt={alt || 'Зображення'}
       className={className}
-      style={{ 
-        opacity: isLoading ? 0.7 : 1, 
+      style={{
+        opacity: isLoading ? 0.7 : 1,
         transition: 'opacity 0.3s ease',
-        ...style 
+        ...style,
       }}
       {...props}
     />

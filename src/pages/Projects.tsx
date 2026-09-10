@@ -28,6 +28,7 @@ import { ProjectStatusDialog } from '../components/projects/ProjectStatusDialog'
 import { DeleteProjectDialog } from '../components/projects/DeleteProjectDialog';
 import { ProjectDetailsDialog } from '../components/projects/ProjectDetailsDialog';
 import { format } from 'date-fns';
+import { openBlobInNewTab } from '../utils/url';
 import { SecureImage } from '../components/common/SecureImage';
 import { useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -159,9 +160,7 @@ export const Projects = () => {
     try {
       setDownloadingId(project.id);
       const blob = await projectsApi.downloadProjectFile(project.fileUrl);
-      const url = window.URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
-      window.open(url, '_blank');
-      setTimeout(() => window.URL.revokeObjectURL(url), 60000);
+      openBlobInNewTab(blob);
     } catch (error) {
       console.error('Failed to view document', error);
       toast.error('Не вдалося відкрити PDF документ.');

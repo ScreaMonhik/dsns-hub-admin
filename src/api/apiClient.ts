@@ -1,30 +1,65 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import toast from 'react-hot-toast';
+import { clearAuthStorage, getAccessToken, getRefreshToken, setAuthTokens } from '../utils/authStorage';
+import { getApiBaseUrl, getApiOrigin } from '../utils/url';
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
+  baseURL: getApiBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
+const AUTH_ENDPOINTS_WITHOUT_REFRESH = /\/auth\/(login|refresh|register|logout)(?:\?|$)/i;
+
+function resolveRequestUrl(config: InternalAxiosRequestConfig): URL | null {
+  try {
+    const base = config.baseURL || apiClient.defaults.baseURL || getApiBaseUrl();
+    const url = config.url || '';
+    return new URL(url, base.endsWith('/') ? base : `${base}/`);
+  } catch {
+    return null;
+  }
+}
+
+function isInternalApiRequest(config: InternalAxiosRequestConfig): boolean {
+  const resolved = resolveRequestUrl(config);
+  const apiOrigin = getApiOrigin();
+  if (!resolved || !apiOrigin) return false;
+  return resolved.origin === apiOrigin;
+}
+
+function isAuthEndpointWithoutRefresh(config: InternalAxiosRequestConfig): boolean {
+  const resolved = resolveRequestUrl(config);
+  const path = resolved?.pathname || config.url || '';
+  return AUTH_ENDPOINTS_WITHOUT_REFRESH.test(path);
+}
+
+function redirectToLogin() {
+  clearAuthStorage();
+  if (!window.location.pathname?.startsWith('/login')) {
+    window.location.replace('/login');
+  }
+}
+
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('jwt_token');
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (isInternalApiRequest(config)) {
+      const token = getAccessToken();
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
   (error: AxiosError) => Promise.reject(error)
 );
 
-import toast from 'react-hot-toast';
-
 let isRefreshing = false;
-let failedQueue: Array<{ resolve: (value?: unknown) => void, reject: (reason?: any) => void }> = [];
+let failedQueue: Array<{ resolve: (value?: unknown) => void; reject: (reason?: unknown) => void }> = [];
 
-const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach(prom => {
+const processQueue = (error: unknown, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
     if (error) prom.reject(error);
     else prom.resolve(token);
   });
@@ -41,44 +76,42 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !isAuthEndpointWithoutRefresh(originalRequest)
+    ) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then(token => {
+        }).then((token) => {
           originalRequest.headers.Authorization = `Bearer ${token}`;
           return apiClient(originalRequest);
-        }).catch(err => Promise.reject(err));
+        }).catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
       isRefreshing = true;
-      const refreshToken = localStorage.getItem('refresh_token');
+      const refreshToken = getRefreshToken();
 
       if (!refreshToken) {
-        localStorage.removeItem('jwt_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('auth_storage');
-        window.location.href = '/login';
+        redirectToLogin();
         return Promise.reject(error);
       }
 
       try {
         const response = await axios.post(`${apiClient.defaults.baseURL}/auth/refresh`, { refreshToken });
         const { accessToken, refreshToken: newRefreshToken } = response.data;
-        
-        localStorage.setItem('jwt_token', accessToken);
-        localStorage.setItem('refresh_token', newRefreshToken);
+
+        setAuthTokens(accessToken, newRefreshToken);
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        
+
         processQueue(null, accessToken);
         return apiClient(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        localStorage.removeItem('jwt_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('auth_storage');
-        window.location.href = '/login';
+        redirectToLogin();
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

@@ -28,6 +28,7 @@ import { SecureImage } from '../components/common/SecureImage';
 import { useSearchParams } from 'react-router-dom';
 import { Checkbox } from '@mui/material';
 import { BulkActionsBar } from '../components/common/BulkActionsBar';
+import { openBlobInNewTab } from '../utils/url';
 
 export const Documents = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -147,13 +148,7 @@ export const Documents = () => {
     try {
       setDownloadingId(doc.id);
       const blob = await documentsApi.downloadDocument(doc.fileUrl);
-      
-      // Створюємо URL і відкриваємо в новій вкладці для перегляду
-      const url = window.URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
-      window.open(url, '_blank');
-      
-      // Очищаємо пам'ять через хвилину, щоб браузер встиг завантажити PDF у новій вкладці
-      setTimeout(() => window.URL.revokeObjectURL(url), 60000);
+      openBlobInNewTab(blob);
     } catch (error) {
       console.error('Failed to view document', error);
       toast.error('Не вдалося відкрити документ для перегляду.');

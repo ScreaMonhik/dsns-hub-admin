@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { projectsApi, ProjectStatus, type ProjectModel } from '../../api/projectsApi';
 import { SecureImage } from '../common/SecureImage';
+import { openBlobInNewTab } from '../../utils/url';
 
 interface Props {
   open: boolean;
@@ -71,9 +72,7 @@ export const ProjectDetailsDialog = ({ open, projectId, onClose, onRefreshList }
     if (!project) return;
     try {
       const blob = await projectsApi.downloadProjectFile(project.fileUrl);
-      const url = window.URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
-      window.open(url, '_blank');
-      setTimeout(() => window.URL.revokeObjectURL(url), 60000);
+      openBlobInNewTab(blob);
     } catch (error) {
       console.error('Failed to view document', error);
       toast.error('Не вдалося відкрити PDF документ.');

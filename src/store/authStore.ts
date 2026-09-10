@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { apiClient } from '../api/apiClient';
+import { clearAuthStorage, setAuthTokens } from '../utils/authStorage';
 
 export interface User {
   id: string;
@@ -11,8 +13,6 @@ export interface User {
   avatarUrl: string | null;
   createdAt: string;
 }
-
-import { apiClient } from '../api/apiClient';
 
 interface AuthState {
   user: User | null;
@@ -28,8 +28,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       setAuth: (user, accessToken, refreshToken) => {
-        localStorage.setItem('jwt_token', accessToken);
-        localStorage.setItem('refresh_token', refreshToken);
+        setAuthTokens(accessToken, refreshToken);
         set({ user, isAuthenticated: true });
       },
       logout: async () => {
@@ -38,18 +37,27 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           console.error('Logout API failed', error);
         } finally {
-          localStorage.removeItem('jwt_token');
-          localStorage.removeItem('refresh_token');
-          localStorage.removeItem('refresh_token');
+          clearAuthStorage();
           set({ user: null, isAuthenticated: false });
         }
       },
-      updateCurrentUser: (data) => set((state) => ({ 
-        user: state.user ? { ...state.user, ...data } : null 
+      updateCurrentUser: (data) => set((state) => ({
+        user: state.user ? { ...state.user, ...data } : null,
       })),
     }),
     {
       name: 'auth_storage',
+      partialize: (state) => ({ user: state.user }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        const hasToken = Boolean(localStorage.getItem('jwt_token'));
+        if (!hasToken || !state.user) {
+          state.user = null;
+          state.isAuthenticated = false;
+          return;
+        }
+        state.isAuthenticated = true;
+      },
     }
   )
 );

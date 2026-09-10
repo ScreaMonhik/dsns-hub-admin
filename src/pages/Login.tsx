@@ -8,6 +8,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useAuthStore, type User } from '../store/authStore';
 import { apiClient } from '../api/apiClient';
+import axios from 'axios';
 
 const loginSchema = z.object({
   email: z.string().email('Некоректна електронна пошта').endsWith('@dsns.gov.ua', 'Дозволено тільки домен @dsns.gov.ua'),
@@ -44,17 +45,27 @@ export const Login = () => {
       const { accessToken, refreshToken, user } = response.data;
       
       if (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN') {
+        try {
+          await axios.post(
+            `${apiClient.defaults.baseURL}/auth/logout`,
+            {},
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+          );
+        } catch {
+          // Session may already be invalid; continue with the access-denied message.
+        }
         setErrorMsg('Доступ заборонено. Потрібні права адміністратора або суперадміністратора.');
         return;
       }
 
       setAuth(user, accessToken, refreshToken);
       navigate('/', { replace: true });
-    } catch (error: any) {
-      if (error.response?.status === 403) {
+    } catch (error: unknown) {
+      const err = error as { response?: { status?: number } };
+      if (err.response?.status === 403) {
         setErrorMsg('Ваш обліковий запис заблоковано. Зверніться до адміністратора.');
       } else {
-        setErrorMsg(error.response?.data?.message || 'Помилка авторизації');
+        setErrorMsg('Помилка авторизації. Перевірте логін і пароль.');
       }
     }
   };

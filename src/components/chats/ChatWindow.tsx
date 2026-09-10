@@ -66,7 +66,8 @@ export const ChatWindow = ({ chat, onChatUpdate }: Props) => {
     
     socketRef.current = io(`${baseUrl}/chat`, {
       auth: { token },
-      transports: ['websocket']
+      transports: ['websocket'],
+      autoConnect: Boolean(token),
     });
 
     socketRef.current.on('connect', () => {
@@ -108,6 +109,10 @@ export const ChatWindow = ({ chat, onChatUpdate }: Props) => {
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
 
     try {
       setUploadingAvatar(true);
@@ -141,7 +146,7 @@ export const ChatWindow = ({ chat, onChatUpdate }: Props) => {
           >
             {uploadingAvatar ? <CircularProgress size={16} /> : <PhotoCameraIcon fontSize="small" />}
           </IconButton>
-          <input type="file" hidden ref={fileInputRef} accept="image/*" onChange={handleAvatarUpload} />
+          <input type="file" hidden ref={fileInputRef} accept="image/jpeg,image/png,image/webp" onChange={handleAvatarUpload} />
         </Box>
         <Box sx={{ flexGrow: 1 }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{chat.name}</Typography>

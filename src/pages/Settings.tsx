@@ -11,8 +11,9 @@ import BuildIcon from '@mui/icons-material/Build';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import StorageIcon from '@mui/icons-material/Storage';
 import toast from 'react-hot-toast';
-import { settingsApi, type SystemSettings } from '../api/settingsApi';
+import { settingsApi } from '../api/settingsApi';
 import { PermissionGuard } from '../components/common/PermissionGuard';
+import { useCan } from '../hooks/useCan';
 
 const settingsSchema = z.object({
   maintenanceMode: z.boolean(),
@@ -27,6 +28,7 @@ const settingsSchema = z.object({
 type SettingsFormInputs = z.infer<typeof settingsSchema>;
 
 export const Settings = () => {
+  const { isSuperAdmin } = useCan();
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -47,6 +49,11 @@ export const Settings = () => {
   const globalBannerEnabled = watch('globalBannerEnabled');
 
   useEffect(() => {
+    if (!isSuperAdmin) {
+      setLoading(false);
+      return;
+    }
+
     const fetchSettings = async () => {
       try {
         const data = await settingsApi.getSettings();
@@ -60,7 +67,7 @@ export const Settings = () => {
     };
 
     fetchSettings();
-  }, [reset]);
+  }, [reset, isSuperAdmin]);
 
   const onSubmit = async (data: SettingsFormInputs) => {
     try {
@@ -76,9 +83,11 @@ export const Settings = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
-        <CircularProgress />
-      </Box>
+      <PermissionGuard require="SUPER_ADMIN" redirectTo="/">
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
+          <CircularProgress />
+        </Box>
+      </PermissionGuard>
     );
   }
 

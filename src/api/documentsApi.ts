@@ -1,4 +1,5 @@
 import { apiClient } from './apiClient';
+import { toApiRequestUrl } from '../utils/url';
 
 export const DocumentStatus = {
   DRAFT: 'DRAFT',
@@ -128,7 +129,7 @@ export const documentsApi = {
   },
 
   downloadDocument: async (fileUrl: string): Promise<Blob> => {
-    const response = await apiClient.get(fileUrl, { responseType: 'blob' });
+    const response = await apiClient.get(toApiRequestUrl(fileUrl), { responseType: 'blob' });
     return response.data;
   }
 };

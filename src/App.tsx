@@ -1,24 +1,31 @@
-import { useMemo } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { Login } from './pages/Login';
-import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { Box, CircularProgress, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { ukUA } from '@mui/material/locale';
 import { AdminLayout } from './components/layout/AdminLayout';
-import { Dashboard } from './pages/Dashboard';
-import { Users } from './pages/Users';
-import { News } from './pages/News';
-import { Documents } from './pages/Documents';
-import { Projects } from './pages/Projects';
-import { Polls } from './pages/Polls';
-import { Chats } from './pages/Chats';
-import { AuditLogs } from './pages/AuditLogs';
-import { Broadcasts } from './pages/Broadcasts';
-import { Profile } from './pages/Profile';
-import { Settings } from './pages/Settings';
 import { useThemeStore } from './store/themeStore';
-import { Toaster } from 'react-hot-toast';
-import { Departments } from './pages/Departments';
+import { PermissionGuard } from './components/common/PermissionGuard';
+
+const Dashboard = lazy(() => import('./pages/Dashboard').then((m) => ({ default: m.Dashboard })));
+const Users = lazy(() => import('./pages/Users').then((m) => ({ default: m.Users })));
+const News = lazy(() => import('./pages/News').then((m) => ({ default: m.News })));
+const Documents = lazy(() => import('./pages/Documents').then((m) => ({ default: m.Documents })));
+const Projects = lazy(() => import('./pages/Projects').then((m) => ({ default: m.Projects })));
+const Polls = lazy(() => import('./pages/Polls').then((m) => ({ default: m.Polls })));
+const Chats = lazy(() => import('./pages/Chats').then((m) => ({ default: m.Chats })));
+const AuditLogs = lazy(() => import('./pages/AuditLogs').then((m) => ({ default: m.AuditLogs })));
+const Broadcasts = lazy(() => import('./pages/Broadcasts').then((m) => ({ default: m.Broadcasts })));
+const Profile = lazy(() => import('./pages/Profile').then((m) => ({ default: m.Profile })));
+const Settings = lazy(() => import('./pages/Settings').then((m) => ({ default: m.Settings })));
+const Departments = lazy(() => import('./pages/Departments').then((m) => ({ default: m.Departments })));
+
+const PageFallback = () => (
+  <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
+    <CircularProgress />
+  </Box>
+);
 
 function App() {
   const mode = useThemeStore((state) => state.mode);
@@ -96,30 +103,52 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Toaster position="top-right" />
       <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          
-          <Route element={<ProtectedRoute />}>
-            <Route element={<AdminLayout />}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/news" element={<News />} />
-              <Route path="/documents" element={<Documents />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/polls" element={<Polls />} />
-              <Route path="/chats" element={<Chats />} />
-              <Route path="/broadcasts" element={<Broadcasts />} />
-              <Route path="/audit-logs" element={<AuditLogs />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/departments" element={<Departments />} />
-            </Route>
-          </Route>
+        <Suspense fallback={<PageFallback />}>
+          <Routes>
+            <Route path="/login" element={<Login />} />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            <Route element={<ProtectedRoute />}>
+              <Route element={<AdminLayout />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/users" element={<Users />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/documents" element={<Documents />} />
+                <Route path="/projects" element={<Projects />} />
+                <Route path="/polls" element={<Polls />} />
+                <Route path="/chats" element={<Chats />} />
+                <Route path="/broadcasts" element={<Broadcasts />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route
+                  path="/audit-logs"
+                  element={
+                    <PermissionGuard require="SUPER_ADMIN" redirectTo="/">
+                      <AuditLogs />
+                    </PermissionGuard>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <PermissionGuard require="SUPER_ADMIN" redirectTo="/">
+                      <Settings />
+                    </PermissionGuard>
+                  }
+                />
+                <Route
+                  path="/departments"
+                  element={
+                    <PermissionGuard require="SUPER_ADMIN" redirectTo="/">
+                      <Departments />
+                    </PermissionGuard>
+                  }
+                />
+              </Route>
+            </Route>
+
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </ThemeProvider>
   );

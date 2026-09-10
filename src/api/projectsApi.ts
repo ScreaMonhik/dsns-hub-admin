@@ -1,4 +1,5 @@
 import { apiClient } from './apiClient';
+import { toApiRequestUrl } from '../utils/url';
 
 export const ProjectStatus = {
   DRAFT: 'DRAFT',
@@ -134,7 +135,7 @@ export const projectsApi = {
   },
 
   downloadProjectFile: async (fileUrl: string): Promise<Blob> => {
-    const response = await apiClient.get(fileUrl, { responseType: 'blob' });
+    const response = await apiClient.get(toApiRequestUrl(fileUrl), { responseType: 'blob' });
     return response.data;
   },
 

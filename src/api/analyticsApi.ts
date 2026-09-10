@@ -51,9 +51,6 @@ export const analyticsApi = {
     
     const response = await apiClient.get<DashboardAnalyticsResponse>('/analytics/dashboard', { params });
     
-    // DEBUG: Виводимо сирі дані від бекенду в консоль, щоб перевірити наявність коментарів
-    console.log('RAW JSON FROM BACKEND:', JSON.parse(JSON.stringify(response.data.activityChart)));
-    
     // Нормалізація даних: гарантуємо, що всі необхідні ключі існують для коректного рендеру Recharts
     if (response.data && response.data.activityChart) {
       response.data.activityChart = response.data.activityChart.map(item => ({
