@@ -5,12 +5,13 @@ import { z } from 'zod';
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, 
   Button, TextField, MenuItem, Box, Alert, Typography,
-  CircularProgress, IconButton, Tooltip, Autocomplete, Divider, Chip
+  CircularProgress, IconButton, Tooltip, Autocomplete
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { newsApi, type News, type NewsCategory } from '../../api/newsApi';
-import { TipTapEditor, TipTapViewer } from './TipTapEditor';
+import { TipTapEditor } from './TipTapEditor';
+import { NewsMobilePreview } from './NewsMobilePreview';
 import { CreateCategoryDialog } from './CreateCategoryDialog';
 import { ManageCategoriesDialog } from './ManageCategoriesDialog';
 import { SecureImage } from '../common/SecureImage';
@@ -21,7 +22,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { uk } from 'date-fns/locale';
-import { format } from 'date-fns';
 
 const newsSchema = z.object({
   title: z.string().min(3, 'Мінімум 3 символи'),
@@ -296,101 +296,17 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
           </Box>
         </Box>
 
-        {/* ПРАВА ПАНЕЛЬ: Live Preview (Mobile Emulator) */}
-        <Box sx={{ width: { xs: '100%', lg: '35%' }, bgcolor: 'background.default', p: 3, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', overflowY: 'auto' }}>
-          
-          <Box sx={{ 
-            width: 360, 
-            minHeight: 700, 
-            bgcolor: 'background.paper', 
-            borderRadius: '40px', 
-            border: '12px solid #0f172a', 
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)', 
-            position: 'relative', 
-            overflow: 'hidden', 
-            display: 'flex', 
-            flexDirection: 'column' 
-          }}>
-            {/* Notch (Виріз екрану) */}
-            <Box sx={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 140, height: 28, bgcolor: '#0f172a', borderBottomLeftRadius: 16, borderBottomRightRadius: 16, zIndex: 10 }} />
-            
-            {/* Status Bar */}
-            <Box sx={{ height: 44, width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 3, pt: 1, color: 'text.primary', bgcolor: 'background.paper', zIndex: 5 }}>
-              <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '0.75rem' }}>
-                {format(new Date(), 'HH:mm')}
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-                <Box sx={{ width: 16, height: 10, bgcolor: 'text.primary', borderRadius: 0.5, opacity: 0.8 }} />
-                <Box sx={{ width: 14, height: 10, bgcolor: 'text.primary', borderRadius: 2, opacity: 0.8 }} />
-              </Box>
-            </Box>
-
-            {/* Mobile Header */}
-            <Box sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider', display: 'flex', alignItems: 'center' }}>
-              <Box sx={{ width: 24, height: 24, borderRadius: '50%', bgcolor: 'action.hover', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1.5 }}>
-                <Typography variant="caption" sx={{ fontSize: '10px' }}>←</Typography>
-              </Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 600, flexGrow: 1, textAlign: 'center', mr: 3 }}>
-                Новини DSNS
-              </Typography>
-            </Box>
-
-            {/* Mobile Content (Preview) */}
-            <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2 }}>
-              {liveStatus === 'DRAFT' && (
-                <Alert severity="warning" sx={{ mb: 2, py: 0, '& .MuiAlert-message': { fontSize: '0.75rem' } }}>
-                  Режим чернетки (невидимо)
-                </Alert>
-              )}
-              {liveStatus === 'SCHEDULED' && (
-                <Alert severity="info" sx={{ mb: 2, py: 0, '& .MuiAlert-message': { fontSize: '0.75rem' } }}>
-                  Буде опубліковано автоматично
-                </Alert>
-              )}
-              
-              {coverUrl ? (
-                <SecureImage 
-                  src={coverUrl} 
-                  alt="Cover" 
-                  style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: '12px', marginBottom: '16px' }} 
-                />
-              ) : (
-                <Box sx={{ width: '100%', height: 160, bgcolor: 'divider', borderRadius: '12px', mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Typography variant="caption" color="text.secondary">Обкладинка відсутня</Typography>
-                </Box>
-              )}
-              
-              <Box sx={{ display: 'flex', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-                <Chip 
-                  label={liveCategoryId && categories ? (categories.find(c => c.id === liveCategoryId)?.name || 'Без категорії') : 'Без категорії'} 
-                  size="small" 
-                  sx={{ fontSize: '0.65rem', height: 20, bgcolor: 'primary.main', color: 'primary.contrastText', fontWeight: 600 }} 
-                />
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', fontSize: '0.7rem' }}>
-                  {livePublishedAt ? format(new Date(livePublishedAt), 'dd.MM.yyyy HH:mm') : format(new Date(), 'dd.MM.yyyy HH:mm')}
-                </Typography>
-              </Box>
-
-              <Typography variant="h6" sx={{ fontWeight: 800, mb: 2, lineHeight: 1.3, fontSize: '1.25rem', wordBreak: 'break-word', color: 'text.primary' }}>
-                {liveTitle || 'Заголовок новини відображатиметься тут'}
-              </Typography>
-              
-              <Divider sx={{ mb: 2 }} />
-              
-              <Box sx={{
-                color: 'text.primary',
-                '& .ProseMirror': { fontSize: '0.95rem', lineHeight: 1.6, color: 'inherit' },
-                '& img': { maxWidth: '100%', borderRadius: '8px', my: 1 },
-                '& iframe': { maxWidth: '100%', borderRadius: '8px', my: 1 },
-                '& p': { mb: 1.5 },
-                '& h2, & h3': { mt: 2, mb: 1, fontWeight: 700 }
-              }}>
-                {liveContent ? <TipTapViewer value={liveContent} /> : <Typography variant="body2" color="text.disabled">Текст новини...</Typography>}
-              </Box>
-            </Box>
-            
-          </Box>
-        </Box>
+        <NewsMobilePreview
+          title={liveTitle}
+          content={liveContent}
+          coverUrl={coverUrl}
+          categoryName={liveCategoryId ? (categories.find((c) => c.id === liveCategoryId)?.name || null) : null}
+          publishedAt={livePublishedAt || news?.publishedAt || news?.createdAt || null}
+          status={liveStatus}
+          likes={news?._count?.likes ?? 0}
+          dislikes={news?._count?.dislikes ?? 0}
+          commentsCount={news?._count?.comments ?? 0}
+        />
         
         </Box>
         </DialogContent>
