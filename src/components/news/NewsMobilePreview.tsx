@@ -48,9 +48,6 @@ export const NewsMobilePreview = ({
   const inputFill = isDark ? 'rgba(44, 44, 44, 0.55)' : 'rgba(226, 232, 240, 0.7)';
   const outline = isDark ? '#A1A1AA' : '#94A3B8';
   const codeBg = isDark ? '#2C2C2C' : '#E2E8F0';
-  const errorContainer = isDark ? 'rgba(127, 29, 29, 0.4)' : '#FFDAD6';
-  const errorColor = isDark ? '#FCA5A5' : '#BA1A1A';
-  const errorBorder = isDark ? 'rgba(186, 26, 26, 0.3)' : 'rgba(186, 26, 26, 0.3)';
 
   const displayDate = publishedAt
     ? format(new Date(publishedAt), 'dd MMMM yyyy, HH:mm', { locale: uk })
@@ -228,21 +225,20 @@ export const NewsMobilePreview = ({
                   overflowX: 'auto',
                 },
                 '& [data-youtube-video]': {
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 1.5,
-                  p: 2.5,
+                  pointerEvents: 'auto',
+                  position: 'relative',
+                  width: '100%',
+                  aspectRatio: '16 / 9',
                   my: 1.5,
                   borderRadius: '12px',
-                  bgcolor: errorContainer,
-                  border: `1px solid ${errorBorder}`,
-                  '& iframe': { display: 'none' },
-                  '&::after': {
-                    content: '"Дивитись відео на YouTube"',
-                    color: errorColor,
-                    fontWeight: 700,
-                    fontSize: 16,
+                  overflow: 'hidden',
+                  '& iframe': {
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    border: 'none',
+                    display: 'block',
                   },
                 },
                 '& blockquote': {
