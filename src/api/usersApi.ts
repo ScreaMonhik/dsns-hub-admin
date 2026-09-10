@@ -10,13 +10,22 @@ export interface UsersResponse {
   };
 }
 
-export type CreateUserPayload = Omit<User, 'id' | 'createdAt' | 'avatarUrl'> & { password: string };
+export interface CreateUserPayload {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: 'SUPER_ADMIN' | 'ADMIN' | 'USER';
+  isActive: boolean;
+  departmentId?: string | null;
+}
 
 export interface UpdateUserPayload {
   firstName?: string;
   lastName?: string;
   role?: 'SUPER_ADMIN' | 'ADMIN' | 'USER';
   isActive?: boolean;
+  departmentId?: string | null;
 }
 
 export const usersApi = {

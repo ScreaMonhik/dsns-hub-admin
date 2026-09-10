@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Box, Pagination, Typography, Card, CardContent, CircularProgress, Paper, 
-  useTheme, Grid, List, ListItem, ListItemText, ListItemAvatar, Avatar, Divider, Chip, ListItemButton, TextField, MenuItem, Button, Menu, Skeleton
+  useTheme, Grid, List, ListItem, ListItemText, ListItemAvatar, Avatar, Divider, Chip, ListItemButton, TextField, MenuItem, Button, Menu, Skeleton, Alert
 } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -144,6 +144,7 @@ export const Dashboard = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardAnalyticsResponse | null>(null);
+  const [dataSource, setDataSource] = useState<'live' | 'mock'>('live');
   const [loading, setLoading] = useState<boolean>(true);
 
   // Стейт для пагінації чернеток (MUI Pagination починається з 1)
@@ -239,6 +240,7 @@ export const Dashboard = () => {
         // Використовуємо реальні нормалізовані дані з бекенду
         // React автоматично перемалює лише змінені цифри, екран не блиматиме
         setData(res);
+        setDataSource('live');
       } catch {
         console.warn('Backend analytics not ready, using mock data.');
         const { startDate, endDate } = getDatesForApi(period, customRange);
@@ -246,6 +248,7 @@ export const Dashboard = () => {
           ...MOCK_DATA,
           activityChart: generateMockChartData(startDate, endDate, period)
         });
+        setDataSource('mock');
       } finally {
         if (!isSilent) setLoading(false);
       }
@@ -387,6 +390,12 @@ export const Dashboard = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      {dataSource === 'mock' && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <Alert severity="warning">Мокові дані для візуалізації</Alert>
+          <Alert severity="error">Дані з бекенду не прийшли</Alert>
+        </Box>
+      )}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
         <Typography variant="h4">Аналітична панель</Typography>
         <Button 

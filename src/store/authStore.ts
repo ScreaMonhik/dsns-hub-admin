@@ -12,6 +12,8 @@ export interface User {
   isActive: boolean;
   avatarUrl: string | null;
   createdAt: string;
+  departmentId?: string | null;
+  department?: { id: string; name: string } | null;
 }
 
 interface AuthState {

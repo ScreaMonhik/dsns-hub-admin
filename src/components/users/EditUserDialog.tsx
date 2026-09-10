@@ -9,6 +9,8 @@ import { useState, useEffect } from 'react';
 import { usersApi } from '../../api/usersApi';
 import { type User } from '../../store/authStore';
 import { useCan } from '../../hooks/useCan';
+import { DepartmentAutocomplete } from '../common/DepartmentAutocomplete';
+import { asDepartment, type Department } from '../../api/departmentsApi';
 
 const editUserSchema = z.object({
   firstName: z.string().min(2, "Обов'язкове поле"),
@@ -29,6 +31,7 @@ interface Props {
 export const EditUserDialog = ({ open, user, onClose, onSuccess }: Props) => {
   const { isSuperAdmin } = useCan();
   const [apiError, setApiError] = useState<string | null>(null);
+  const [department, setDepartment] = useState<Department | null>(null);
 
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormInputs>({
     resolver: zodResolver(editUserSchema),
@@ -43,6 +46,7 @@ export const EditUserDialog = ({ open, user, onClose, onSuccess }: Props) => {
         role: user.role,
         isActive: user.isActive,
       });
+      setDepartment(user.department ? asDepartment(user.department) : null);
     }
   }, [user, reset]);
 
@@ -50,7 +54,7 @@ export const EditUserDialog = ({ open, user, onClose, onSuccess }: Props) => {
     if (!user) return;
     try {
       setApiError(null);
-      await usersApi.updateUser(user.id, data);
+      await usersApi.updateUser(user.id, { ...data, departmentId: department?.id ?? null });
       onSuccess();
       onClose();
     } catch (error: any) {
@@ -81,6 +85,12 @@ export const EditUserDialog = ({ open, user, onClose, onSuccess }: Props) => {
                 )}
               />
             </Box>
+            <DepartmentAutocomplete
+              label="Підрозділ"
+              value={department}
+              onChange={(_, value) => setDepartment(value as Department | null)}
+              placeholder="Без підрозділу"
+            />
             <Controller
               name="role"
               control={control}

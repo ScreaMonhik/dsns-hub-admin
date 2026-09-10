@@ -141,6 +141,7 @@ export const Users = () => {
                     <TableCell>Ім'я та Прізвище</TableCell>
                 <TableCell>Електронна пошта</TableCell>
                 <TableCell>Роль</TableCell>
+                <TableCell>Підрозділ</TableCell>
                 <TableCell>Статус</TableCell>
                 <TableCell>Дата реєстрації</TableCell>
                 <TableCell align="right">Дії</TableCell>
@@ -154,6 +155,7 @@ export const Users = () => {
                       <TableCell><Skeleton variant="text" width={180} /></TableCell>
                     <TableCell><Skeleton variant="text" width={220} /></TableCell>
                     <TableCell><Skeleton variant="text" width={100} /></TableCell>
+                    <TableCell><Skeleton variant="text" width={140} /></TableCell>
                     <TableCell>
                       <Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: 4 }} />
                     </TableCell>
@@ -185,6 +187,7 @@ export const Users = () => {
                       ? 'Адміністратор' 
                       : 'Користувач'}
                   </TableCell>
+                  <TableCell>{user.department?.name || '—'}</TableCell>
                   <TableCell>
                     <Chip 
                       label={user.isActive ? 'Активний' : 'Заблокований'} 
@@ -223,7 +226,7 @@ export const Users = () => {
               ))}
               {!loading && data?.data.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} align="center">Користувачів не знайдено</TableCell>
+                  <TableCell colSpan={8} align="center">Користувачів не знайдено</TableCell>
                 </TableRow>
               )}
             </TableBody>

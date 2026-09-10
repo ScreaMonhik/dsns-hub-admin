@@ -44,6 +44,8 @@ export const Polls = () => {
   const [sortBy, setSortBy] = useState<string>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editPoll, setEditPoll] = useState<Poll | null>(null);
@@ -102,7 +104,7 @@ export const Polls = () => {
       setLoading(true);
       const targetStatus = activeTab === 1 ? PollStatus.ARCHIVED : (filterStatus || undefined);
       
-      const res = await pollsApi.getPolls(page, 10, filterDepartment?.id || undefined, targetStatus, sortBy, sortOrder);
+      const res = await pollsApi.getPolls(page, 10, filterDepartment?.id || undefined, targetStatus, sortBy, sortOrder, debouncedSearch || undefined);
       setData(res);
     } catch (error) {
       console.error('Failed to fetch polls data', error);
@@ -110,7 +112,15 @@ export const Polls = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, filterDepartment, filterStatus, sortBy, sortOrder, activeTab]);
+  }, [page, filterDepartment, filterStatus, sortBy, sortOrder, activeTab, debouncedSearch]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
 
   useEffect(() => {
     fetchData();
@@ -197,6 +207,14 @@ export const Polls = () => {
 
         <Box sx={{ mb: 3, display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+            <TextField
+              size="small"
+              label="Пошук"
+              placeholder="Назва опитування..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              sx={{ minWidth: 220 }}
+            />
             <Box sx={{ minWidth: 200 }}>
               <DepartmentAutocomplete
                 size="small"

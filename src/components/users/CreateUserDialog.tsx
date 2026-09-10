@@ -10,6 +10,8 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useState } from 'react';
 import { usersApi } from '../../api/usersApi';
 import { useCan } from '../../hooks/useCan';
+import { DepartmentAutocomplete } from '../common/DepartmentAutocomplete';
+import type { Department } from '../../api/departmentsApi';
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
@@ -34,6 +36,7 @@ export const CreateUserDialog = ({ open, onClose, onSuccess }: Props) => {
   const { isSuperAdmin } = useCan();
   const [apiError, setApiError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [department, setDepartment] = useState<Department | null>(null);
 
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormInputs>({
     resolver: zodResolver(createUserSchema),
@@ -43,8 +46,9 @@ export const CreateUserDialog = ({ open, onClose, onSuccess }: Props) => {
   const onSubmit = async (data: FormInputs) => {
     try {
       setApiError(null);
-      await usersApi.createUser(data);
+      await usersApi.createUser({ ...data, departmentId: department?.id });
       reset();
+      setDepartment(null);
       onSuccess();
       onClose();
     } catch (error: any) {
@@ -54,6 +58,7 @@ export const CreateUserDialog = ({ open, onClose, onSuccess }: Props) => {
 
   const handleClose = () => {
     reset();
+    setDepartment(null);
     setApiError(null);
     onClose();
   };
@@ -113,6 +118,12 @@ export const CreateUserDialog = ({ open, onClose, onSuccess }: Props) => {
                 )}
               />
             </Box>
+            <DepartmentAutocomplete
+              label="Підрозділ"
+              value={department}
+              onChange={(_, value) => setDepartment(value as Department | null)}
+              placeholder="Не обов'язково"
+            />
             <Controller
               name="role"
               control={control}

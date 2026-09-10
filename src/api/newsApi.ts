@@ -76,7 +76,8 @@ export const newsApi = {
     departmentId?: string,
     status?: NewsStatus,
     sortBy?: string,
-    sortOrder?: 'ASC' | 'DESC'
+    sortOrder?: 'ASC' | 'DESC',
+    search?: string,
   ) => {
     const params: Record<string, any> = { page, limit };
     if (categoryId) params.categoryId = categoryId;
@@ -84,6 +85,7 @@ export const newsApi = {
     if (status) params.status = status;
     if (sortBy) params.sortBy = sortBy;
     if (sortOrder) params.sortOrder = sortOrder;
+    if (search) params.search = search;
     
     const response = await apiClient.get<NewsListResponse>('/news', { params });
     return response.data;

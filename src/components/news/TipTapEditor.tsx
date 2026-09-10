@@ -32,7 +32,8 @@ import { useState, useRef, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { newsApi } from '../../api/newsApi';
 import { SecureImage } from '../common/SecureImage';
-import { getFullUrl, isSafeHttpUrl, isSafeYoutubeUrl } from '../../utils/url';
+import { SecureVideo } from '../common/SecureVideo';
+import { isSafeHttpUrl, isSafeYoutubeUrl } from '../../utils/url';
 import { sanitizeHtmlContent } from '../../utils/sanitizeHtml';
 
 // Кастомний вузол для TipTap: рендерить наш SecureImage
@@ -56,12 +57,12 @@ const SecureImageExtension = Image.extend({
 
 // Кастомний вузол для TipTap: рендерить власні відео
 const TipTapVideo = (props: any) => {
-  // Для відео формуємо повний URL. Якщо потрібен JWT, бекенд повинен роздавати відео з перевіркою cookies 
-  // або використовувати тимчасові підписані посилання, оскільки стандартний <video> тег не вміє передавати Authorization Headers.
-  const videoUrl = getFullUrl(props.node.attrs.src);
   return (
     <NodeViewWrapper as="div" style={{ display: 'flex', justifyContent: 'center', width: '100%', padding: '16px 0' }}>
-      <video controls src={videoUrl} style={{ maxWidth: '100%', borderRadius: '4px', maxHeight: '450px' }} />
+      <SecureVideo
+        src={props.node.attrs.src}
+        style={{ maxWidth: '100%', borderRadius: '4px', maxHeight: '450px' }}
+      />
     </NodeViewWrapper>
   );
 };

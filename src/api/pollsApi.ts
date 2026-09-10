@@ -74,13 +74,15 @@ export const pollsApi = {
     departmentId?: string,
     status?: PollStatus,
     sortBy?: string,
-    sortOrder?: 'asc' | 'desc'
+    sortOrder?: 'asc' | 'desc',
+    search?: string,
   ) => {
     const params: Record<string, any> = { page, limit };
     if (departmentId) params.departmentId = departmentId;
     if (status) params.status = status;
     if (sortBy) params.sortBy = sortBy;
     if (sortOrder) params.sortOrder = sortOrder;
+    if (search) params.search = search;
 
     const response = await apiClient.get<PaginatedPollsResponse>('/polls', { params });
     return response.data;
