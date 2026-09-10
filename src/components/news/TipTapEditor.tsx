@@ -100,6 +100,7 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
   const [youtubeDialog, setYoutubeDialog] = useState({ open: false, url: '' });
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: { levels: [2, 3] },
@@ -468,6 +469,7 @@ export const TipTapEditor = ({ value, onChange, error }: TipTapEditorProps) => {
 // Компонент для безпечного відображення контенту (Read-Only)
 export const TipTapViewer = ({ value }: { value: string }) => {
   const editor = useEditor({
+    immediatelyRender: false,
     editable: false,
     extensions: [
       StarterKit.configure({ heading: { levels: [2, 3] } }),

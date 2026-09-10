@@ -8,6 +8,16 @@ export interface Department {
   hasChildren: boolean;
 }
 
+export function asDepartment(item: { id: string; name: string }): Department {
+  return {
+    id: item.id,
+    name: item.name,
+    parentId: null,
+    orderIndex: 0,
+    hasChildren: false,
+  };
+}
+
 export interface PaginatedDepartmentsResponse {
   data: Department[];
   meta: {

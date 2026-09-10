@@ -12,6 +12,7 @@ import { useAuthStore } from '../../store/authStore';
 import { SecureImage } from '../common/SecureImage';
 import { ManageMembersDialog } from './ManageMembersDialog';
 import { format } from 'date-fns';
+import toast from 'react-hot-toast';
 
 interface Props {
   chat: ChatGroup;
@@ -80,11 +81,9 @@ export const ChatWindow = ({ chat, onChatUpdate }: Props) => {
       }
     });
 
-    socketRef.current.on('exception', (error: any) => {
+    socketRef.current.on('exception', (error: { message?: string } | undefined) => {
       if (isMounted) {
-        import('react-hot-toast').then(({ default: toast }) => {
-          toast.error(error?.message || 'Помилка чату. Забагато запитів.');
-        });
+        toast.error(error?.message || 'Помилка чату. Забагато запитів.');
       }
     });
 

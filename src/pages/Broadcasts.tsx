@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { 
   Box, Typography, Button, Paper, Table, TableBody, TableCell, 
-  TableContainer, TableHead, TableRow, Pagination, CircularProgress,
+  TableContainer, TableHead, TableRow, Pagination,
   IconButton, Tooltip, Chip, MenuItem, TextField, Skeleton, InputAdornment
 } from '@mui/material';
 import CampaignIcon from '@mui/icons-material/Campaign';
@@ -9,7 +9,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import SearchIcon from '@mui/icons-material/Search';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import { format } from 'date-fns';
-import { broadcastsApi, type EmergencyBroadcast, type BroadcastSeverity, type PaginatedBroadcastsResponse } from '../api/broadcastsApi';
+import { broadcastsApi, type BroadcastSeverity, type PaginatedBroadcastsResponse } from '../api/broadcastsApi';
 import { CreateBroadcastDialog } from '../components/broadcasts/CreateBroadcastDialog';
 import { BroadcastDetailsDialog } from '../components/broadcasts/BroadcastDetailsDialog';
 

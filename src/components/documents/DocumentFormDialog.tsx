@@ -9,9 +9,9 @@ import {
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import CloseIcon from '@mui/icons-material/Close';
-import { documentsApi, DocumentStatus, type DocumentModel } from '../../api/documentsApi';
+import { documentsApi, type DocumentModel } from '../../api/documentsApi';
 import { DepartmentAutocomplete } from '../common/DepartmentAutocomplete';
-import type { Department } from '../../api/departmentsApi';
+import { asDepartment, type Department } from '../../api/departmentsApi';
 
 const documentSchema = z.object({
   title: z.string().min(3, 'Мінімум 3 символи'),
@@ -99,7 +99,7 @@ export const DocumentFormDialog = ({ open, document, onClose, onSuccess }: Props
       setApiError(null);
       setSelectedFile(null);
       if (document) {
-        setSelectedDepartments(document.departments || []);
+        setSelectedDepartments((document.departments || []).map(asDepartment));
         reset({
           title: document.title,
           description: document.description || '',

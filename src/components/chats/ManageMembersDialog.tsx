@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, Button, 
   List, ListItem, ListItemAvatar, ListItemText, Avatar, IconButton, 
@@ -37,6 +37,20 @@ export const ManageMembersDialog = ({ open, groupId, chatName, onClose }: Props)
   const [memberToDelete, setMemberToDelete] = useState<GroupMember | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  const fetchMembers = useCallback(async () => {
+    setLoading(true);
+    try {
+      setApiError(null);
+      const membersData = await chatsApi.getMembers(groupId);
+      setMembers(membersData);
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      setApiError(err.response?.data?.message || 'Помилка завантаження даних');
+    } finally {
+      setLoading(false);
+    }
+  }, [groupId]);
+
   useEffect(() => {
     if (open) {
       fetchMembers();
@@ -47,7 +61,7 @@ export const ManageMembersDialog = ({ open, groupId, chatName, onClose }: Props)
       setAddOptions([]);
       setApiError(null);
     }
-  }, [open, groupId]);
+  }, [open, groupId, fetchMembers]);
 
   useEffect(() => {
     if (!open) return;
@@ -73,19 +87,6 @@ export const ManageMembersDialog = ({ open, groupId, chatName, onClose }: Props)
 
     return () => clearTimeout(handler);
   }, [addSearchQuery, members, open]);
-
-  const fetchMembers = async () => {
-    setLoading(true);
-    try {
-      setApiError(null);
-      const membersData = await chatsApi.getMembers(groupId);
-      setMembers(membersData);
-    } catch (error: any) {
-      setApiError(error.response?.data?.message || 'Помилка завантаження даних');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAddMember = async () => {
     if (!selectedUser) return;

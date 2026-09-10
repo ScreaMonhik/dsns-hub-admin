@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, 
   Box, Chip, Divider, CircularProgress, Alert, Avatar, TextField, IconButton
@@ -27,7 +27,7 @@ export const ProjectDetailsDialog = ({ open, projectId, onClose, onRefreshList }
   const [commentText, setCommentText] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
 
-  const fetchProjectDetails = async () => {
+  const fetchProjectDetails = useCallback(async () => {
     if (!projectId) return;
     try {
       setLoading(true);
@@ -40,7 +40,7 @@ export const ProjectDetailsDialog = ({ open, projectId, onClose, onRefreshList }
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId]);
 
   useEffect(() => {
     if (open && projectId) {
@@ -50,7 +50,7 @@ export const ProjectDetailsDialog = ({ open, projectId, onClose, onRefreshList }
       setCommentText('');
       setApiError(null);
     }
-  }, [open, projectId]);
+  }, [open, projectId, fetchProjectDetails]);
 
   const handleAddComment = async () => {
     if (!project || !commentText.trim()) return;

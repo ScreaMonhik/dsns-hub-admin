@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, Button, 
   List, ListItem, ListItemText, ListItemAvatar, Avatar, IconButton, 
@@ -21,6 +21,21 @@ export const NewsCommentsDialog = ({ open, news, onClose, onRefreshNews }: NewsC
   const [apiError, setApiError] = useState<string | null>(null);
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
 
+  const fetchComments = useCallback(async () => {
+    if (!news) return;
+    try {
+      setLoading(true);
+      setApiError(null);
+      const data = await newsApi.getNewsComments(news.id);
+      setComments(data);
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      setApiError(err.response?.data?.message || 'Не вдалося завантажити коментарі');
+    } finally {
+      setLoading(false);
+    }
+  }, [news]);
+
   useEffect(() => {
     if (open && news) {
       fetchComments();
@@ -28,21 +43,7 @@ export const NewsCommentsDialog = ({ open, news, onClose, onRefreshNews }: NewsC
       setComments([]);
       setApiError(null);
     }
-  }, [open, news]);
-
-  const fetchComments = async () => {
-    if (!news) return;
-    try {
-      setLoading(true);
-      setApiError(null);
-      const data = await newsApi.getNewsComments(news.id);
-      setComments(data);
-    } catch (error: any) {
-      setApiError(error.response?.data?.message || 'Не вдалося завантажити коментарі');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [open, news, fetchComments]);
 
   const confirmDeleteComment = async () => {
     if (!news || !commentToDelete) return;

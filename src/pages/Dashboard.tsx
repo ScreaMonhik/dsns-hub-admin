@@ -239,7 +239,7 @@ export const Dashboard = () => {
         // Використовуємо реальні нормалізовані дані з бекенду
         // React автоматично перемалює лише змінені цифри, екран не блиматиме
         setData(res);
-      } catch (error: any) {
+      } catch {
         console.warn('Backend analytics not ready, using mock data.');
         const { startDate, endDate } = getDatesForApi(period, customRange);
         setData({

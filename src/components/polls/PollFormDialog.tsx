@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, 
-  Button, TextField, Box, Alert, MenuItem, IconButton, Typography, Select, Chip
+  Button, TextField, Box, Alert, IconButton, Typography
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -175,8 +175,6 @@ export const PollFormDialog = ({ open, poll, onClose, onSuccess, isDuplicate }: 
         options: data.options.map(o => o.text),
         status: PollStatus.DRAFT, 
       };
-
-      console.log('DEBUG: Передаємо на бекенд у такому порядку:', payload.options);
 
       // Якщо ми в режимі дублювання, ігноруємо poll.id і викликаємо метод створення нового запису
       if (poll && !isDuplicate) {

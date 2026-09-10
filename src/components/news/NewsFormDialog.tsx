@@ -15,7 +15,7 @@ import { CreateCategoryDialog } from './CreateCategoryDialog';
 import { ManageCategoriesDialog } from './ManageCategoriesDialog';
 import { SecureImage } from '../common/SecureImage';
 import { DepartmentAutocomplete } from '../common/DepartmentAutocomplete';
-import type { Department } from '../../api/departmentsApi';
+import { asDepartment, type Department } from '../../api/departmentsApi';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -76,7 +76,7 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
   useEffect(() => {
     if (open && !wasOpen.current) {
       if (news) {
-        setSelectedDepartments(news.departments || []);
+        setSelectedDepartments((news.departments || []).map(asDepartment));
         reset({
           title: news.title,
           content: news.content,

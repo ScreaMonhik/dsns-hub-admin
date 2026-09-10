@@ -6,7 +6,7 @@ import {
   Button, TextField, MenuItem, Box, Alert, FormControlLabel, Switch 
 } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { usersApi, type UpdateUserPayload } from '../../api/usersApi';
+import { usersApi } from '../../api/usersApi';
 import { type User } from '../../store/authStore';
 import { useCan } from '../../hooks/useCan';
 

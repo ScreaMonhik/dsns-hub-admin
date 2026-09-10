@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,6 +9,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useAuthStore, type User } from '../store/authStore';
 import { apiClient } from '../api/apiClient';
 import axios from 'axios';
+import { hasAccessToken } from '../utils/authStorage';
 
 const loginSchema = z.object({
   email: z.string().email('Некоректна електронна пошта').endsWith('@dsns.gov.ua', 'Дозволено тільки домен @dsns.gov.ua'),
@@ -26,6 +27,7 @@ interface LoginResponse {
 export const Login = () => {
   const navigate = useNavigate();
   const setAuth = useAuthStore((state) => state.setAuth);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -69,6 +71,10 @@ export const Login = () => {
       }
     }
   };
+
+  if (isAuthenticated && hasAccessToken()) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <Container component="main" maxWidth="xs">

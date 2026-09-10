@@ -8,7 +8,7 @@ import {
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useState } from 'react';
-import { usersApi, type CreateUserPayload } from '../../api/usersApi';
+import { usersApi } from '../../api/usersApi';
 import { useCan } from '../../hooks/useCan';
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;

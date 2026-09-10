@@ -14,6 +14,7 @@ import toast from 'react-hot-toast';
 import { settingsApi } from '../api/settingsApi';
 import { PermissionGuard } from '../components/common/PermissionGuard';
 import { useCan } from '../hooks/useCan';
+import { getApiErrorMessage } from '../utils/apiError';
 
 const settingsSchema = z.object({
   maintenanceMode: z.boolean(),
@@ -75,8 +76,8 @@ export const Settings = () => {
       const updatedData = await settingsApi.updateSettings(data);
       reset(updatedData);
       toast.success('Налаштування успішно збережено');
-    } catch (error: any) {
-      setApiError(error.response?.data?.message || 'Не вдалося зберегти налаштування.');
+    } catch (error: unknown) {
+      setApiError(getApiErrorMessage(error, 'Не вдалося зберегти налаштування.'));
       toast.error('Помилка збереження');
     }
   };

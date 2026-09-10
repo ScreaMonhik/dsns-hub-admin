@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, 
   Box, Chip, Divider, CircularProgress, Alert, Avatar, TextField, IconButton
@@ -28,7 +28,7 @@ export const NewsDetailsDialog = ({ open, news, onClose, onRefreshList }: Props)
   const [submittingComment, setSubmittingComment] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
 
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     if (!news) return;
     try {
       setLoadingComments(true);
@@ -41,7 +41,7 @@ export const NewsDetailsDialog = ({ open, news, onClose, onRefreshList }: Props)
     } finally {
       setLoadingComments(false);
     }
-  };
+  }, [news]);
 
   useEffect(() => {
     if (open && news) {
@@ -51,7 +51,7 @@ export const NewsDetailsDialog = ({ open, news, onClose, onRefreshList }: Props)
       setCommentText('');
       setApiError(null);
     }
-  }, [open, news]);
+  }, [open, news, fetchComments]);
 
   const handleAddComment = async () => {
     if (!news || !commentText.trim()) return;
