@@ -43,7 +43,9 @@
 
 Редактура новин зі статусами `DRAFT`, `PUBLISHED`, `SCHEDULED`, `ARCHIVED`. Категорії (створення, перейменування, видалення, drag-and-drop порядок). Прив’язка до підрозділів. Обкладинка, коментарі, лайки.
 
-Текст редагується в **TipTap**: заголовки, списки, вирівнювання, посилання, зображення, відео з диска, YouTube. HTML проходить через DOMPurify; у iframe дозволений лише YouTube.
+Текст редагується в **TipTap** і зберігається як JSON: заголовки H2/H3, списки, вирівнювання, посилання, зображення, відео з диска, YouTube. Перед показом HTML проходить через DOMPurify; у iframe дозволений лише YouTube.
+
+Праворуч у формі створення/редагування — живе прев’ю (`NewsMobilePreview`): той самий екран, що `NewsDetailScreen` у `dsns-hub-mobile` (шапка «Новина», категорія, дата публікації, заголовок, обкладинка, тіло, лайки/коментарі). Тема прев’ю береться з теми адмінки (світла/темна). YouTube у прев’ю — картка «Дивитись відео на YouTube», як у застосунку, а не iframe редактора.
 
 ### Документи (`/documents`) і проєкти (`/projects`)
 
@@ -123,7 +125,7 @@ src/
   components/
     layout/            # Header, Sidebar, AdminLayout, банер, хлібні крихти
     common/            # PermissionGuard, SecureImage, ErrorBoundary, bulk-дії
-    news|users|…/      # Діалоги конкретного розділу
+    news|users|…/      # Діалоги розділу; у news — TipTap + NewsMobilePreview
   hooks/               # useCan, useIdleTimer
   pages/               # Екрани маршрутів (ліниве завантаження)
   routes/              # ProtectedRoute

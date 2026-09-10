@@ -47,6 +47,10 @@ export const NewsMobilePreview = ({
   const divider = isDark ? '#333333' : 'rgba(15, 23, 42, 0.12)';
   const inputFill = isDark ? 'rgba(44, 44, 44, 0.55)' : 'rgba(226, 232, 240, 0.7)';
   const outline = isDark ? '#A1A1AA' : '#94A3B8';
+  const codeBg = isDark ? '#2C2C2C' : '#E2E8F0';
+  const errorContainer = isDark ? 'rgba(127, 29, 29, 0.4)' : '#FFDAD6';
+  const errorColor = isDark ? '#FCA5A5' : '#BA1A1A';
+  const errorBorder = isDark ? 'rgba(186, 26, 26, 0.3)' : 'rgba(186, 26, 26, 0.3)';
 
   const displayDate = publishedAt
     ? format(new Date(publishedAt), 'dd MMMM yyyy, HH:mm', { locale: uk })
@@ -140,9 +144,9 @@ export const NewsMobilePreview = ({
           <Typography
             sx={{
               flexGrow: 1,
-              fontSize: 22,
+              fontSize: 28,
               fontWeight: 800,
-              letterSpacing: '-0.8px',
+              letterSpacing: '-1px',
               color: onSurface,
               lineHeight: 1.1,
             }}
@@ -179,7 +183,7 @@ export const NewsMobilePreview = ({
 
           <Typography
             sx={{
-              fontSize: 22,
+              fontSize: 24,
               fontWeight: 700,
               lineHeight: 1.3,
               color: onSurface,
@@ -191,11 +195,11 @@ export const NewsMobilePreview = ({
           </Typography>
 
           {coverUrl ? (
-            <Box sx={{ mb: 3, borderRadius: '16px', overflow: 'hidden', height: 180 }}>
+            <Box sx={{ mb: 3, borderRadius: '16px', overflow: 'hidden' }}>
               <SecureImage
                 src={coverUrl}
                 alt="Обкладинка"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                style={{ width: '100%', display: 'block' }}
               />
             </Box>
           ) : null}
@@ -212,12 +216,41 @@ export const NewsMobilePreview = ({
                 '& p': { my: '6px' },
                 '& h2, & h3': { mt: 2, mb: 1, fontWeight: 700, color: onSurface },
                 '& img': { maxWidth: '100%', borderRadius: '12px', my: 2, display: 'block' },
-                '& iframe': { maxWidth: '100%', borderRadius: '12px', my: 1.5 },
+                '& video': { maxWidth: '100%', borderRadius: '12px', my: 2, display: 'block' },
+                '& hr': { my: 2, borderColor: divider },
+                '& pre': {
+                  bgcolor: codeBg,
+                  borderRadius: '12px',
+                  p: 1.5,
+                  my: 1.5,
+                  fontFamily: 'monospace',
+                  fontSize: 14,
+                  overflowX: 'auto',
+                },
+                '& [data-youtube-video]': {
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 1.5,
+                  p: 2.5,
+                  my: 1.5,
+                  borderRadius: '12px',
+                  bgcolor: errorContainer,
+                  border: `1px solid ${errorBorder}`,
+                  '& iframe': { display: 'none' },
+                  '&::after': {
+                    content: '"Дивитись відео на YouTube"',
+                    color: errorColor,
+                    fontWeight: 700,
+                    fontSize: 16,
+                  },
+                },
                 '& blockquote': {
                   borderLeft: `4px solid ${primary}`,
                   pl: 2,
                   my: 1.5,
                   mx: 0,
+                  fontStyle: 'normal',
                 },
                 '& a': { color: primary, textDecoration: 'underline' },
                 '& ul, & ol': { pl: 2.5, my: 1 },
