@@ -1,10 +1,13 @@
-import { Box, Typography, IconButton, Divider } from '@mui/material';
+import { useState } from 'react';
+import { Box, Typography, IconButton, Divider, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { format } from 'date-fns';
 import { uk } from 'date-fns/locale';
 import { useThemeStore } from '../../store/themeStore';
@@ -24,6 +27,21 @@ interface NewsMobilePreviewProps {
   commentsCount?: number;
 }
 
+function previewPalette(isDark: boolean) {
+  return {
+    surface: isDark ? '#121212' : '#F8FAFC',
+    onSurface: isDark ? '#F8FAFC' : '#0F172A',
+    onVariant: isDark ? '#A1A1AA' : '#64748B',
+    primary: isDark ? '#3B82F6' : '#1E40AF',
+    primaryContainer: isDark ? 'rgba(29, 78, 216, 0.3)' : '#DBEAFE',
+    onPrimaryContainer: isDark ? '#DBEAFE' : '#1E3A8A',
+    divider: isDark ? '#333333' : 'rgba(15, 23, 42, 0.12)',
+    inputFill: isDark ? 'rgba(44, 44, 44, 0.55)' : 'rgba(226, 232, 240, 0.7)',
+    outline: isDark ? '#A1A1AA' : '#94A3B8',
+    codeBg: isDark ? '#2C2C2C' : '#E2E8F0',
+  };
+}
+
 export const NewsMobilePreview = ({
   title,
   content,
@@ -35,19 +53,23 @@ export const NewsMobilePreview = ({
   dislikes = 0,
   commentsCount = 0,
 }: NewsMobilePreviewProps) => {
-  const mode = useThemeStore((state) => state.mode);
-  const isDark = mode === 'dark';
-
-  const surface = isDark ? '#121212' : '#F8FAFC';
-  const onSurface = isDark ? '#F8FAFC' : '#0F172A';
-  const onVariant = isDark ? '#A1A1AA' : '#64748B';
-  const primary = isDark ? '#3B82F6' : '#1E40AF';
-  const primaryContainer = isDark ? 'rgba(29, 78, 216, 0.3)' : '#DBEAFE';
-  const onPrimaryContainer = isDark ? '#DBEAFE' : '#1E3A8A';
-  const divider = isDark ? '#333333' : 'rgba(15, 23, 42, 0.12)';
-  const inputFill = isDark ? 'rgba(44, 44, 44, 0.55)' : 'rgba(226, 232, 240, 0.7)';
-  const outline = isDark ? '#A1A1AA' : '#94A3B8';
-  const codeBg = isDark ? '#2C2C2C' : '#E2E8F0';
+  const adminMode = useThemeStore((state) => state.mode);
+  const [previewMode, setPreviewMode] = useState<'light' | 'dark'>('light');
+  const isDark = previewMode === 'dark';
+  const isAdminDark = adminMode === 'dark';
+  const {
+    surface,
+    onSurface,
+    onVariant,
+    primary,
+    primaryContainer,
+    onPrimaryContainer,
+    divider,
+    inputFill,
+    outline,
+    codeBg,
+  } = previewPalette(isDark);
+  const panelMuted = isAdminDark ? '#A1A1AA' : '#64748B';
 
   const displayDate = publishedAt
     ? format(new Date(publishedAt), 'dd MMMM yyyy, HH:mm', { locale: uk })
@@ -55,20 +77,44 @@ export const NewsMobilePreview = ({
 
   return (
     <Box
+      data-testid="news-mobile-preview"
       sx={{
         width: { xs: '100%', lg: '35%' },
-        bgcolor: isDark ? '#0B1220' : '#E2E8F0',
+        height: { lg: '100%' },
+        minHeight: 0,
+        bgcolor: isAdminDark ? '#0B1220' : '#E2E8F0',
         p: 3,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        overflowY: 'auto',
+        overflow: 'hidden',
         gap: 2,
       }}
     >
-      <Typography variant="caption" sx={{ fontWeight: 700, letterSpacing: 0.4, color: onVariant, textTransform: 'uppercase' }}>
+      <Typography variant="caption" sx={{ fontWeight: 700, letterSpacing: 0.4, color: panelMuted, textTransform: 'uppercase', flexShrink: 0 }}>
         Прев’ю екрана в застосунку
       </Typography>
+
+      <ToggleButtonGroup
+        exclusive
+        size="small"
+        value={previewMode}
+        onChange={(_, value: 'light' | 'dark' | null) => {
+          if (value) setPreviewMode(value);
+        }}
+        aria-label="Тема прев’ю застосунку"
+        data-testid="news-preview-theme-toggle"
+        sx={{ flexShrink: 0 }}
+      >
+        <ToggleButton value="light" aria-label="Світла тема прев’ю">
+          <LightModeIcon fontSize="small" sx={{ mr: 0.75 }} />
+          Світла
+        </ToggleButton>
+        <ToggleButton value="dark" aria-label="Темна тема прев’ю">
+          <DarkModeIcon fontSize="small" sx={{ mr: 0.75 }} />
+          Темна
+        </ToggleButton>
+      </ToggleButtonGroup>
 
       {(status === 'DRAFT' || status === 'SCHEDULED') && (
         <Typography variant="caption" sx={{ color: status === 'DRAFT' ? 'warning.main' : 'info.main', fontWeight: 600 }}>
@@ -77,9 +123,11 @@ export const NewsMobilePreview = ({
       )}
 
       <Box
+        data-testid="news-preview-phone"
         sx={{
           width: 360,
           height: 740,
+          maxHeight: '100%',
           bgcolor: '#0F172A',
           borderRadius: '40px',
           border: '10px solid #0F172A',
@@ -88,7 +136,8 @@ export const NewsMobilePreview = ({
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-          flexShrink: 0,
+          flex: '0 1 auto',
+          minHeight: 0,
         }}
       >
         <Box
@@ -116,6 +165,7 @@ export const NewsMobilePreview = ({
             alignItems: 'center',
             bgcolor: surface,
             color: onSurface,
+            flexShrink: 0,
           }}
         >
           <Typography sx={{ fontSize: 12, fontWeight: 700 }}>{format(new Date(), 'HH:mm')}</Typography>
@@ -133,6 +183,7 @@ export const NewsMobilePreview = ({
             py: 0.5,
             bgcolor: surface,
             minHeight: 52,
+            flexShrink: 0,
           }}
         >
           <IconButton size="small" disabled sx={{ color: `${onSurface} !important` }}>
@@ -155,7 +206,21 @@ export const NewsMobilePreview = ({
           </IconButton>
         </Box>
 
-        <Box sx={{ flexGrow: 1, overflowY: 'auto', bgcolor: surface, px: 2, py: 2, pointerEvents: 'none' }}>
+        <Box
+          data-testid="news-preview-scroll"
+          data-preview-mode={previewMode}
+          sx={{
+            flex: '1 1 0',
+            minHeight: 0,
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            bgcolor: surface,
+            px: 2,
+            py: 2,
+            overscrollBehavior: 'contain',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, mb: 2 }}>
             {categoryName ? (
               <Box
@@ -225,7 +290,6 @@ export const NewsMobilePreview = ({
                   overflowX: 'auto',
                 },
                 '& [data-youtube-video]': {
-                  pointerEvents: 'auto',
                   position: 'relative',
                   width: '100%',
                   aspectRatio: '16 / 9',
@@ -295,6 +359,7 @@ export const NewsMobilePreview = ({
             display: 'flex',
             alignItems: 'center',
             gap: 1.5,
+            flexShrink: 0,
           }}
         >
           <Box

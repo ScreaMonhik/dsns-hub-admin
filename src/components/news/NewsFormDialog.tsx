@@ -133,11 +133,11 @@ export const NewsFormDialog = ({ open, news, categories, onClose, onSuccess, onR
         {news ? 'Редагувати новину' : 'Створити новину'}
       </DialogTitle>
       <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <DialogContent sx={{ p: 0, overflow: 'hidden' }}>
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, height: '80vh' }}>
+        <DialogContent sx={{ p: 0, overflow: 'hidden', minHeight: 0 }}>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, height: '80vh', minHeight: 0 }}>
             
             {/* ЛІВА ПАНЕЛЬ: Форма */}
-            <Box sx={{ width: { xs: '100%', lg: '65%' }, p: 3, overflowY: 'auto', borderRight: { lg: 1 }, borderColor: 'divider', display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Box sx={{ width: { xs: '100%', lg: '65%' }, p: 3, overflowY: 'auto', minHeight: 0, borderRight: { lg: 1 }, borderColor: 'divider', display: 'flex', flexDirection: 'column', gap: 3 }}>
               {apiError && <Alert severity="error">{apiError}</Alert>}
               
               <Controller name="title" control={control} render={({ field }) => (
