@@ -28,6 +28,7 @@ describe('apiClient Axios Interceptors', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    sessionStorage.clear();
     mockLocation('');
   });
 
@@ -35,31 +36,20 @@ describe('apiClient Axios Interceptors', () => {
     (window as unknown as { location: Location }).location = originalLocation;
   });
 
-  it('should attach Authorization header if jwt_token exists in localStorage', async () => {
-    localStorage.setItem('jwt_token', 'test_token_123');
-
-    const requestInterceptor = (apiClient.interceptors.request as any).handlers[0].fulfilled;
-
-    const config = { headers: {}, url: '/users' };
-    const result = await requestInterceptor(config);
-
-    expect(result.headers.Authorization).toBe('Bearer test_token_123');
-  });
-
-  it('should not attach Authorization header if jwt_token is missing', async () => {
+  it('sends requests with credentials and does not attach a JS-readable Bearer token', async () => {
     const requestInterceptor = (apiClient.interceptors.request as any).handlers[0].fulfilled;
 
     const config = { headers: {}, url: '/users' };
     const result = await requestInterceptor(config);
 
     expect(result.headers.Authorization).toBeUndefined();
+    expect(apiClient.defaults.withCredentials).toBe(true);
   });
 
   it('should not attach Authorization header for requests to a foreign origin', async () => {
-    localStorage.setItem('jwt_token', 'test_token_123');
     const requestInterceptor = (apiClient.interceptors.request as any).handlers[0].fulfilled;
 
-    const config = { headers: {}, url: 'https://evil.example/steal' };
+    const config = { headers: { Authorization: 'Bearer leftover' }, url: 'https://evil.example/steal' };
     const result = await requestInterceptor(config);
 
     expect(result.headers.Authorization).toBeUndefined();
@@ -77,12 +67,11 @@ describe('apiClient Axios Interceptors', () => {
     expect(toast.error).toHaveBeenCalledWith('Забагато запитів. Зачекайте хвилину.');
   });
 
-  it('should redirect to /login and clear storage on 401 without refresh token', async () => {
+  it('should redirect to /login and clear storage on 401 without a session flag', async () => {
     const locationMock = mockLocation('/users');
     const responseInterceptorError = (apiClient.interceptors.response as any).handlers[0].rejected;
 
-    localStorage.setItem('jwt_token', 'expired_token');
-    localStorage.setItem('auth_storage', '{"user":{}}');
+    sessionStorage.setItem('auth_storage', '{"user":{}}');
     
     const mockError = {
       response: { status: 401 },
@@ -91,10 +80,23 @@ describe('apiClient Axios Interceptors', () => {
 
     await expect(responseInterceptorError(mockError)).rejects.toEqual(mockError);
 
-    expect(localStorage.getItem('jwt_token')).toBeNull();
-    expect(localStorage.getItem('refresh_token')).toBeNull();
-    expect(localStorage.getItem('auth_storage')).toBeNull();
+    expect(sessionStorage.getItem('dsns_session')).toBeNull();
+    expect(sessionStorage.getItem('auth_storage')).toBeNull();
     expect(locationMock.replace).toHaveBeenCalledWith('/login');
+  });
+
+  it('redirects to /profile on FORCE_PASSWORD_CHANGE', async () => {
+    const locationMock = mockLocation('/users');
+    const responseInterceptorError = (apiClient.interceptors.response as any).handlers[0].rejected;
+
+    const mockError = {
+      response: { status: 403, data: { code: 'FORCE_PASSWORD_CHANGE' } },
+      config: { url: '/users' },
+    };
+
+    await expect(responseInterceptorError(mockError)).rejects.toEqual(mockError);
+    expect(toast.error).toHaveBeenCalledWith('Необхідно змінити тимчасовий пароль.');
+    expect(locationMock.replace).toHaveBeenCalledWith('/profile');
   });
 
   it('should not try to refresh tokens on failed login 401', async () => {

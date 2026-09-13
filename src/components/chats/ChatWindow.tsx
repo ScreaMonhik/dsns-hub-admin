@@ -8,6 +8,7 @@ import SendIcon from '@mui/icons-material/Send';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import PeopleIcon from '@mui/icons-material/People';
 import { chatsApi, type ChatGroup, type ChatMessage } from '../../api/chatsApi';
+import { hasAccessToken } from '../../utils/authStorage';
 import { useAuthStore } from '../../store/authStore';
 import { SecureImage } from '../common/SecureImage';
 import { ManageMembersDialog } from './ManageMembersDialog';
@@ -62,13 +63,12 @@ export const ChatWindow = ({ chat, onChatUpdate }: Props) => {
 
     initChat();
 
-    const token = localStorage.getItem('jwt_token');
     const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
     
     socketRef.current = io(`${baseUrl}/chat`, {
-      auth: { token },
+      withCredentials: true,
       transports: ['websocket'],
-      autoConnect: Boolean(token),
+      autoConnect: hasAccessToken(),
     });
 
     socketRef.current.on('connect', () => {

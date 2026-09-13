@@ -25,9 +25,24 @@ const previewCsp = [
   "frame-ancestors 'none'",
 ].join('; ')
 
+function cspPlugin() {
+  return {
+    name: 'dsns-csp-meta',
+    transformIndexHtml(html: string) {
+      if (html.includes('Content-Security-Policy')) {
+        return html;
+      }
+      return html.replace(
+        '<head>',
+        `<head>\n    <meta http-equiv="Content-Security-Policy" content="${previewCsp}" />`,
+      );
+    },
+  };
+}
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), cspPlugin()],
   server: {
     headers: securityHeaders,
   },

@@ -12,37 +12,38 @@ describe('authStore', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    sessionStorage.clear();
     // Reset Zustand store state before each test
     useAuthStore.setState({ user: null, isAuthenticated: false });
   });
 
-  it('should authenticate user and save tokens to localStorage on setAuth', () => {
+  it('should authenticate user and mark a cookie session on setAuth', () => {
     const mockUser = { 
       id: '1', email: 'test@dsns.gov.ua', firstName: 'Ivan', lastName: 'Franko', 
       role: 'ADMIN', isActive: true, avatarUrl: null, createdAt: '2023-01-01' 
     } as any;
     
-    useAuthStore.getState().setAuth(mockUser, 'access_123', 'refresh_123');
+    useAuthStore.getState().setAuth(mockUser);
 
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
     expect(useAuthStore.getState().user).toEqual(mockUser);
-    expect(localStorage.getItem('jwt_token')).toBe('access_123');
-    expect(localStorage.getItem('refresh_token')).toBe('refresh_123');
+    expect(sessionStorage.getItem('dsns_session')).toBe('1');
+    expect(sessionStorage.getItem('jwt_token')).toBeNull();
+    expect(localStorage.getItem('jwt_token')).toBeNull();
+    expect(localStorage.getItem('auth_storage')).toBeNull();
   });
 
   it('should clear state, clear localStorage, and call API on logout', async () => {
     // Setup initial authenticated state
     useAuthStore.setState({ isAuthenticated: true, user: { id: '1' } as any });
-    localStorage.setItem('jwt_token', 'access_123');
-    localStorage.setItem('refresh_token', 'refresh_123');
+    sessionStorage.setItem('dsns_session', '1');
 
     await useAuthStore.getState().logout();
 
     expect(apiClient.post).toHaveBeenCalledWith('/auth/logout');
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
     expect(useAuthStore.getState().user).toBeNull();
-    expect(localStorage.getItem('jwt_token')).toBeNull();
-    expect(localStorage.getItem('refresh_token')).toBeNull();
+    expect(sessionStorage.getItem('dsns_session')).toBeNull();
   });
 
   it('should partially update current user data without affecting other fields', () => {

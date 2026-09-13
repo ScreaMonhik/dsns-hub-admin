@@ -5,7 +5,8 @@ import { z } from 'zod';
 import { 
   Box, Typography, Paper, Tabs, Tab, Button, TextField, 
   Avatar, CircularProgress, Grid, Divider, Table, TableBody, 
-  TableCell, TableContainer, TableHead, TableRow, Pagination, Chip, IconButton, InputAdornment
+  TableCell, TableContainer, TableHead, TableRow, Pagination, Chip, IconButton, InputAdornment,
+  Alert
 } from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import PersonIcon from '@mui/icons-material/Person';
@@ -100,6 +101,7 @@ export const Profile = () => {
         oldPassword: data.oldPassword, 
         newPassword: data.newPassword 
       });
+      updateCurrentUser({ forcePasswordChange: false });
       toast.success('Пароль успішно змінено');
       reset();
     } catch (error: any) {
@@ -127,11 +129,24 @@ export const Profile = () => {
     }
   }, [tabValue, fetchLogs]);
 
+  useEffect(() => {
+    if (user?.forcePasswordChange) {
+      setTabValue(1);
+    }
+  }, [user?.forcePasswordChange]);
+
   if (!user) return null;
+
+  const mustChangePassword = Boolean(user.forcePasswordChange);
 
   return (
     <Box sx={{ maxWidth: 900, mx: 'auto' }}>
       <Typography variant="h4" sx={{ mb: 3 }}>Особистий кабінет</Typography>
+      {mustChangePassword && (
+        <Alert severity="warning" sx={{ mb: 3 }}>
+          Необхідно змінити тимчасовий пароль. Інші розділи будуть доступні після оновлення.
+        </Alert>
+      )}
       
       <Paper sx={{ width: '100%', display: 'flex', flexDirection: 'column', minHeight: 500 }}>
         <Tabs 
@@ -139,10 +154,10 @@ export const Profile = () => {
           onChange={(_, newValue) => setTabValue(newValue)} 
           sx={{ borderBottom: 1, borderColor: 'divider', px: 2, pt: 2 }}
         >
-          <Tab icon={<PersonIcon />} iconPosition="start" label="Профіль" />
+          <Tab icon={<PersonIcon />} iconPosition="start" label="Профіль" disabled={mustChangePassword} />
           <Tab icon={<SecurityIcon />} iconPosition="start" label="Безпека" />
-          <Tab icon={<HistoryIcon />} iconPosition="start" label="Моя активність" />
-          <Tab icon={<DevicesIcon />} iconPosition="start" label="Активні сесії" />
+          <Tab icon={<HistoryIcon />} iconPosition="start" label="Моя активність" disabled={mustChangePassword} />
+          <Tab icon={<DevicesIcon />} iconPosition="start" label="Активні сесії" disabled={mustChangePassword} />
         </Tabs>
 
         {/* 1. Вкладка "Профіль" */}

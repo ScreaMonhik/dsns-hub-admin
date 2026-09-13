@@ -1,26 +1,27 @@
-const ACCESS_TOKEN_KEY = 'jwt_token';
-const REFRESH_TOKEN_KEY = 'refresh_token';
+const SESSION_FLAG_KEY = 'dsns_session';
 const AUTH_PERSIST_KEY = 'auth_storage';
+const LEGACY_ACCESS_KEY = 'jwt_token';
+const LEGACY_REFRESH_KEY = 'refresh_token';
 
-export function getAccessToken(): string | null {
-  return localStorage.getItem(ACCESS_TOKEN_KEY);
+function authStore(): Storage {
+  return sessionStorage;
 }
 
-export function getRefreshToken(): string | null {
-  return localStorage.getItem(REFRESH_TOKEN_KEY);
-}
-
-export function setAuthTokens(accessToken: string, refreshToken: string): void {
-  localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-}
-
-export function clearAuthStorage(): void {
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
-  localStorage.removeItem(AUTH_PERSIST_KEY);
+export function markSession(): void {
+  authStore().setItem(SESSION_FLAG_KEY, '1');
 }
 
 export function hasAccessToken(): boolean {
-  return Boolean(getAccessToken());
+  return authStore().getItem(SESSION_FLAG_KEY) === '1';
+}
+
+export function clearAuthStorage(): void {
+  authStore().removeItem(SESSION_FLAG_KEY);
+  authStore().removeItem(AUTH_PERSIST_KEY);
+  authStore().removeItem(LEGACY_ACCESS_KEY);
+  authStore().removeItem(LEGACY_REFRESH_KEY);
+  localStorage.removeItem(SESSION_FLAG_KEY);
+  localStorage.removeItem(AUTH_PERSIST_KEY);
+  localStorage.removeItem(LEGACY_ACCESS_KEY);
+  localStorage.removeItem(LEGACY_REFRESH_KEY);
 }

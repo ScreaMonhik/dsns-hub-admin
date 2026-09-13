@@ -1,10 +1,11 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import toast from 'react-hot-toast';
-import { clearAuthStorage, getAccessToken, getRefreshToken, setAuthTokens } from '../utils/authStorage';
+import { clearAuthStorage, hasAccessToken } from '../utils/authStorage';
 import { getApiBaseUrl, getApiOrigin } from '../utils/url';
 
 export const apiClient = axios.create({
   baseURL: getApiBaseUrl(),
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -44,11 +45,8 @@ function redirectToLogin() {
 
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    if (isInternalApiRequest(config)) {
-      const token = getAccessToken();
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+    if (!isInternalApiRequest(config) && config.headers) {
+      delete config.headers.Authorization;
     }
     return config;
   },
@@ -58,10 +56,10 @@ apiClient.interceptors.request.use(
 let isRefreshing = false;
 let failedQueue: Array<{ resolve: (value?: unknown) => void; reject: (reason?: unknown) => void }> = [];
 
-const processQueue = (error: unknown, token: string | null = null) => {
+const processQueue = (error: unknown) => {
   failedQueue.forEach((prom) => {
     if (error) prom.reject(error);
-    else prom.resolve(token);
+    else prom.resolve();
   });
   failedQueue = [];
 };
@@ -76,41 +74,41 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    const errorCode = (error.response?.data as { code?: string } | undefined)?.code;
+    if (error.response?.status === 403 && errorCode === 'FORCE_PASSWORD_CHANGE') {
+      toast.error('Необхідно змінити тимчасовий пароль.');
+      if (!window.location.pathname?.startsWith('/profile')) {
+        window.location.replace('/profile');
+      }
+      return Promise.reject(error);
+    }
+
     if (
       error.response?.status === 401 &&
       originalRequest &&
       !originalRequest._retry &&
       !isAuthEndpointWithoutRefresh(originalRequest)
     ) {
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return apiClient(originalRequest);
-        }).catch((err) => Promise.reject(err));
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-      const refreshToken = getRefreshToken();
-
-      if (!refreshToken) {
+      if (!hasAccessToken()) {
         redirectToLogin();
         return Promise.reject(error);
       }
 
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(() => apiClient(originalRequest)).catch((err) => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
       try {
-        const response = await axios.post(`${apiClient.defaults.baseURL}/auth/refresh`, { refreshToken });
-        const { accessToken, refreshToken: newRefreshToken } = response.data;
-
-        setAuthTokens(accessToken, newRefreshToken);
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-
-        processQueue(null, accessToken);
+        await axios.post(`${apiClient.defaults.baseURL}/auth/refresh`, {}, { withCredentials: true });
+        processQueue(null);
         return apiClient(originalRequest);
       } catch (err) {
-        processQueue(err, null);
+        processQueue(err);
         redirectToLogin();
         return Promise.reject(err);
       } finally {

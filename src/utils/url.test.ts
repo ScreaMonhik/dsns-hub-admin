@@ -29,4 +29,16 @@ describe('url security helpers', () => {
     expect(isSafeYoutubeUrl('https://www.youtube.com/watch?v=abc')).toBe(true);
     expect(isSafeYoutubeUrl('https://evil.com/youtube')).toBe(false);
   });
+
+  it('rejects SSRF and open-redirect style API URLs', () => {
+    expect(isInternalApiUrl('http://127.0.0.1:3000/users')).toBe(false);
+    expect(isInternalApiUrl('http://169.254.169.254/latest/meta-data/')).toBe(false);
+    expect(isInternalApiUrl('file:///etc/passwd')).toBe(false);
+    expect(isInternalApiUrl('/uploads/../../etc/passwd')).toBe(false);
+    expect(isInternalApiUrl('https://localhost:3000/users@evil.example')).toBe(false);
+    expect(isSafeHttpUrl('data:text/html,<script>alert(1)</script>')).toBe(false);
+    expect(isSafeYoutubeUrl('https://youtube.com.evil.example/watch?v=abc')).toBe(false);
+    expect(isSafeYoutubeUrl('https://evil.example/?u=youtube.com')).toBe(false);
+  });
 });
+

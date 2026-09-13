@@ -49,4 +49,18 @@ describe('useCan hook', () => {
     expect(result.current.can(['ADMIN', 'SUPER_ADMIN'])).toBe(true);
     expect(result.current.can(['USER', 'SUPER_ADMIN'])).toBe(false);
   });
+
+  it('does not elevate a USER to admin surfaces', () => {
+    vi.mocked(useAuthStore).mockImplementation((selector: any) =>
+      selector({ user: { role: 'USER' } }),
+    );
+
+    const { result } = renderHook(() => useCan());
+
+    expect(result.current.can('USER')).toBe(true);
+    expect(result.current.can('ADMIN')).toBe(false);
+    expect(result.current.can('SUPER_ADMIN')).toBe(false);
+    expect(result.current.isAdmin).toBe(false);
+    expect(result.current.isAtLeastAdmin).toBe(false);
+  });
 });

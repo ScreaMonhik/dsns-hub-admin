@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import { apiClient } from '../api/apiClient';
-import { clearAuthStorage, setAuthTokens } from '../utils/authStorage';
+import { clearAuthStorage, markSession } from '../utils/authStorage';
 
 export interface User {
   id: string;
@@ -12,6 +12,7 @@ export interface User {
   isActive: boolean;
   avatarUrl: string | null;
   createdAt: string;
+  forcePasswordChange?: boolean;
   departmentId?: string | null;
   department?: { id: string; name: string } | null;
 }
@@ -19,7 +20,7 @@ export interface User {
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
-  setAuth: (user: User, accessToken: string, refreshToken: string) => void;
+  setAuth: (user: User) => void;
   logout: () => Promise<void>;
   updateCurrentUser: (data: Partial<User>) => void;
 }
@@ -29,8 +30,8 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       isAuthenticated: false,
-      setAuth: (user, accessToken, refreshToken) => {
-        setAuthTokens(accessToken, refreshToken);
+      setAuth: (user) => {
+        markSession();
         set({ user, isAuthenticated: true });
       },
       logout: async () => {
@@ -49,15 +50,15 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth_storage',
+      storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({ user: state.user }),
       onRehydrateStorage: () => (state) => {
         if (!state) return;
-        const hasToken = Boolean(localStorage.getItem('jwt_token'));
-        if (!hasToken || !state.user) {
-          state.user = null;
+        if (!state.user) {
           state.isAuthenticated = false;
           return;
         }
+        markSession();
         state.isAuthenticated = true;
       },
     }

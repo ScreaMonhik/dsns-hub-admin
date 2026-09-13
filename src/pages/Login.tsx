@@ -8,7 +8,6 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useAuthStore, type User } from '../store/authStore';
 import { apiClient } from '../api/apiClient';
-import axios from 'axios';
 import { hasAccessToken } from '../utils/authStorage';
 
 const loginSchema = z.object({
@@ -28,6 +27,7 @@ export const Login = () => {
   const navigate = useNavigate();
   const setAuth = useAuthStore((state) => state.setAuth);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const currentUser = useAuthStore((state) => state.user);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -44,15 +44,11 @@ export const Login = () => {
       setErrorMsg(null);
       const response = await apiClient.post<LoginResponse>('/auth/login', data);
       
-      const { accessToken, refreshToken, user } = response.data;
+      const { user } = response.data;
       
       if (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN') {
         try {
-          await axios.post(
-            `${apiClient.defaults.baseURL}/auth/logout`,
-            {},
-            { headers: { Authorization: `Bearer ${accessToken}` } }
-          );
+          await apiClient.post('/auth/logout');
         } catch {
           // Session may already be invalid; continue with the access-denied message.
         }
@@ -60,8 +56,8 @@ export const Login = () => {
         return;
       }
 
-      setAuth(user, accessToken, refreshToken);
-      navigate('/', { replace: true });
+      setAuth(user);
+      navigate(user.forcePasswordChange ? '/profile' : '/', { replace: true });
     } catch (error: unknown) {
       const err = error as { response?: { status?: number } };
       if (err.response?.status === 403) {
@@ -73,7 +69,7 @@ export const Login = () => {
   };
 
   if (isAuthenticated && hasAccessToken()) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={currentUser?.forcePasswordChange ? '/profile' : '/'} replace />;
   }
 
   return (

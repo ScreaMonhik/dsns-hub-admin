@@ -12,6 +12,7 @@ import CampaignIcon from '@mui/icons-material/Campaign';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import { useCan } from '../../hooks/useCan';
+import { useAuthStore } from '../../store/authStore';
 
 const DRAWER_WIDTH = 240;
 
@@ -19,6 +20,7 @@ export const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isSuperAdmin } = useCan();
+  const mustChangePassword = Boolean(useAuthStore((state) => state.user?.forcePasswordChange));
 
   const menuItems = [
     { text: 'Головна', path: '/', icon: <DashboardIcon /> },
@@ -57,6 +59,7 @@ export const Sidebar = () => {
               <ListItem key={item.text} disablePadding>
                 <ListItemButton
                   selected={isSelected}
+                  disabled={mustChangePassword && item.path !== '/profile'}
                   onClick={() => navigate(item.path)}
                 >
                   <ListItemIcon>{item.icon}</ListItemIcon>

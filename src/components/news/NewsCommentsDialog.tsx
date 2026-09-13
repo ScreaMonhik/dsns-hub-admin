@@ -7,6 +7,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import { format } from 'date-fns';
 import { newsApi, type News, type NewsComment } from '../../api/newsApi';
+import { SecureImage } from '../common/SecureImage';
 
 interface NewsCommentsDialogProps {
   open: boolean;
@@ -89,9 +90,17 @@ export const NewsCommentsDialog = ({ open, news, onClose, onRefreshNews }: NewsC
                   }
                 >
                   <ListItemAvatar>
-                    <Avatar src={comment.author.avatarUrl || undefined} alt={comment.author.firstName}>
-                      {comment.author.firstName.charAt(0)}
-                    </Avatar>
+                    {comment.author.avatarUrl ? (
+                      <SecureImage
+                        src={comment.author.avatarUrl}
+                        alt={comment.author.firstName}
+                        style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <Avatar alt={comment.author.firstName}>
+                        {comment.author.firstName.charAt(0)}
+                      </Avatar>
+                    )}
                   </ListItemAvatar>
                   <ListItemText
                     primary={
